@@ -1,6 +1,9 @@
+import 'package:agave/screens/parcels_screen.dart';
 import 'package:flutter/material.dart';
 
 class Navigation extends StatefulWidget {
+  const Navigation({super.key});
+
   @override
   _NavigationState createState() => _NavigationState();
 }
@@ -8,9 +11,9 @@ class Navigation extends StatefulWidget {
 class _NavigationState extends State<Navigation> {
   int _currentIndex = 0;
   final List<Widget> _children = [
-    Center(child: Text('Inicio')),
-    Center(child: Text('Parcelas')),
-    Center(child: Text('Acerca de')),
+    const Center(child: Text('Inicio')),
+    const ParcelasScreen(),
+    const Center(child: Text('Acerca de')),
   ];
 
   void onTabTapped(int index) {
@@ -22,22 +25,18 @@ class _NavigationState extends State<Navigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Inicio'),
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
       body: _children[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTabTapped,
         currentIndex: _currentIndex,
         selectedItemColor: Theme.of(context).primaryColor,
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Inicio',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list),
+            icon: Icon(Icons.landscape),
             label: 'Parcelas',
           ),
           BottomNavigationBarItem(
