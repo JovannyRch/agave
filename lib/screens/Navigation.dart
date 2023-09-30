@@ -1,3 +1,5 @@
+import 'package:agave/screens/configuraciones_screen.dart';
+import 'package:agave/screens/inicio_screen.dart';
 import 'package:agave/screens/parcels_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -11,9 +13,9 @@ class Navigation extends StatefulWidget {
 class _NavigationState extends State<Navigation> {
   int _currentIndex = 0;
   final List<Widget> _children = [
-    const Center(child: Text('Inicio')),
+    const HomeScreen(),
     const ParcelasScreen(),
-    const Center(child: Text('Acerca de')),
+    const ConfiguracionScreen(),
   ];
 
   void onTabTapped(int index) {

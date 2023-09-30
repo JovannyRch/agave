@@ -48,7 +48,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
 
   Widget _obervacionesInput() {
     return TextFormField(
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         labelText: 'Observaciones',
         hintText: 'Ingresa cualquier detalle o nota adicional sobre la parcela',
       ),
