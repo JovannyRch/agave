@@ -27,7 +27,7 @@ class ParcelasScreen extends StatelessWidget {
         backgroundColor: Theme.of(context).primaryColor,
         actions: [
           IconButton(
-            icon: Icon(Icons.delete),
+            icon: const Icon(Icons.delete),
             onPressed: () {
               _showDeleteConfirmationDialog(context);
             },
@@ -70,18 +70,18 @@ class ParcelasScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Eliminar todas las parcelas'),
-          content: Text(
+          title: const Text('Eliminar todas las parcelas'),
+          content: const Text(
               '¿Estás seguro de que quieres eliminar todas las parcelas registradas? Esta acción no se puede deshacer.'),
           actions: [
             TextButton(
-              child: Text('Cancelar'),
+              child: const Text('Cancelar'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Eliminar', style: TextStyle(color: Colors.red)),
+              child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
               onPressed: () {
                 ParcelasProvider.db.deleteAll(DB.parcels);
                 Navigator.of(context).pop();
