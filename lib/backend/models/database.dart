@@ -2,6 +2,7 @@ const String kDBname = "agave_database";
 
 class DB {
   static const String parcels = 'parcels';
+  static const String studies = 'studies';
 }
 
 List<String> plages = [
@@ -22,6 +23,18 @@ const parcelsTable = """
     fechaUltimoMuestreo TEXT,       -- Fecha de último muestreo
     rutaImagen TEXT                 -- Ruta de la imagen de la parcela
   );
+""";
+
+const studiesTable = """
+  CREATE TABLE ${DB.studies} (
+    idEstudio INTEGER PRIMARY KEY AUTOINCREMENT,
+    idParcela INTEGER,
+    fechaEstudio TEXT NOT NULL,
+    observaciones TEXT,
+    FOREIGN KEY (idParcela) REFERENCES Parcelas(idParcela)
+);
+
+
 """;
 
 final List<String> kTables = [

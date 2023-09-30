@@ -194,6 +194,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
             const SnackBar(content: Text('Parcela guardada con éxito!')),
           );
 
+          // Pop the screen
           Navigator.pop(context);
         }
       },

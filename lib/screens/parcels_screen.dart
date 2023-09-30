@@ -1,6 +1,7 @@
 import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
+import 'package:agave/screens/parcelas_details_screen.dart';
 import 'package:agave/screens/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -54,7 +55,15 @@ class ParcelasScreen extends StatelessWidget {
                   subtitle:
                       Text('Tipo de Agave: ${snapshot.data?[index].tipoAgave}'),
                   onTap: () {
-                    // Acciones al tocar una parcela, por ejemplo, navegar a detalles
+                    Parcela parcela = snapshot.data?[index] ?? Parcela();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DetallesParcela(
+                          parcela: parcela,
+                        ),
+                      ),
+                    );
                   },
                 );
               },
@@ -81,7 +90,8 @@ class ParcelasScreen extends StatelessWidget {
               },
             ),
             TextButton(
-              child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+              child:
+                  const Text('Eliminar', style: TextStyle(color: Colors.red)),
               onPressed: () {
                 ParcelasProvider.db.deleteAll(DB.parcels);
                 Navigator.of(context).pop();

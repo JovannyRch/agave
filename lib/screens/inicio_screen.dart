@@ -1,9 +1,10 @@
-import 'package:agave/backend/widgets/graficos_estadisticas.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final TextEditingController _searchController = TextEditingController();
+
+  HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,26 +17,19 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: ListView(
           children: [
+            /*  _accesoDirectoWidget(context), */
+            _busquedaRapidaWidget(),
             _estadoDelCultivoWidget(),
             const SizedBox(height: 10), // Espaciado entre widgets
             _ultimaPlagaDetectadaWidget(),
             const SizedBox(height: 10),
             _actividadRecienteWidget(),
             const SizedBox(height: 20),
-            SizedBox(
-              height: 200.0,
-              child: _distribucionPlagasWidget(),
-            ),
+            _distribucionPlagasWidget(),
             const SizedBox(height: 20),
-            SizedBox(
-              height: 200.0,
-              child: _evolucionCultivoWidget(),
-            ),
+            _evolucionCultivoWidget(),
             const SizedBox(height: 20),
-            SizedBox(
-              height: 200.0,
-              child: _incidenciasParcelaWidget(),
-            ),
+            _incidenciasParcelaWidget(),
           ],
         ),
       ),
@@ -94,27 +88,50 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _distribucionPlagasWidget() {
-    return PieChart(
-      PieChartData(
-        sections: [
-          // Aquí puedes agregar las diferentes secciones del gráfico de pastel
-          // Por ejemplo:
-          PieChartSectionData(value: 40, color: Colors.red, title: 'Pulgon'),
-          PieChartSectionData(value: 30, color: Colors.blue, title: 'Trips'),
-          PieChartSectionData(
-              value: 20, color: Colors.green, title: 'Escarabajo'),
-          // ... Agrega más plagas según tus datos
-        ],
+  Widget _chartCard(String title, Widget content) {
+    return Card(
+      elevation: 4.0,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            ListTile(
+              title: Text(title),
+            ),
+            const Divider(), // Línea separadora
+            SizedBox(
+              height: 200.0,
+              child: content,
+            )
+          ],
+        ),
       ),
     );
   }
 
+  Widget _distribucionPlagasWidget() {
+    Widget content = PieChart(
+      PieChartData(
+        sections: [
+          // Aquí puedes agregar las diferentes secciones del gráfico de pastel
+          // Por ejemplo:
+          PieChartSectionData(
+              value: 40, color: Colors.red, title: 'Pulgon (40)'),
+          PieChartSectionData(
+              value: 30, color: Colors.blue, title: 'Trips (30)'),
+          PieChartSectionData(
+              value: 20, color: Colors.green, title: 'Escarabajo (20)'),
+        ],
+      ),
+    );
+    return _chartCard('Distribución de plagas', content);
+  }
+
   Widget _evolucionCultivoWidget() {
-    return LineChart(
+    Widget content = LineChart(
       LineChartData(
-        gridData: FlGridData(show: false),
-        titlesData: FlTitlesData(show: false),
+        gridData: const FlGridData(show: false),
+        titlesData: const FlTitlesData(show: false),
         borderData: FlBorderData(
             show: true,
             border: Border.all(color: const Color(0xff37434d), width: 1)),
@@ -127,10 +144,10 @@ class HomeScreen extends StatelessWidget {
             spots: [
               // Aquí puedes agregar los datos de la evolución
               // Por ejemplo:
-              FlSpot(0, 3),
-              FlSpot(1, 1),
-              FlSpot(2, 4),
-              FlSpot(3, 2),
+              const FlSpot(0, 3),
+              const FlSpot(1, 1),
+              const FlSpot(2, 4),
+              const FlSpot(3, 2),
               // ... Agrega más puntos según tus datos
             ],
             isCurved: true,
@@ -149,27 +166,26 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
     );
+    return _chartCard("Evolución de cultivos", content);
   }
 
   Widget _incidenciasParcelaWidget() {
-    return BarChart(
+    Widget content = BarChart(
       BarChartData(
         alignment: BarChartAlignment.spaceAround,
         maxY: 20, // Ajusta según tu máximo de incidencias
         barTouchData: BarTouchData(enabled: false),
-        titlesData: FlTitlesData(show: false),
+        titlesData: const FlTitlesData(show: false),
         borderData: FlBorderData(
             show: true,
             border: Border.all(color: const Color(0xff37434d), width: 1)),
         barGroups: [
-          // Aquí puedes agregar los datos de incidencias por parcela
-          // Por ejemplo:
           BarChartGroupData(x: 0, barRods: [
             BarChartRodData(
               toY: 8,
               gradient: LinearGradient(
                 colors: [Colors.blue, Colors.blue.withOpacity(0.3)],
-                stops: [0.0, 0.5],
+                stops: const [0.0, 0.5],
               ),
             ) // Parcela A
           ]),
@@ -180,7 +196,7 @@ class HomeScreen extends StatelessWidget {
                 toY: 12,
                 gradient: LinearGradient(
                   colors: [Colors.blue, Colors.blue.withOpacity(0.3)],
-                  stops: [0.0, 0.5],
+                  stops: const [0.0, 0.5],
                 ),
               ) // Parcela B
             ],
@@ -188,5 +204,74 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
     );
+    return _chartCard("Incidencias por parcela", content);
+  }
+
+  Widget _busquedaRapidaWidget() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: TextField(
+        controller: _searchController,
+        decoration: const InputDecoration(
+          labelText: "Búsqueda rápida",
+          hintText: "Buscar parcela, plaga, etc.",
+          prefixIcon: Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(25.0)),
+          ),
+        ),
+        onChanged: (value) {
+          // Aquí puedes implementar la lógica de búsqueda
+          // Por ejemplo, filtrar la lista de parcelas basado en la consulta de búsqueda
+        },
+      ),
+    );
+  }
+
+  Widget _accesoDirectoWidget(BuildContext context) {
+    return GridView.count(
+      shrinkWrap: true,
+      physics:
+          const NeverScrollableScrollPhysics(), // Para evitar el scroll dentro del GridView
+      crossAxisCount: 2, // Número de columnas
+      children: [
+        _crearBotonAccesoDirecto(
+          context,
+          Icons.add,
+          "Nueva Parcela",
+          _accionNuevaParcela,
+        ),
+        _crearBotonAccesoDirecto(
+          context,
+          Icons.bug_report,
+          "Reporte de Plagas",
+          _accionReportePlagas,
+        ),
+      ],
+    );
+  }
+
+  Widget _crearBotonAccesoDirecto(
+      BuildContext context, IconData icono, String texto, Function accion) {
+    return InkWell(
+      onTap: () {
+        accion();
+      },
+      child: Column(
+        children: [
+          Icon(icono, size: 50.0),
+          const SizedBox(height: 10.0),
+          Text(texto, textAlign: TextAlign.center),
+        ],
+      ),
+    );
+  }
+
+  void _accionNuevaParcela() {
+    // Navegación o acción para "Nueva Parcela"
+  }
+
+  void _accionReportePlagas() {
+    // Navegación o acción para "Reporte de Plagas"
   }
 }
