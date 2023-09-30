@@ -1,3 +1,4 @@
+import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/screens/registro_parcela_screen.dart';
@@ -14,7 +15,8 @@ class ParcelasScreen extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const RegistroParcelaScreen()),
+            MaterialPageRoute(
+                builder: (context) => const RegistroParcelaScreen()),
           );
         },
         tooltip: 'Agregar Parcela',
@@ -23,6 +25,14 @@ class ParcelasScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Parcelas'),
         backgroundColor: Theme.of(context).primaryColor,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              _showDeleteConfirmationDialog(context);
+            },
+          )
+        ],
       ),
       body: FutureBuilder(
         future: ParcelasProvider.db.getAll(),
@@ -52,6 +62,34 @@ class ParcelasScreen extends StatelessWidget {
           }
         },
       ),
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Eliminar todas las parcelas'),
+          content: Text(
+              '¿Estás seguro de que quieres eliminar todas las parcelas registradas? Esta acción no se puede deshacer.'),
+          actions: [
+            TextButton(
+              child: Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Eliminar', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                ParcelasProvider.db.deleteAll(DB.parcels);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'package:agave/backend/models/parcela.dart';
+import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:flutter/material.dart';
 
 class RegistroParcelaScreen extends StatefulWidget {
@@ -74,8 +76,19 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
+
+                    Parcela parcela = Parcela(
+                      nombreParcela: nombreParcela!,
+                      tipoAgave: tipoAgave!,
+                      superficie: superficie!,
+                      fechaCreacion: DateTime.now().toString(),
+                    );
+
+                    ParcelasProvider.db.insert(parcela);
+
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Parcela guardada con éxito!')),
+                      const SnackBar(
+                          content: Text('Parcela guardada con éxito!')),
                     );
                   }
                 },
