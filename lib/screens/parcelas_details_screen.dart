@@ -41,7 +41,9 @@ class _DetallesParcelaState extends State<DetallesParcela> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const RegistroEstudio(),
+                builder: (context) => RegistroEstudio(
+                  idParcela: widget.parcela.id ?? -1,
+                ),
               ),
             );
           },

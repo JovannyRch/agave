@@ -1,5 +1,5 @@
 class Parcela {
-  int? idParcela;
+  int? id;
   String? nombreParcela;
   double? superficie;
   String? fechaCreacion;
@@ -12,7 +12,7 @@ class Parcela {
   String? rutaImagen;
 
   Parcela(
-      {this.idParcela,
+      {this.id,
       this.nombreParcela,
       this.superficie,
       this.fechaCreacion,
@@ -25,7 +25,7 @@ class Parcela {
       this.rutaImagen});
 
   Parcela.fromJson(Map<String, dynamic> json) {
-    idParcela = json['idParcela'];
+    id = json['id'];
     nombreParcela = json['nombreParcela'];
     superficie = json['superficie'];
     fechaCreacion = json['fechaCreacion'];
@@ -40,7 +40,7 @@ class Parcela {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['idParcela'] = idParcela;
+    data['id'] = id;
     data['nombreParcela'] = nombreParcela;
     data['superficie'] = superficie;
     data['fechaCreacion'] = fechaCreacion;

@@ -22,19 +22,19 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
         body: TabBarView(
           children: [
             _buildGeneralTab(),
-            HeatmapScreen(),
+            const HeatmapScreen(),
             _buildSemivariogramaChart(),
             TabIncidencias(incidencias: [
               Incidencia(
-                ubicacion: LatLng(19.432608, -99.133209),
+                ubicacion: const LatLng(19.432608, -99.133209),
                 cantidad: 1,
               ),
               Incidencia(
-                ubicacion: LatLng(19.432608, -99.133209),
+                ubicacion: const LatLng(19.432608, -99.133209),
                 cantidad: 1,
               ),
               Incidencia(
-                ubicacion: LatLng(19.432608, -99.133209),
+                ubicacion: const LatLng(19.432608, -99.133209),
                 cantidad: 1,
               ),
             ]),
@@ -118,8 +118,8 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   Widget _buildSemivariogramaChart() {
     return LineChart(
       LineChartData(
-        gridData: FlGridData(show: true),
-        titlesData: FlTitlesData(show: true),
+        gridData: const FlGridData(show: true),
+        titlesData: const FlTitlesData(show: true),
         borderData: FlBorderData(
           show: true,
           border: Border.all(color: const Color(0xff37434d), width: 1),
@@ -131,8 +131,8 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
         lineBarsData: [
           LineChartBarData(
             spots: [
-              FlSpot(0.303, 0.201),
-              FlSpot(0.606, 0.403),
+              const FlSpot(0.303, 0.201),
+              const FlSpot(0.606, 0.403),
               // ... (añade tus datos aquí)
             ],
             isCurved: true,

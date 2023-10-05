@@ -13,12 +13,6 @@ class ParcelasProvider extends BaseProvider {
     return await db!.insert(tabla, scan.toJson());
   }
 
-  Future<Parcela?> getById(int id) async {
-    final db = await database;
-    final res = await db!.query(tabla, where: 'idParcela = ?', whereArgs: [id]);
-    return res.isNotEmpty ? Parcela.fromJson(res.first) : null;
-  }
-
   Future<List<Parcela>> getAll() async {
     final db = await database;
     final res = await db!.query(tabla);
@@ -27,10 +21,16 @@ class ParcelasProvider extends BaseProvider {
         : res.map((registro) => Parcela.fromJson(registro)).toList();
   }
 
+  Future<Parcela?> getById(int id) async {
+    final db = await database;
+    final res = await db!.query(tabla, where: 'idParcela = ?', whereArgs: [id]);
+    return res.isNotEmpty ? Parcela.fromJson(res.first) : null;
+  }
+
   Future<int> update(Parcela parcela) async {
     final db = await database;
     final res = await db!.update(tabla, parcela.toJson(),
-        where: 'idParcela = ?', whereArgs: [parcela.idParcela]);
+        where: 'idParcela = ?', whereArgs: [parcela.id]);
     return res;
   }
 }

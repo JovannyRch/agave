@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter_heat_map/flutter_heat_map.dart';
 
 class HeatmapScreen extends StatefulWidget {
+  const HeatmapScreen({super.key});
+
   @override
   _HeatmapScreenState createState() => _HeatmapScreenState();
 }
@@ -29,12 +30,12 @@ class _HeatmapScreenState extends State<HeatmapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
+    return const Scaffold(
+      body: SizedBox(
         height: 400.0,
         child: GoogleMap(
           initialCameraPosition: CameraPosition(
-            target: const LatLng(19.432608, -99.133209),
+            target: LatLng(19.432608, -99.133209),
             zoom: 15,
           ),
           /* heatmapLayers: [
