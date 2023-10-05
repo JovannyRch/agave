@@ -87,7 +87,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
                 ),
               ),
         const SizedBox(height: 20.0),
-        const Text(
+        Text(
           "Observaciones",
           style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
         ),

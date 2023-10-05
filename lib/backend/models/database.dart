@@ -1,23 +1,25 @@
+import 'package:agave/backend/models/plaga.dart';
+
 const String kDBname = "agave_database";
 
 class DB {
   static const String parcels = 'parcels';
   static const String studies = 'studies';
-  static const String plages = 'plages';
+  static const String plagues = 'plagues';
 }
 
-List<String> plagasList = [
-  "Picudo del agave",
-  "Gusano barrenador del cogollo",
-  "Gusano trozador del agave",
-  "Ácaro rojo del agave",
-  "Pulguilla del agave",
-  "Mosca del agave",
-  "Falsa arañita roja del agave",
-  "Chinche del agave",
-  "Gusano blanco del agave",
-  "Nematodo barrenador del agave",
-  "Mosquita blanca del agave",
+List<Plaga> kPlagues = [
+  Plaga(id: 1, nombre: "Picudo del agave"),
+  Plaga(id: 2, nombre: "Gusano barrenador del cogollo"),
+  Plaga(id: 3, nombre: "Gusano trozador del agave"),
+  Plaga(id: 4, nombre: "Ácaro rojo del agave"),
+  Plaga(id: 5, nombre: "Pulguilla del agave"),
+  Plaga(id: 6, nombre: "Mosca del agave"),
+  Plaga(id: 7, nombre: "Falsa arañita roja del agave"),
+  Plaga(id: 8, nombre: "Chinche del agave"),
+  Plaga(id: 9, nombre: "Gusano blanco del agave"),
+  Plaga(id: 10, nombre: "Nematodo barrenador del agave"),
+  Plaga(id: 11, nombre: "Mosquita blanca del agave"),
 ];
 
 const parcelsTable = """
@@ -37,7 +39,7 @@ const parcelsTable = """
 """;
 
 const plaguesTable = """
-  CREATE TABLE ${DB.plages} (
+  CREATE TABLE ${DB.plagues} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT NOT NULL
 );
@@ -53,7 +55,7 @@ const studiesTable = """
     fechaEstudio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     observaciones TEXT,
     FOREIGN KEY (idParcela) REFERENCES ${DB.parcels}(id) ON DELETE CASCADE,
-    FOREIGN KEY (idPlaga) REFERENCES ${DB.plages}(id) ON DELETE CASCADE
+    FOREIGN KEY (idPlaga) REFERENCES ${DB.plagues}(id) ON DELETE CASCADE
 );
 """;
 
@@ -61,10 +63,4 @@ final List<String> kTables = [
   parcelsTable,
   plaguesTable,
   studiesTable,
-  plagasList
-      .asMap()
-      .entries
-      .map((entry) =>
-          "INSERT INTO ${DB.plages} (id, nombre) VALUES (${entry.key}, '${entry.value}');")
-      .join("\n"),
 ];
