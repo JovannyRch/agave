@@ -1,24 +1,16 @@
 import 'package:agave/backend/models/estudio.dart';
-import 'package:agave/backend/models/plaga.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
-import 'package:agave/backend/providers/plagas_provider.dart';
 import 'package:flutter/material.dart';
 
 class RegistroEstudio extends StatefulWidget {
-  final int idParcela;
-  const RegistroEstudio({super.key, required this.idParcela});
-
   @override
   _RegistroEstudioState createState() => _RegistroEstudioState();
 }
 
 class _RegistroEstudioState extends State<RegistroEstudio> {
   final _formKey = GlobalKey<FormState>();
-
-  final List<Plaga> _plagas = [];
-  double? _humedad;
-  int? _plagaId;
-  double? _temperatura;
+  String? _nombre;
+  String? _observaciones;
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +24,8 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
         child: Form(
           key: _formKey,
           child: ListView(children: [
-            _plagaDropdown(),
-            _humedadInput(),
-            _temperaturaInput(),
+            _nombreInput(),
+            _obervacionesInput(),
             const SizedBox(height: 20),
             _submitButton(),
           ]),
@@ -43,59 +34,15 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
     );
   }
 
-  Widget _plagaDropdown() {
-    return FutureBuilder<List<Plaga>>(
-      future: PlagasProvider.db.getAll(),
-      builder: (BuildContext context, AsyncSnapshot<List<Plaga>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          }
-
-          List<DropdownMenuItem<int>> items = [];
-          for (int i = 0; i < snapshot.data!.length; i++) {
-            String nombrePlaga = snapshot.data![i].nombre ?? "";
-
-            if (nombrePlaga.length > 35) {
-              nombrePlaga = "${nombrePlaga.substring(0, 35)}...";
-            }
-
-            items.add(DropdownMenuItem(
-              value: snapshot.data![i].id,
-              child: Text(nombrePlaga),
-            ));
-          }
-
-          return DropdownButtonFormField<int>(
-            items: items,
-            onChanged: (value) => _plagaId = value,
-            decoration: const InputDecoration(labelText: 'Plaga a estudiar'),
-            validator: (value) => value == null ? 'Selecciona una plaga' : null,
-          );
-        } else {
-          return const CircularProgressIndicator();
+  Widget _nombreInput() {
+    return TextFormField(
+      decoration: const InputDecoration(labelText: 'Nombre'),
+      keyboardType: TextInputType.number,
+      onSaved: (value) => _nombre = value,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor ingresa un nombre';
         }
-      },
-    );
-  }
-
-  Widget _humedadInput() {
-    return TextFormField(
-      decoration: const InputDecoration(labelText: 'Humedad'),
-      keyboardType: TextInputType.number,
-      onSaved: (value) => _humedad = double.tryParse(value!),
-      validator: (value) {
-        return null;
-      },
-    );
-  }
-
-  Widget _temperaturaInput() {
-    return TextFormField(
-      decoration: const InputDecoration(labelText: 'Temperatura'),
-      keyboardType: TextInputType.number,
-      onSaved: (value) => _humedad = double.tryParse(value!),
-      validator: (value) {
         return null;
       },
     );
@@ -119,12 +66,32 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
       Estudio estudio = Estudio();
 
       estudio.fechaCreacion = DateTime.now().toString();
+      estudio.nombre = _nombre;
 
-      EstudiosProvider.db.insert(estudio);
+      if (_observaciones != null) {
+        estudio.observaciones = _observaciones;
+      }
+
+      await EstudiosProvider.db.insert(estudio);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Estudio guardado con éxito!')),
       );
       Navigator.pop(context);
     }
+  }
+
+  Widget _obervacionesInput() {
+    return TextFormField(
+      decoration: const InputDecoration(
+        labelText: 'Observaciones',
+        hintText: 'Ingresa cualquier detalle o nota adicional sobre la parcela',
+      ),
+      maxLines: 5, // Permite que el input tenga varias líneas
+      keyboardType: TextInputType.multiline,
+      initialValue: _observaciones,
+      onSaved: (value) {
+        _observaciones = value;
+      },
+    );
   }
 }

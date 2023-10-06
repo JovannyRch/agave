@@ -1,159 +1,241 @@
-import 'package:agave/backend/models/Incidencia.dart';
+import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/estudio.dart';
-import 'package:agave/backend/widgets/heat_map.dart';
-import 'package:agave/backend/widgets/incidencias_tab.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:agave/backend/models/parcela.dart';
+import 'package:agave/backend/providers/estudios_provider.dart';
+import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../utils.dart';
 
 class EstudioDetailsScreen extends StatefulWidget {
   Estudio estudio;
-
-  EstudioDetailsScreen({required this.estudio});
+  EstudioDetailsScreen({super.key, required this.estudio});
 
   @override
   State<EstudioDetailsScreen> createState() => _EstudioDetailsScreenState();
 }
 
 class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+
+  Estudio? estudio;
+
+  @override
+  void initState() {
+    estudio = widget.estudio;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        appBar: _appBar(),
-        body: TabBarView(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Detalle del Estudio'),
+        backgroundColor: Theme.of(context).primaryColor,
+        actions: [
+          _deleteButton(),
+          _editButton(),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).primaryColor,
+        onPressed: () async {
+          /*  await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RegistroEstudioScreen(),
+            ),
+          );
+          setState(() {}); */
+        },
+        tooltip: 'Agregar Parcela',
+        child: const Icon(Icons.add),
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildGeneralTab(),
-            const HeatmapScreen(),
-            _buildSemivariogramaChart(),
-            TabIncidencias(incidencias: [
-              Incidencia(
-                ubicacion: const LatLng(19.432608, -99.133209),
-                cantidad: 1,
+            Text(
+              'Nombre: ${widget.estudio.nombre}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
               ),
-              Incidencia(
-                ubicacion: const LatLng(19.432608, -99.133209),
-                cantidad: 1,
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Fecha de Creación: ${formatDate(estudio!.fechaCreacion)}',
+              style: TextStyle(
+                fontSize: 16,
               ),
-              Incidencia(
-                ubicacion: const LatLng(19.432608, -99.133209),
-                cantidad: 1,
-              ),
-            ]),
+            ),
+            _renderObservaciones(),
+            // Aquí puede ir la lista de Parcelas Asociadas
+            _listaParcelas(),
           ],
         ),
       ),
     );
   }
 
-  AppBar _appBar() {
-    return AppBar(
-      backgroundColor: Theme.of(context).primaryColor,
-      title: Text(
-          /* widget.estudio.nombrePlaga ?? "", */
-          ""), // Puedes personalizar el título aquí
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.share),
-          onPressed: () {
-            // Acción para compartir
-          },
-        ),
-        // Puedes agregar más iconos para otras acciones aquí
-      ],
-      bottom: const TabBar(
-        tabs: [
-          Tab(
-              icon: Icon(
-            Icons.info,
-          )),
-          Tab(
-            icon: Icon(Icons.map),
-          ),
-          Tab(
-            icon: Icon(Icons.line_axis),
-          ),
-          Tab(
-            icon: Icon(Icons.table_chart),
-          ),
-        ],
-      ),
+  Widget _deleteButton() {
+    return IconButton(
+      icon: const Icon(Icons.delete),
+      onPressed: () {
+        _showDeleteConfirmationDialog(context);
+      },
     );
   }
 
-  Widget _buildGeneralTab() {
+  Widget _renderObservaciones() {
+    if (estudio!.observaciones == null || estudio!.observaciones == "") {
+      return Container();
+    }
+    return Column(
+      children: [
+        const SizedBox(height: 20.0),
+        const Text(
+          "Observaciones",
+          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10.0),
+        Text(estudio!.observaciones ?? ""),
+      ],
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Eliminar Estudio"),
+          content: const Text("¿Estás seguro de eliminar este estudio?"),
+          actions: [
+            TextButton(
+              child: const Text("Cancelar"),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).primaryColor,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text("Eliminar"),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).primaryColor,
+              ),
+              onPressed: () async {
+                await EstudiosProvider.db
+                    .delete(estudio!.id ?? -1, DB.estudios);
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _editButton() {
+    return IconButton(
+      icon: const Icon(Icons.edit),
+      onPressed: () async {
+        /*  await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RegistroParcelaScreen(
+              parcela: parcela,
+            ),
+          ),
+        );
+        Parcela? editedParcel =
+            await ParcelasProvider.db.getById(parcela!.id ?? -1);
+        setState(() {
+          parcela = editedParcel;
+        }); */
+      },
+    );
+  }
+
+  Widget _detalleParcela() {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
-        // Información Principal del Estudio (Header)
-        /*  Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Column(
-              children: [
-                const Icon(
-                  Icons.thermostat_outlined,
-                  size: 40,
-                ), // ícono de temperatura
-                Text(
-                  widget.estudio.temperatura.toString(),
-                ), // Ejemplo de temperatura
-              ],
-            ),
-            Column(
-              children: [
-                const Icon(Icons.water_damage, size: 40), // ícono de humedad
-                Text(
-                  widget.estudio.humedad.toString(),
-                ), // Ejemplo de humedad
-              ],
-            ),
-          ],
-        ), */
-        SizedBox(height: 20),
-
-        // Datos Estadísticos y Modelado (Usa Cards o ListTile para cada dato)
-        // ... (Tu código aquí)
+        Text(
+          estudio!.nombre ?? "",
+          style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        _renderObservaciones(),
       ],
     );
   }
 
-  Widget _buildSemivariogramaChart() {
-    return LineChart(
-      LineChartData(
-        gridData: const FlGridData(show: true),
-        titlesData: const FlTitlesData(show: true),
-        borderData: FlBorderData(
-          show: true,
-          border: Border.all(color: const Color(0xff37434d), width: 1),
-        ),
-        minX: 0,
-        maxX: 7,
-        minY: 0,
-        maxY: 1.5,
-        lineBarsData: [
-          LineChartBarData(
-            spots: [
-              const FlSpot(0.303, 0.201),
-              const FlSpot(0.606, 0.403),
-              // ... (añade tus datos aquí)
-            ],
-            isCurved: true,
-            gradient: LinearGradient(
-              colors: [
-                Colors.blue,
-                Colors.blue.withOpacity(0.3),
+  Future<void> _refresh() async {
+    setState(() {});
+  }
+
+  Widget _listaParcelas() {
+    return RefreshIndicator(
+      key: _refreshIndicatorKey,
+      onRefresh: _refresh,
+      child: FutureBuilder<List<Parcela>>(
+        future: ParcelasProvider.db.getAll(),
+        builder: (BuildContext context, AsyncSnapshot<List<Parcela>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(
+              child: Text(
+                  'Ha ocurrido un error al obtener las parcelas asociadas'),
+            );
+          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text('No hay parcelas disponibles'),
+            );
+          } else {
+            Widget list = ListView.builder(
+              itemCount: snapshot.data?.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text("Estdio"),
+                  subtitle:
+                      Text(formatDate(snapshot.data?[index].fechaCreacion)),
+                  onTap: () {
+                    /* Estudio estudio = snapshot.data?[index] ?? Estudio();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EstudioDetailsScreen(
+                          estudio: estudio,
+                        ),
+                      ),
+                    ); */
+                  },
+                );
+              },
+            );
+
+            return Column(
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  'Parcelas Asociadas:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                list,
               ],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            ),
-            barWidth: 4,
-            isStrokeCapRound: true,
-            belowBarData: BarAreaData(show: false),
-          ),
-          // Puedes añadir más líneas si es necesario
-        ],
+            );
+          }
+        },
       ),
     );
   }

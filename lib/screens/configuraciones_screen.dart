@@ -1,3 +1,5 @@
+import 'package:agave/screens/agaves/agaves_screen.dart';
+import 'package:agave/screens/plagas/plagas_screen.dart';
 import 'package:flutter/material.dart';
 
 class ConfiguracionScreen extends StatelessWidget {
@@ -12,7 +14,7 @@ class ConfiguracionScreen extends StatelessWidget {
       ),
       body: ListView(
         children: <Widget>[
-          _buildDataConfigSection(),
+          _buildDataConfigSection(context),
           _buildHelpSupportSection(),
           _buildAppInfoSection(),
         ],
@@ -20,9 +22,29 @@ class ConfiguracionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDataConfigSection() {
+  Widget _buildDataConfigSection(BuildContext context) {
     return Column(
       children: [
+        ListTile(
+          title: const Text('Plagas'),
+          trailing: const Icon(Icons.arrow_forward),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlagasScreen(),
+            ),
+          ),
+        ),
+        ListTile(
+          title: const Text('Tipos de agave'),
+          trailing: const Icon(Icons.arrow_forward),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AgavesScreen(),
+            ),
+          ),
+        ),
         ListTile(
           title: const Text('Exportar datos'),
           trailing: const Icon(Icons.arrow_forward),

@@ -2,22 +2,21 @@ import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
-import 'package:agave/screens/estudio_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:agave/screens/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../utils.dart';
 
-class DetallesParcela extends StatefulWidget {
+class MuestreoDetailsScreen extends StatefulWidget {
   Parcela parcela;
-  DetallesParcela({super.key, required this.parcela});
+  MuestreoDetailsScreen({super.key, required this.parcela});
 
   @override
-  State<DetallesParcela> createState() => _DetallesParcelaState();
+  State<MuestreoDetailsScreen> createState() => _MuestreoDetailsScreenState();
 }
 
-class _DetallesParcelaState extends State<DetallesParcela> {
+class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
@@ -217,15 +216,15 @@ class _DetallesParcelaState extends State<DetallesParcela> {
                   subtitle:
                       Text(formatDate(snapshot.data?[index].fechaCreacion)),
                   onTap: () {
-                    Estudio estudio = snapshot.data?[index] ?? Estudio();
+                    /* Estudio estudio = snapshot.data?[index] ?? Estudio();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => EstudioDetailsScreen(
+                        builder: (context) => MuestreoDetailsScreen(
                           estudio: estudio,
                         ),
                       ),
-                    );
+                    ); */
                   },
                 );
               },

@@ -35,13 +35,13 @@ class BaseProvider {
         }
 
         for (Agave agave in kAgaves) {
-          await db.insert(DB.plagas, agave.toJson());
+          await db.insert(DB.agaves, agave.toJson());
         }
       },
     );
   }
 
-  Future<int> delete(String id, String table) async {
+  Future<int> delete(int id, String table) async {
     final db = await database;
     final res = await db!.delete(table, where: 'id = ?', whereArgs: [id]);
     return res;

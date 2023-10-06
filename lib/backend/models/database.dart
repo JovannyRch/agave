@@ -90,8 +90,7 @@ const incidenciasTable = """
     cantidad INTEGER NOT NULL,
     latitud REAL,                   -- Ubicación geográfica
     longitud REAL,
-    FOREIGN KEY (idMuestreo) REFERENCES ${DB.muestreos}(id) ON DELETE CASCADE,
-    FOREIGN KEY (idPlaga) REFERENCES ${DB.plagas}(id) ON DELETE CASCADE
+    FOREIGN KEY (idMuestreo) REFERENCES ${DB.muestreos}(id) ON DELETE CASCADE
   );
 """;
 
