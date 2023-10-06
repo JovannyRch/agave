@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/plaga.dart';
 import 'package:sqflite/sqflite.dart';
@@ -30,7 +31,11 @@ class BaseProvider {
         }
 
         for (Plaga plaga in kPlagues) {
-          await db.insert(DB.plagues, plaga.toJson());
+          await db.insert(DB.plagas, plaga.toJson());
+        }
+
+        for (Agave agave in kAgaves) {
+          await db.insert(DB.plagas, agave.toJson());
         }
       },
     );

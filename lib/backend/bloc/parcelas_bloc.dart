@@ -26,12 +26,12 @@ class ParcelasBloc {
   }
 
   deleteData(int id) async {
-    await ParcelasProvider.db.delete("$id", DB.parcels, "idParcela");
+    await ParcelasProvider.db.delete("$id", DB.parcelas);
     getDatos();
   }
 
   deletaALl() async {
-    await ParcelasProvider.db.deleteAll(DB.parcels);
+    await ParcelasProvider.db.deleteAll(DB.parcelas);
     getDatos();
   }
 

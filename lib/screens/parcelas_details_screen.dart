@@ -143,7 +143,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
       padding: const EdgeInsets.all(16.0),
       children: [
         Text(
-          parcela!.nombreParcela ?? "",
+          parcela!.nombre ?? "",
           style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
@@ -215,11 +215,9 @@ class _DetallesParcelaState extends State<DetallesParcela> {
               itemCount: snapshot.data?.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(
-                    "Estudio - ${snapshot.data?[index].nombrePlaga ?? ""}",
-                  ),
+                  title: Text("Estdio"),
                   subtitle:
-                      Text(formatDate(snapshot.data?[index].fechaEstudio)),
+                      Text(formatDate(snapshot.data?[index].fechaCreacion)),
                   onTap: () {
                     Estudio estudio = snapshot.data?[index] ?? Estudio();
                     Navigator.push(

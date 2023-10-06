@@ -34,7 +34,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text('Parcelas'),
+        title: const Text('Estudios'),
         backgroundColor: Theme.of(context).primaryColor,
         actions: [
           IconButton(
@@ -65,7 +65,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                   return ListTile(
                     /*leading:  Image.network(snapshot.data[index]
                       .rutaImagen), */
-                    title: Text(snapshot.data?[index].nombreParcela ?? ""),
+                    title: Text(snapshot.data?[index].nombre ?? ""),
                     subtitle: Text(
                         'Tipo de Agave: ${snapshot.data?[index].tipoAgave}'),
                     onTap: () async {
@@ -113,7 +113,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
               child:
                   const Text('Eliminar', style: TextStyle(color: Colors.red)),
               onPressed: () {
-                ParcelasProvider.db.deleteAll(DB.parcels);
+                ParcelasProvider.db.deleteAll(DB.parcelas);
                 Navigator.of(context).pop();
               },
             ),

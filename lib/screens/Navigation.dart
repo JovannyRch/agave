@@ -1,4 +1,5 @@
 import 'package:agave/screens/configuraciones_screen.dart';
+import 'package:agave/screens/estudios_parcelas_screen.dart';
 import 'package:agave/screens/inicio_screen.dart';
 import 'package:agave/screens/parcels_screen.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,7 @@ class _NavigationState extends State<Navigation> {
   int _currentIndex = 0;
   final List<Widget> _children = [
     HomeScreen(),
-    const ParcelasScreen(),
+    const EstudiosParcelasScreen(),
     const ConfiguracionScreen(),
   ];
 
@@ -38,8 +39,8 @@ class _NavigationState extends State<Navigation> {
             label: 'Inicio',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.landscape),
-            label: 'Parcelas',
+            icon: Icon(Icons.search),
+            label: 'Estudios y parcelas',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),

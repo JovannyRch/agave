@@ -2,7 +2,7 @@ import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/providers/base_provider.dart';
 
 class ReportesProvider extends BaseProvider {
-  String tabla = DB.parcels;
+  String tabla = DB.parcelas;
   ReportesProvider._();
 
   Future<int> total(String table) async {

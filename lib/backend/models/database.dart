@@ -1,11 +1,16 @@
+import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/plaga.dart';
 
 const String kDBname = "agave_database";
 
 class DB {
-  static const String parcels = 'parcels';
-  static const String studies = 'studies';
-  static const String plagues = 'plagues';
+  static const String parcelas = 'parcelas';
+  static const String estudios = 'estudios';
+  static const String plagas = 'plagas';
+  static const String agaves = 'agaves';
+  static const String muestreos = "muestreos";
+  static const String incidencias = "incidencias";
+  static const String logs = "logs";
 }
 
 List<Plaga> kPlagues = [
@@ -22,10 +27,27 @@ List<Plaga> kPlagues = [
   Plaga(id: 11, nombre: "Mosquita blanca del agave"),
 ];
 
-const parcelsTable = """
-  CREATE TABLE ${DB.parcels} (
+List<Agave> kAgaves = [
+  Agave(id: 1, nombre: "Agave tequilana (Azul)"),
+  Agave(id: 2, nombre: "Agave angustifolia (Espadín)"),
+  Agave(id: 3, nombre: "Agave salmiana"),
+  Agave(id: 4, nombre: "Agave americana"),
+  Agave(id: 5, nombre: "Agave potatorum (Tobala)"),
+];
+
+const studiesTable = """
+  CREATE TABLE ${DB.estudios} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombreParcela TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    fechaCreacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    observaciones TEXT
+);
+""";
+
+const parcelsTable = """
+  CREATE TABLE ${DB.parcelas} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
     superficie REAL NOT NULL,
     fechaCreacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     latitud REAL,                   -- Ubicación geográfica
@@ -38,29 +60,61 @@ const parcelsTable = """
   );
 """;
 
+const estudiosParcelasTable = """
+  CREATE TABLE estudios_parcelas (
+    idEstudio INTEGER NOT NULL,
+    idParcela INTEGER NOT NULL,
+    PRIMARY KEY (idEstudio, idParcela),
+    FOREIGN KEY (idEstudio) REFERENCES ${DB.estudios}(id) ON DELETE CASCADE,
+    FOREIGN KEY (idParcela) REFERENCES ${DB.parcelas}(id) ON DELETE CASCADE
+  );
+""";
+
+const muestreosTable = """
+  CREATE TABLE ${DB.muestreos} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    idParcela INTEGER NOT NULL,
+    idEstudio INTEGER NOT NULL,
+    idPlaga INTEGER NOT NULL,
+    fechaCreacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (idParcela) REFERENCES ${DB.parcelas}(id) ON DELETE CASCADE,
+    FOREIGN KEY (idEstudio) REFERENCES ${DB.estudios}(id) ON DELETE CASCADE,
+    FOREIGN KEY (idPlaga) REFERENCES ${DB.plagas}(id) ON DELETE CASCADE
+  );
+""";
+
+const incidenciasTable = """
+  CREATE TABLE ${DB.incidencias} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    idMuestreo INTEGER NOT NULL,
+    cantidad INTEGER NOT NULL,
+    latitud REAL,                   -- Ubicación geográfica
+    longitud REAL,
+    FOREIGN KEY (idMuestreo) REFERENCES ${DB.muestreos}(id) ON DELETE CASCADE,
+    FOREIGN KEY (idPlaga) REFERENCES ${DB.plagas}(id) ON DELETE CASCADE
+  );
+""";
+
 const plaguesTable = """
-  CREATE TABLE ${DB.plagues} (
+  CREATE TABLE ${DB.plagas} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT NOT NULL
 );
 """;
 
-const studiesTable = """
-  CREATE TABLE ${DB.studies} (
+const agavesTable = """
+  CREATE TABLE ${DB.agaves} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    idParcela INTEGER,
-    idPlaga INTEGER,
-    humedad REAL,
-    temperatura REAL,
-    fechaEstudio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    observaciones TEXT,
-    FOREIGN KEY (idParcela) REFERENCES ${DB.parcels}(id) ON DELETE CASCADE,
-    FOREIGN KEY (idPlaga) REFERENCES ${DB.plagues}(id) ON DELETE CASCADE
+    nombre TEXT NOT NULL
 );
 """;
 
 final List<String> kTables = [
-  parcelsTable,
+  agavesTable,
   plaguesTable,
   studiesTable,
+  parcelsTable,
+  estudiosParcelasTable,
+  muestreosTable,
+  incidenciasTable,
 ];

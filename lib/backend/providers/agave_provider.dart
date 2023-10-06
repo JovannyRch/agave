@@ -1,24 +1,24 @@
+import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/database.dart';
-import 'package:agave/backend/models/plaga.dart';
 import 'package:agave/backend/providers/base_provider.dart';
 
-class PlagasProvider extends BaseProvider {
-  static final PlagasProvider db = PlagasProvider._();
+class AgaveProvider extends BaseProvider {
+  static final AgaveProvider db = AgaveProvider._();
 
   String tabla = DB.plagas;
-  PlagasProvider._();
+  AgaveProvider._();
 
-  insert(Plaga item) async {
+  insert(Agave item) async {
     final db = await database;
     return await db!.insert(tabla, item.toJson());
   }
 
-  Future<List<Plaga>> getAll() async {
+  Future<List<Agave>> getAll() async {
     final db = await database;
     final res = await db!.query(tabla);
     print(res);
     return res.isEmpty
         ? []
-        : res.map((registro) => Plaga.fromJson(registro)).toList();
+        : res.map((registro) => Agave.fromJson(registro)).toList();
   }
 }

@@ -118,21 +118,8 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
       _formKey.currentState!.save();
       Estudio estudio = Estudio();
 
-      estudio.fechaEstudio = DateTime.now().toString();
+      estudio.fechaCreacion = DateTime.now().toString();
 
-      if (_humedad != null) {
-        estudio.humedad = _humedad!;
-      }
-
-      if (_temperatura != null) {
-        estudio.temperatura = _temperatura!;
-      }
-
-      if (_plagaId != null) {
-        estudio.idPlaga = _plagaId;
-      }
-
-      estudio.idParcela = widget.idParcela;
       EstudiosProvider.db.insert(estudio);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Estudio guardado con éxito!')),

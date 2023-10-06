@@ -5,7 +5,7 @@ import 'package:agave/backend/providers/base_provider.dart';
 class ParcelasProvider extends BaseProvider {
   static final ParcelasProvider db = ParcelasProvider._();
 
-  String table = DB.parcels;
+  String table = DB.parcelas;
   ParcelasProvider._();
 
   insert(Parcela scan) async {

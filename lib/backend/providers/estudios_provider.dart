@@ -5,7 +5,7 @@ import 'package:agave/backend/providers/base_provider.dart';
 class EstudiosProvider extends BaseProvider {
   static final EstudiosProvider db = EstudiosProvider._();
 
-  String tabla = DB.studies;
+  String tabla = DB.estudios;
 
   EstudiosProvider._();
 
@@ -26,10 +26,10 @@ class EstudiosProvider extends BaseProvider {
     final db = await database;
 
     final res = await db!.rawQuery('''
-    SELECT ${DB.studies}.*, ${DB.plagues}.nombre AS nombrePlaga
-    FROM ${DB.studies}
-    INNER JOIN plagues ON ${DB.studies}.idPlaga =  ${DB.plagues}.id
-    WHERE ${DB.studies}.idParcela = $idParcela
+    SELECT ${DB.estudios}.*, ${DB.plagas}.nombre AS nombrePlaga
+    FROM ${DB.estudios}
+    INNER JOIN ${DB.plagas} ON ${DB.estudios}.idPlaga =  ${DB.plagas}.id
+    WHERE ${DB.estudios}.idParcela = $idParcela
   ''');
 
     return res.isEmpty

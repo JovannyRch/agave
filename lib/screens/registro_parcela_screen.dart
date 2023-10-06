@@ -26,9 +26,9 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
     print("init state");
     if (widget.parcela != null) {
       isEditing = true;
-      _nombreParcela = widget.parcela!.nombreParcela;
+      _nombreParcela = widget.parcela!.nombre;
       print(_nombreParcela);
-      print(widget.parcela!.nombreParcela);
+      print(widget.parcela!.nombre);
       _superficie = widget.parcela!.superficie;
       _selectedAgave = widget.parcela!.tipoAgave;
       _selectedEstadoCultivo = widget.parcela!.estadoCultivo;
@@ -201,7 +201,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
           _formKey.currentState!.save();
 
           Parcela parcela = Parcela(
-            nombreParcela: _nombreParcela!,
+            nombre: _nombreParcela!,
             superficie: _superficie!,
             observaciones: _observaciones!,
           );

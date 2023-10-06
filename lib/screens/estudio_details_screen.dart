@@ -2,7 +2,6 @@ import 'package:agave/backend/models/Incidencia.dart';
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/widgets/heat_map.dart';
 import 'package:agave/backend/widgets/incidencias_tab.dart';
-import 'package:agave/utils.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -52,8 +51,8 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
     return AppBar(
       backgroundColor: Theme.of(context).primaryColor,
       title: Text(
-        widget.estudio.nombrePlaga ?? "",
-      ), // Puedes personalizar el título aquí
+          /* widget.estudio.nombrePlaga ?? "", */
+          ""), // Puedes personalizar el título aquí
       actions: [
         IconButton(
           icon: const Icon(Icons.share),
@@ -88,7 +87,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
       padding: const EdgeInsets.all(16.0),
       children: [
         // Información Principal del Estudio (Header)
-        Row(
+        /*  Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Column(
@@ -111,7 +110,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
               ],
             ),
           ],
-        ),
+        ), */
         SizedBox(height: 20),
 
         // Datos Estadísticos y Modelado (Usa Cards o ListTile para cada dato)
