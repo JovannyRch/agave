@@ -2,7 +2,7 @@ import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
-import 'package:agave/screens/estudio_details_screen.dart';
+import 'package:agave/screens/estudios/estudio_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:agave/screens/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +61,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
             await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => RegistroEstudio(),
+                builder: (context) => const RegistroEstudio(),
               ),
             );
             setState(() {});
@@ -90,16 +90,15 @@ class _DetallesParcelaState extends State<DetallesParcela> {
           content: const Text("¿Estás seguro de eliminar esta parcela?"),
           actions: [
             TextButton(
-              child: const Text("Cancelar"),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).primaryColor,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              child: const Text("Cancelar"),
             ),
             TextButton(
-              child: const Text("Eliminar"),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).primaryColor,
               ),
@@ -108,6 +107,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
+              child: const Text("Eliminar"),
             ),
           ],
         );
@@ -213,7 +213,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
               itemCount: snapshot.data?.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text("Estdio"),
+                  title: const Text("Estdio"),
                   subtitle:
                       Text(formatDate(snapshot.data?[index].fechaCreacion)),
                   onTap: () {

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class RegistroPlaga extends StatefulWidget {
   final Plaga? plaga;
 
-  RegistroPlaga({this.plaga});
+  const RegistroPlaga({super.key, this.plaga});
 
   @override
   _RegistroPlagaState createState() => _RegistroPlagaState();
@@ -30,7 +30,7 @@ class _RegistroPlagaState extends State<RegistroPlaga> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Registrar Plaga'),
+        title: const Text('Registrar Plaga'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Padding(
@@ -40,7 +40,7 @@ class _RegistroPlagaState extends State<RegistroPlaga> {
           child: Column(
             children: [
               TextFormField(
-                decoration: InputDecoration(labelText: 'Nombre de la plaga'),
+                decoration: const InputDecoration(labelText: 'Nombre de la plaga'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor introduce el nombre de la plaga';

@@ -60,7 +60,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
             await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => RegistroEstudio(),
+                builder: (context) => const RegistroEstudio(),
               ),
             );
             setState(() {});
@@ -89,16 +89,15 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
           content: const Text("¿Estás seguro de eliminar esta parcela?"),
           actions: [
             TextButton(
-              child: const Text("Cancelar"),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).primaryColor,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              child: const Text("Cancelar"),
             ),
             TextButton(
-              child: const Text("Eliminar"),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).primaryColor,
               ),
@@ -107,6 +106,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
+              child: const Text("Eliminar"),
             ),
           ],
         );
@@ -212,7 +212,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
               itemCount: snapshot.data?.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text("Estdio"),
+                  title: const Text("Estdio"),
                   subtitle:
                       Text(formatDate(snapshot.data?[index].fechaCreacion)),
                   onTap: () {

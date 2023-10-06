@@ -72,7 +72,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                       Parcela parcela = snapshot.data?[index] ?? Parcela();
                       await Navigator.push(
                         context,
-                        await MaterialPageRoute(
+                        MaterialPageRoute(
                           builder: (context) => DetallesParcela(
                             parcela: parcela,
                           ),

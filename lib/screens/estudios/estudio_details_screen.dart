@@ -5,7 +5,7 @@ import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:flutter/material.dart';
 
-import '../utils.dart';
+import '../../utils.dart';
 
 class EstudioDetailsScreen extends StatefulWidget {
   Estudio estudio;
@@ -31,7 +31,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detalle del Estudio'),
+        title: const Text('Detalle del Estudio'),
         backgroundColor: Theme.of(context).primaryColor,
         actions: [
           _deleteButton(),
@@ -53,21 +53,21 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
         child: const Icon(Icons.add),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Nombre: ${widget.estudio.nombre}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               'Fecha de Creación: ${formatDate(estudio!.fechaCreacion)}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
               ),
             ),
@@ -115,16 +115,15 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
           content: const Text("¿Estás seguro de eliminar este estudio?"),
           actions: [
             TextButton(
-              child: const Text("Cancelar"),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).primaryColor,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
+              child: const Text("Cancelar"),
             ),
             TextButton(
-              child: const Text("Eliminar"),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).primaryColor,
               ),
@@ -134,6 +133,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
+              child: const Text("Eliminar"),
             ),
           ],
         );
@@ -203,7 +203,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
               itemCount: snapshot.data?.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text("Estdio"),
+                  title: const Text("Estdio"),
                   subtitle:
                       Text(formatDate(snapshot.data?[index].fechaCreacion)),
                   onTap: () {

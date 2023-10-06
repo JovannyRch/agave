@@ -1,8 +1,11 @@
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
+import 'package:agave/backend/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
 
 class RegistroEstudio extends StatefulWidget {
+  const RegistroEstudio({super.key});
+
   @override
   _RegistroEstudioState createState() => _RegistroEstudioState();
 }
@@ -49,15 +52,7 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
   }
 
   Widget _submitButton() {
-    return ElevatedButton(
-      onPressed: _guardarEstudio,
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(
-          Theme.of(context).primaryColor,
-        ),
-      ),
-      child: const Text('Guardar Estudio'),
-    );
+    return SubmitButton(text: 'Guardar estudio', onPressed: _guardarEstudio);
   }
 
   void _guardarEstudio() async {
@@ -76,7 +71,7 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Estudio guardado con éxito!')),
       );
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     }
   }
 

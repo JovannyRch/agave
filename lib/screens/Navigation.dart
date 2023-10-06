@@ -1,5 +1,5 @@
 import 'package:agave/screens/configuraciones_screen.dart';
-import 'package:agave/screens/estudios_screen.dart';
+import 'package:agave/screens/estudios/estudios_screen.dart';
 import 'package:agave/screens/inicio_screen.dart';
 import 'package:flutter/material.dart';
 

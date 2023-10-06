@@ -31,7 +31,7 @@ class ConfiguracionScreen extends StatelessWidget {
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PlagasScreen(),
+              builder: (context) => const PlagasScreen(),
             ),
           ),
         ),
@@ -41,7 +41,7 @@ class ConfiguracionScreen extends StatelessWidget {
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AgavesScreen(),
+              builder: (context) => const AgavesScreen(),
             ),
           ),
         ),

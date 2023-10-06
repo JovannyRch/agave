@@ -2,7 +2,6 @@ import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/providers/agave_provider.dart';
 import 'package:agave/screens/agaves/registro_agave.dart';
-import 'package:agave/screens/plagas/registro_plaga_screen.dart';
 import 'package:flutter/material.dart';
 
 class AgavesScreen extends StatefulWidget {
@@ -27,7 +26,7 @@ class _AgavesScreenState extends State<AgavesScreen> {
           bool? check = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => RegistroAgave(),
+              builder: (context) => const RegistroAgave(),
             ),
           );
 
@@ -59,16 +58,16 @@ class _AgavesScreenState extends State<AgavesScreen> {
               return SafeArea(
                 child: ListView.builder(
                   itemCount: snapshot.data?.length,
-                  padding: EdgeInsets.only(bottom: 80.0),
+                  padding: const EdgeInsets.only(bottom: 80.0),
                   itemBuilder: (context, index) {
                     var agave = snapshot.data![index];
                     return ListTile(
-                      title: Text(agave!.nombre ?? ""),
+                      title: Text(agave.nombre ?? ""),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.edit),
+                            icon: const Icon(Icons.edit),
                             onPressed: () async {
                               bool? check = await Navigator.push(
                                 context,
@@ -85,7 +84,7 @@ class _AgavesScreenState extends State<AgavesScreen> {
                             },
                           ),
                           IconButton(
-                            icon: Icon(Icons.delete),
+                            icon: const Icon(Icons.delete),
                             onPressed: () {
                               setState(() {
                                 this.agave = agave;

@@ -26,7 +26,7 @@ class _PlagasScreenState extends State<PlagasScreen> {
           bool? check = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => RegistroPlaga(),
+              builder: (context) => const RegistroPlaga(),
             ),
           );
 
@@ -57,16 +57,16 @@ class _PlagasScreenState extends State<PlagasScreen> {
               return SafeArea(
                 child: ListView.builder(
                   itemCount: snapshot.data?.length,
-                  padding: EdgeInsets.only(bottom: 80.0),
+                  padding: const EdgeInsets.only(bottom: 80.0),
                   itemBuilder: (context, index) {
                     var plaga = snapshot.data![index];
                     return ListTile(
-                      title: Text(plaga!.nombre ?? ""),
+                      title: Text(plaga.nombre ?? ""),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.edit),
+                            icon: const Icon(Icons.edit),
                             onPressed: () async {
                               bool? check = await Navigator.push(
                                 context,
@@ -83,7 +83,7 @@ class _PlagasScreenState extends State<PlagasScreen> {
                             },
                           ),
                           IconButton(
-                            icon: Icon(Icons.delete),
+                            icon: const Icon(Icons.delete),
                             onPressed: () {
                               setState(() {
                                 this.plaga = plaga;

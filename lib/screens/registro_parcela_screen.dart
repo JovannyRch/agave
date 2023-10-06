@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class RegistroParcelaScreen extends StatefulWidget {
   Parcela? parcela;
 
-  RegistroParcelaScreen({this.parcela});
+  RegistroParcelaScreen({super.key, this.parcela});
 
   @override
   _RegistroParcelaScreenState createState() => _RegistroParcelaScreenState();

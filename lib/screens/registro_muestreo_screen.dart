@@ -5,6 +5,8 @@ import 'package:agave/backend/providers/plagas_provider.dart';
 import 'package:flutter/material.dart';
 
 class RegistroMuestreo extends StatefulWidget {
+  const RegistroMuestreo({super.key});
+
   @override
   _RegistroMuestreoState createState() => _RegistroMuestreoState();
 }

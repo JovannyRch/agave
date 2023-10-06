@@ -1,11 +1,10 @@
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
-import 'package:agave/screens/estudio_details_screen.dart';
-import 'package:agave/screens/muestreo_details_screen.dart';
+import 'package:agave/screens/estudios/estudio_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../utils.dart';
+import '../../utils.dart';
 
 class EstudiosScreen extends StatefulWidget {
   const EstudiosScreen({super.key});
@@ -22,23 +21,26 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Estudios'),
+        title: const Text('Estudios'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: _listaEstudios(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await Navigator.push(
+          bool? check = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => RegistroEstudio(),
+              builder: (context) => const RegistroEstudio(),
             ),
           );
-          _refresh();
+
+          if (check != null && check) {
+            _refresh();
+          }
         },
-        child: Icon(Icons.add),
         tooltip: 'Crear nuevo estudio',
         backgroundColor: Theme.of(context).primaryColor,
+        child: const Icon(Icons.add),
       ),
     );
   }

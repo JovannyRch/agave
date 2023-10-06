@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class RegistroAgave extends StatefulWidget {
   final Agave? agave;
 
-  RegistroAgave({this.agave});
+  const RegistroAgave({super.key, this.agave});
 
   @override
   _RegistroAgaveState createState() => _RegistroAgaveState();
@@ -30,7 +30,7 @@ class _RegistroAgaveState extends State<RegistroAgave> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Registrar Tipo de Agave'),
+        title: const Text('Registrar Tipo de Agave'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Padding(
@@ -41,7 +41,7 @@ class _RegistroAgaveState extends State<RegistroAgave> {
             children: [
               TextFormField(
                 decoration:
-                    InputDecoration(labelText: 'Nombre del tipo de agave'),
+                    const InputDecoration(labelText: 'Nombre del tipo de agave'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor introduce el nombre del tipo de agave';

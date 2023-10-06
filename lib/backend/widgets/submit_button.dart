@@ -11,7 +11,7 @@ class SubmitButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Column(children: [
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: Theme.of(context).primaryColor,
