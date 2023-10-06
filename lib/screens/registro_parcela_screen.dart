@@ -3,7 +3,9 @@ import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:flutter/material.dart';
 
 class RegistroParcelaScreen extends StatefulWidget {
-  const RegistroParcelaScreen({super.key});
+  Parcela? parcela;
+
+  RegistroParcelaScreen({this.parcela});
 
   @override
   _RegistroParcelaScreenState createState() => _RegistroParcelaScreenState();
@@ -11,13 +13,29 @@ class RegistroParcelaScreen extends StatefulWidget {
 
 class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
   final _formKey = GlobalKey<FormState>();
-
-  String? nombreParcela;
+  bool isEditing = false;
   String? tipoAgave;
-  double? superficie;
+  String? _nombreParcela = "";
+  double? _superficie;
   String? _selectedAgave;
   String? _selectedEstadoCultivo = "";
   String? _observaciones = "";
+
+  @override
+  void initState() {
+    print("init state");
+    if (widget.parcela != null) {
+      isEditing = true;
+      _nombreParcela = widget.parcela!.nombreParcela;
+      print(_nombreParcela);
+      print(widget.parcela!.nombreParcela);
+      _superficie = widget.parcela!.superficie;
+      _selectedAgave = widget.parcela!.tipoAgave;
+      _selectedEstadoCultivo = widget.parcela!.estadoCultivo;
+      _observaciones = widget.parcela!.observaciones;
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +72,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
       ),
       maxLines: 5, // Permite que el input tenga varias líneas
       keyboardType: TextInputType.multiline,
+      initialValue: _observaciones,
       onSaved: (value) {
         _observaciones = value;
       },
@@ -64,6 +83,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
     return TextFormField(
       decoration: const InputDecoration(labelText: 'Superficie (hectáreas)'),
       keyboardType: TextInputType.number,
+      initialValue: _superficie != null ? _superficie.toString() : "",
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Por favor ingresa la superficie';
@@ -71,7 +91,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
         return null;
       },
       onSaved: (value) {
-        superficie = double.tryParse(value!);
+        _superficie = double.tryParse(value!);
       },
     );
   }
@@ -87,8 +107,9 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
         }
         return null;
       },
+      initialValue: _nombreParcela,
       onSaved: (value) {
-        nombreParcela = value;
+        _nombreParcela = value;
       },
     );
   }
@@ -145,7 +166,13 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
         DropdownMenuItem(
             value: "Agave americana", child: Text("Agave americana")),
         DropdownMenuItem(
-            value: "Agave potatorum", child: Text("Agave potatorum (Tobala)")),
+          value: "Agave potatorum",
+          child: Text("Agave potatorum (Tobala)"),
+        ),
+        DropdownMenuItem(
+          value: "Otro",
+          child: Text("Otro"),
+        ),
       ],
       onChanged: (value) {
         setState(() {
@@ -174,9 +201,8 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
           _formKey.currentState!.save();
 
           Parcela parcela = Parcela(
-            nombreParcela: nombreParcela!,
-            superficie: superficie!,
-            fechaCreacion: DateTime.now().toString(),
+            nombreParcela: _nombreParcela!,
+            superficie: _superficie!,
             observaciones: _observaciones!,
           );
 
@@ -188,16 +214,23 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
             parcela.estadoCultivo = _selectedEstadoCultivo!;
           }
 
-          ParcelasProvider.db.insert(parcela);
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Parcela guardada con éxito!')),
-          );
+          if (isEditing) {
+            parcela.id = widget.parcela!.id;
+            ParcelasProvider.db.update(parcela);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Parcela actualizada con éxito!')),
+            );
+          } else {
+            ParcelasProvider.db.insert(parcela);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Parcela guardada con éxito!')),
+            );
+          }
 
           Navigator.pop(context);
         }
       },
-      child: const Text('Guardar'),
+      child: Text(isEditing ? 'Actualizar' : 'Guardar'),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/screens/estudio_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
+import 'package:agave/screens/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../utils.dart';
@@ -19,6 +20,14 @@ class DetallesParcela extends StatefulWidget {
 class _DetallesParcelaState extends State<DetallesParcela> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
+
+  Parcela? parcela;
+
+  @override
+  void initState() {
+    parcela = widget.parcela;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +62,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
               context,
               MaterialPageRoute(
                 builder: (context) => RegistroEstudio(
-                  idParcela: widget.parcela.id ?? -1,
+                  idParcela: parcela!.id ?? -1,
                 ),
               ),
             );
@@ -97,7 +106,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
                 foregroundColor: Theme.of(context).primaryColor,
               ),
               onPressed: () async {
-                await ParcelasProvider.db.deleteOne(widget.parcela.id ?? -1);
+                await ParcelasProvider.db.deleteOne(parcela!.id ?? -1);
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
@@ -112,15 +121,19 @@ class _DetallesParcelaState extends State<DetallesParcela> {
     return IconButton(
       icon: const Icon(Icons.edit),
       onPressed: () async {
-        /* await Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => RegistroParcelaScreen(
-              parcela: widget.parcela,
+              parcela: parcela,
             ),
           ),
-        ); */
-        setState(() {});
+        );
+        Parcela? editedParcel =
+            await ParcelasProvider.db.getById(parcela!.id ?? -1);
+        setState(() {
+          parcela = editedParcel;
+        });
       },
     );
   }
@@ -130,32 +143,31 @@ class _DetallesParcelaState extends State<DetallesParcela> {
       padding: const EdgeInsets.all(16.0),
       children: [
         Text(
-          widget.parcela.nombreParcela ?? "",
+          parcela!.nombreParcela ?? "",
           style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 20.0),
-        widget.parcela.tipoAgave == null || widget.parcela.tipoAgave == ""
+        parcela!.tipoAgave == null || parcela!.tipoAgave == ""
             ? Container()
             : Card(
                 child: ListTile(
                   title: const Text("Tipo de Agave"),
-                  subtitle: Text(widget.parcela.tipoAgave ?? ""),
+                  subtitle: Text(parcela!.tipoAgave ?? ""),
                 ),
               ),
         Card(
           child: ListTile(
             title: const Text("Superficie"),
-            subtitle: Text("${widget.parcela.superficie} ha"),
+            subtitle: Text("${parcela!.superficie} ha"),
           ),
         ),
-        widget.parcela.estadoCultivo == null ||
-                widget.parcela.estadoCultivo == ""
+        parcela!.estadoCultivo == null || parcela!.estadoCultivo == ""
             ? Container()
             : Card(
                 child: ListTile(
                   title: const Text("Estado del Cultivo"),
-                  subtitle: Text(widget.parcela.estadoCultivo ?? ""),
+                  subtitle: Text(parcela!.estadoCultivo ?? ""),
                 ),
               ),
         _renderObservaciones(),
@@ -168,8 +180,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
   }
 
   Widget _renderObservaciones() {
-    if (widget.parcela.observaciones == null ||
-        widget.parcela.observaciones == "") {
+    if (parcela!.observaciones == null || parcela!.observaciones == "") {
       return Container();
     }
 
@@ -181,7 +192,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
           style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10.0),
-        Text(widget.parcela.observaciones ?? ""),
+        Text(parcela!.observaciones ?? ""),
       ],
     );
   }
@@ -191,7 +202,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
       key: _refreshIndicatorKey,
       onRefresh: _refresh,
       child: FutureBuilder<List<Estudio>>(
-        future: EstudiosProvider.db.getAllWithPlague(widget.parcela.id ?? -1),
+        future: EstudiosProvider.db.getAllWithPlague(parcela!.id ?? -1),
         builder: (BuildContext context, AsyncSnapshot<List<Estudio>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

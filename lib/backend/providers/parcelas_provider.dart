@@ -23,14 +23,14 @@ class ParcelasProvider extends BaseProvider {
 
   Future<Parcela?> getById(int id) async {
     final db = await database;
-    final res = await db!.query(table, where: 'idParcela = ?', whereArgs: [id]);
+    final res = await db!.query(table, where: 'id = ?', whereArgs: [id]);
     return res.isNotEmpty ? Parcela.fromJson(res.first) : null;
   }
 
   Future<int> update(Parcela parcela) async {
     final db = await database;
     final res = await db!.update(table, parcela.toJson(),
-        where: 'idParcela = ?', whereArgs: [parcela.id]);
+        where: 'id = ?', whereArgs: [parcela.id]);
     return res;
   }
 

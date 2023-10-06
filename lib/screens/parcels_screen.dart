@@ -25,7 +25,7 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
           await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const RegistroParcelaScreen(),
+              builder: (context) => RegistroParcelaScreen(),
             ),
           );
           setState(() {});
