@@ -1,12 +1,16 @@
 import 'package:agave/backend/models/Incidencia.dart';
+import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/widgets/heat_map.dart';
 import 'package:agave/backend/widgets/incidencias_tab.dart';
+import 'package:agave/utils.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class EstudioDetailsScreen extends StatefulWidget {
-  const EstudioDetailsScreen({super.key});
+  Estudio estudio;
+
+  EstudioDetailsScreen({required this.estudio});
 
   @override
   State<EstudioDetailsScreen> createState() => _EstudioDetailsScreenState();
@@ -16,7 +20,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4, // Tenemos 4 tabs
+      length: 4,
       child: Scaffold(
         appBar: _appBar(),
         body: TabBarView(
@@ -47,8 +51,9 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   AppBar _appBar() {
     return AppBar(
       backgroundColor: Theme.of(context).primaryColor,
-      title: const Text(
-          'Estudio - [Fecha/Plaga]'), // Puedes personalizar el título aquí
+      title: Text(
+        widget.estudio.nombrePlaga ?? "",
+      ), // Puedes personalizar el título aquí
       actions: [
         IconButton(
           icon: const Icon(Icons.share),
@@ -81,28 +86,28 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   Widget _buildGeneralTab() {
     return ListView(
       padding: const EdgeInsets.all(16.0),
-      children: const [
+      children: [
         // Información Principal del Estudio (Header)
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Column(
               children: [
-                Icon(Icons.bug_report, size: 40), // ícono de plaga
-                Text('Plaga'),
+                const Icon(
+                  Icons.thermostat_outlined,
+                  size: 40,
+                ), // ícono de temperatura
+                Text(
+                  widget.estudio.temperatura.toString(),
+                ), // Ejemplo de temperatura
               ],
             ),
             Column(
               children: [
-                Icon(Icons.thermostat_outlined,
-                    size: 40), // ícono de temperatura
-                Text('25.0°C'), // Ejemplo de temperatura
-              ],
-            ),
-            Column(
-              children: [
-                Icon(Icons.water_damage, size: 40), // ícono de humedad
-                Text('25.0%'), // Ejemplo de humedad
+                const Icon(Icons.water_damage, size: 40), // ícono de humedad
+                Text(
+                  widget.estudio.humedad.toString(),
+                ), // Ejemplo de humedad
               ],
             ),
           ],

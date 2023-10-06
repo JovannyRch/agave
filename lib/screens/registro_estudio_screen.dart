@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class RegistroEstudio extends StatefulWidget {
   final int idParcela;
-  RegistroEstudio({required this.idParcela});
+  const RegistroEstudio({super.key, required this.idParcela});
 
   @override
   _RegistroEstudioState createState() => _RegistroEstudioState();
@@ -15,7 +15,7 @@ class RegistroEstudio extends StatefulWidget {
 class _RegistroEstudioState extends State<RegistroEstudio> {
   final _formKey = GlobalKey<FormState>();
 
-  List<Plaga> _plagas = [];
+  final List<Plaga> _plagas = [];
   double? _humedad;
   int? _plagaId;
   double? _temperatura;
@@ -32,9 +32,9 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
         child: Form(
           key: _formKey,
           child: ListView(children: [
+            _plagaDropdown(),
             _humedadInput(),
             _temperaturaInput(),
-            _plagaDropdown(),
             const SizedBox(height: 20),
             _submitButton(),
           ]),
@@ -57,12 +57,12 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
             String nombrePlaga = snapshot.data![i].nombre ?? "";
 
             if (nombrePlaga.length > 35) {
-              nombrePlaga = nombrePlaga.substring(0, 35) + "...";
+              nombrePlaga = "${nombrePlaga.substring(0, 35)}...";
             }
 
             items.add(DropdownMenuItem(
-              child: Text(nombrePlaga),
               value: snapshot.data![i].id,
+              child: Text(nombrePlaga),
             ));
           }
 
@@ -73,7 +73,7 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
             validator: (value) => value == null ? 'Selecciona una plaga' : null,
           );
         } else {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
       },
     );
@@ -113,10 +113,10 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
     );
   }
 
-  void _guardarEstudio() {
+  void _guardarEstudio() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      Estudio estudio = new Estudio();
+      Estudio estudio = Estudio();
 
       estudio.fechaEstudio = DateTime.now().toString();
 
@@ -129,7 +129,7 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
       }
 
       if (_plagaId != null) {
-        estudio.idEstudio = _plagaId;
+        estudio.idPlaga = _plagaId;
       }
 
       estudio.idParcela = widget.idParcela;

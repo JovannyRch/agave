@@ -14,7 +14,7 @@ class ParcelasScreen extends StatefulWidget {
 
 class _ParcelasScreenState extends State<ParcelasScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      new GlobalKey<RefreshIndicatorState>();
+      GlobalKey<RefreshIndicatorState>();
 
   @override
   Widget build(BuildContext context) {
@@ -68,16 +68,17 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                     title: Text(snapshot.data?[index].nombreParcela ?? ""),
                     subtitle: Text(
                         'Tipo de Agave: ${snapshot.data?[index].tipoAgave}'),
-                    onTap: () {
+                    onTap: () async {
                       Parcela parcela = snapshot.data?[index] ?? Parcela();
-                      Navigator.push(
+                      await Navigator.push(
                         context,
-                        MaterialPageRoute(
+                        await MaterialPageRoute(
                           builder: (context) => DetallesParcela(
                             parcela: parcela,
                           ),
                         ),
                       );
+                      _refresh();
                     },
                   );
                 },

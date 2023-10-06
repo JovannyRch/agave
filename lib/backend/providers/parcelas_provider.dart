@@ -5,17 +5,17 @@ import 'package:agave/backend/providers/base_provider.dart';
 class ParcelasProvider extends BaseProvider {
   static final ParcelasProvider db = ParcelasProvider._();
 
-  String tabla = DB.parcels;
+  String table = DB.parcels;
   ParcelasProvider._();
 
   insert(Parcela scan) async {
     final db = await database;
-    return await db!.insert(tabla, scan.toJson());
+    return await db!.insert(table, scan.toJson());
   }
 
   Future<List<Parcela>> getAll() async {
     final db = await database;
-    final res = await db!.query(tabla);
+    final res = await db!.query(table);
     return res.isEmpty
         ? []
         : res.map((registro) => Parcela.fromJson(registro)).toList();
@@ -23,14 +23,20 @@ class ParcelasProvider extends BaseProvider {
 
   Future<Parcela?> getById(int id) async {
     final db = await database;
-    final res = await db!.query(tabla, where: 'idParcela = ?', whereArgs: [id]);
+    final res = await db!.query(table, where: 'idParcela = ?', whereArgs: [id]);
     return res.isNotEmpty ? Parcela.fromJson(res.first) : null;
   }
 
   Future<int> update(Parcela parcela) async {
     final db = await database;
-    final res = await db!.update(tabla, parcela.toJson(),
+    final res = await db!.update(table, parcela.toJson(),
         where: 'idParcela = ?', whereArgs: [parcela.id]);
+    return res;
+  }
+
+  Future<int> deleteOne(int id) async {
+    final db = await database;
+    final res = await db!.delete(table, where: '$id = ?', whereArgs: [id]);
     return res;
   }
 }

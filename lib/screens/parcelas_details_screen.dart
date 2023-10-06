@@ -1,7 +1,12 @@
+import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/parcela.dart';
+import 'package:agave/backend/providers/estudios_provider.dart';
+import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/screens/estudio_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:flutter/material.dart';
+
+import '../utils.dart';
 
 class DetallesParcela extends StatefulWidget {
   Parcela parcela;
@@ -12,6 +17,9 @@ class DetallesParcela extends StatefulWidget {
 }
 
 class _DetallesParcelaState extends State<DetallesParcela> {
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -27,6 +35,10 @@ class _DetallesParcelaState extends State<DetallesParcela> {
             ],
             indicatorColor: Colors.white,
           ),
+          actions: [
+            _deleteButton(),
+            _editButton(),
+          ],
         ),
         body: TabBarView(
           children: [
@@ -36,9 +48,8 @@ class _DetallesParcelaState extends State<DetallesParcela> {
         ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Theme.of(context).primaryColor,
-          onPressed: () {
-            //Navigate to RegistroEstudio
-            Navigator.push(
+          onPressed: () async {
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => RegistroEstudio(
@@ -46,10 +57,71 @@ class _DetallesParcelaState extends State<DetallesParcela> {
                 ),
               ),
             );
+            setState(() {});
           },
           child: const Icon(Icons.add),
         ),
       ),
+    );
+  }
+
+  Widget _deleteButton() {
+    return IconButton(
+      icon: const Icon(Icons.delete),
+      onPressed: () {
+        _showDeleteConfirmationDialog(context);
+      },
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Eliminar Parcela"),
+          content: const Text("¿Estás seguro de eliminar esta parcela?"),
+          actions: [
+            TextButton(
+              child: const Text("Cancelar"),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).primaryColor,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text("Eliminar"),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).primaryColor,
+              ),
+              onPressed: () async {
+                await ParcelasProvider.db.deleteOne(widget.parcela.id ?? -1);
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _editButton() {
+    return IconButton(
+      icon: const Icon(Icons.edit),
+      onPressed: () async {
+        /* await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RegistroParcelaScreen(
+              parcela: widget.parcela,
+            ),
+          ),
+        ); */
+        setState(() {});
+      },
     );
   }
 
@@ -86,8 +158,25 @@ class _DetallesParcelaState extends State<DetallesParcela> {
                   subtitle: Text(widget.parcela.estadoCultivo ?? ""),
                 ),
               ),
+        _renderObservaciones(),
+      ],
+    );
+  }
+
+  Future<void> _refresh() async {
+    setState(() {});
+  }
+
+  Widget _renderObservaciones() {
+    if (widget.parcela.observaciones == null ||
+        widget.parcela.observaciones == "") {
+      return Container();
+    }
+
+    return Column(
+      children: [
         const SizedBox(height: 20.0),
-        Text(
+        const Text(
           "Observaciones",
           style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
         ),
@@ -98,21 +187,45 @@ class _DetallesParcelaState extends State<DetallesParcela> {
   }
 
   Widget _listaEstudios() {
-    return ListView.builder(
-      itemCount: 4,
-      itemBuilder: (context, index) {
-        return ListTile(
-          title: Text('Estudio ${index + 1}'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const EstudioDetailsScreen(),
-              ),
+    return RefreshIndicator(
+      key: _refreshIndicatorKey,
+      onRefresh: _refresh,
+      child: FutureBuilder<List<Estudio>>(
+        future: EstudiosProvider.db.getAllWithPlague(widget.parcela.id ?? -1),
+        builder: (BuildContext context, AsyncSnapshot<List<Estudio>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Ha ocurrido un error'));
+          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No hay estudios disponibles'));
+          } else {
+            return ListView.builder(
+              itemCount: snapshot.data?.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(
+                    "Estudio - ${snapshot.data?[index].nombrePlaga ?? ""}",
+                  ),
+                  subtitle:
+                      Text(formatDate(snapshot.data?[index].fechaEstudio)),
+                  onTap: () {
+                    Estudio estudio = snapshot.data?[index] ?? Estudio();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EstudioDetailsScreen(
+                          estudio: estudio,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
             );
-          },
-        );
-      },
+          }
+        },
+      ),
     );
   }
 }

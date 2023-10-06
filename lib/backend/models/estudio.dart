@@ -1,36 +1,38 @@
 class Estudio {
-  int? idEstudio;
+  int? id;
   int? idParcela;
   int? idPlaga;
   double? humedad;
   double? temperatura;
   String? fechaEstudio;
   String? observaciones;
+  String? nombrePlaga;
 
   Estudio({
-    this.idEstudio,
+    this.id,
     this.idParcela,
     this.idPlaga,
     this.humedad,
     this.temperatura,
     this.fechaEstudio,
     this.observaciones,
+    this.nombrePlaga,
   });
 
   Estudio.fromJson(Map<String, dynamic> json) {
-    idEstudio = json['idEstudio'];
+    id = json['id'];
     idParcela = json['idParcela'];
     idPlaga = json['idPlaga'];
     humedad = json['humedad'];
     temperatura = json['temperatura'];
     fechaEstudio = json['fechaEstudio'];
     observaciones = json['observaciones'];
+    nombrePlaga = json['nombrePlaga'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
 
-    data['idEstudio'] = idEstudio;
     data['idParcela'] = idParcela;
     data['idPlaga'] = idPlaga;
     data['humedad'] = humedad;

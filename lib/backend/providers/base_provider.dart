@@ -36,9 +36,9 @@ class BaseProvider {
     );
   }
 
-  Future<int> delete(String id, String table, String field) async {
+  Future<int> delete(String id, String table) async {
     final db = await database;
-    final res = await db!.delete(table, where: '$field = ?', whereArgs: [id]);
+    final res = await db!.delete(table, where: 'id = ?', whereArgs: [id]);
     return res;
   }
 
