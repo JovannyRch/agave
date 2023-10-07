@@ -4,7 +4,7 @@ import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/screens/estudios/estudio_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
-import 'package:agave/screens/registro_parcela_screen.dart';
+import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../utils.dart';
@@ -61,7 +61,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
             await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const RegistroEstudio(),
+                builder: (context) => RegistroEstudio(),
               ),
             );
             setState(() {});
@@ -216,9 +216,9 @@ class _DetallesParcelaState extends State<DetallesParcela> {
                   title: const Text("Estdio"),
                   subtitle:
                       Text(formatDate(snapshot.data?[index].fechaCreacion)),
-                  onTap: () {
+                  onTap: () async {
                     Estudio estudio = snapshot.data?[index] ?? Estudio();
-                    Navigator.push(
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => EstudioDetailsScreen(
@@ -226,6 +226,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
                         ),
                       ),
                     );
+                    _refresh();
                   },
                 );
               },

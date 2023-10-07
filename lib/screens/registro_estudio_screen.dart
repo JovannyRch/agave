@@ -4,7 +4,8 @@ import 'package:agave/backend/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
 
 class RegistroEstudio extends StatefulWidget {
-  const RegistroEstudio({super.key});
+  Estudio? estudio;
+  RegistroEstudio({Key? key, this.estudio}) : super(key: key);
 
   @override
   _RegistroEstudioState createState() => _RegistroEstudioState();
@@ -14,6 +15,19 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
   final _formKey = GlobalKey<FormState>();
   String? _nombre;
   String? _observaciones;
+  Estudio? estudio;
+  bool isEditing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.estudio != null) {
+      isEditing = true;
+      estudio = widget.estudio;
+      _nombre = estudio!.nombre;
+      _observaciones = estudio!.observaciones;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +54,7 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
   Widget _nombreInput() {
     return TextFormField(
       decoration: const InputDecoration(labelText: 'Nombre'),
-      keyboardType: TextInputType.number,
+      initialValue: _nombre,
       onSaved: (value) => _nombre = value,
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -52,27 +66,52 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
   }
 
   Widget _submitButton() {
-    return SubmitButton(text: 'Guardar estudio', onPressed: _guardarEstudio);
+    return SubmitButton(
+        text: isEditing ? 'Guardar cambios' : 'Guardar estudio',
+        onPressed: _guardarEstudio);
   }
 
   void _guardarEstudio() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      Estudio estudio = Estudio();
 
-      estudio.fechaCreacion = DateTime.now().toString();
-      estudio.nombre = _nombre;
-
-      if (_observaciones != null) {
-        estudio.observaciones = _observaciones;
+      if (isEditing) {
+        _updateEstudio();
+      } else {
+        _saveEstudio();
       }
-
-      await EstudiosProvider.db.insert(estudio);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Estudio guardado con éxito!')),
-      );
-      Navigator.pop(context, true);
     }
+  }
+
+  void _updateEstudio() async {
+    Estudio estudio = widget.estudio!;
+
+    estudio.nombre = _nombre;
+    estudio.observaciones = _observaciones ?? "";
+
+    await EstudiosProvider.db.update(estudio);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Estudio actualizado con éxito!')),
+    );
+
+    Navigator.pop(context, estudio);
+  }
+
+  void _saveEstudio() async {
+    Estudio estudio = Estudio();
+
+    estudio.fechaCreacion = DateTime.now().toString();
+    estudio.nombre = _nombre;
+
+    if (_observaciones != null) {
+      estudio.observaciones = _observaciones;
+    }
+
+    await EstudiosProvider.db.insert(estudio);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Estudio guardado con éxito!')),
+    );
+    Navigator.pop(context, true);
   }
 
   Widget _obervacionesInput() {

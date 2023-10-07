@@ -3,6 +3,7 @@ import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
+import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils.dart';
@@ -19,7 +20,8 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
-  Estudio? estudio;
+  late Estudio estudio;
+  Size? size;
 
   @override
   void initState() {
@@ -29,6 +31,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detalle del Estudio'),
@@ -61,19 +64,19 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
               'Nombre: ${widget.estudio.nombre}',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 20,
+                fontSize: 18,
               ),
             ),
             const SizedBox(height: 10),
             Text(
               'Fecha de Creación: ${formatDate(estudio!.fechaCreacion)}',
-              style: const TextStyle(
-                fontSize: 16,
-              ),
             ),
             _renderObservaciones(),
             // Aquí puede ir la lista de Parcelas Asociadas
-            _listaParcelas(),
+            SizedBox(
+              height: size!.height * 0.7,
+              child: _listaParcelas(),
+            ),
           ],
         ),
       ),
@@ -94,6 +97,8 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
       return Container();
     }
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 20.0),
         const Text(
@@ -145,19 +150,19 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
     return IconButton(
       icon: const Icon(Icons.edit),
       onPressed: () async {
-        /*  await Navigator.push(
+        Estudio? updatedEstudio = await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => RegistroParcelaScreen(
-              parcela: parcela,
+            builder: (context) => RegistroEstudio(
+              estudio: estudio,
             ),
           ),
         );
-        Parcela? editedParcel =
-            await ParcelasProvider.db.getById(parcela!.id ?? -1);
-        setState(() {
-          parcela = editedParcel;
-        }); */
+        if (updatedEstudio != null) {
+          setState(() {
+            estudio = updatedEstudio;
+          });
+        }
       },
     );
   }
@@ -203,7 +208,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
               itemCount: snapshot.data?.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: const Text("Estdio"),
+                  title: const Text("Estudio"),
                   subtitle:
                       Text(formatDate(snapshot.data?[index].fechaCreacion)),
                   onTap: () {

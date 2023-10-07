@@ -3,7 +3,7 @@ import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
-import 'package:agave/screens/registro_parcela_screen.dart';
+import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../utils.dart';
@@ -60,7 +60,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
             await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const RegistroEstudio(),
+                builder: (context) => RegistroEstudio(),
               ),
             );
             setState(() {});

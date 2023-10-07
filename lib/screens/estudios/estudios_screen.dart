@@ -30,7 +30,7 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
           bool? check = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const RegistroEstudio(),
+              builder: (context) => RegistroEstudio(),
             ),
           );
 
@@ -71,9 +71,9 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
                 return ListTile(
                   title: Text(estudio.nombre ?? ""),
                   subtitle: Text(formatDate(estudio.fechaCreacion)),
-                  onTap: () {
+                  onTap: () async {
                     Estudio estudio = snapshot.data?[index] ?? Estudio();
-                    Navigator.push(
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => EstudioDetailsScreen(
@@ -81,6 +81,7 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
                         ),
                       ),
                     );
+                    _refresh();
                   },
                 );
               },

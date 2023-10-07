@@ -2,7 +2,7 @@ import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/screens/parcelas_details_screen.dart';
-import 'package:agave/screens/registro_parcela_screen.dart';
+import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
 
 class ParcelasScreen extends StatefulWidget {
