@@ -1,12 +1,22 @@
+import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/const.dart';
 import 'package:agave/screens/Navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('es_ES');
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => PlagasModel()),
+        ChangeNotifierProvider(create: (context) => AgavesModel()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

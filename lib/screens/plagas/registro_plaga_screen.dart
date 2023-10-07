@@ -1,7 +1,9 @@
 import 'package:agave/backend/models/plaga.dart';
 import 'package:agave/backend/providers/plagas_provider.dart';
+import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegistroPlaga extends StatefulWidget {
   final Plaga? plaga;
@@ -16,6 +18,7 @@ class _RegistroPlagaState extends State<RegistroPlaga> {
   final _formKey = GlobalKey<FormState>();
   String _nombrePlaga = '';
   bool isEditing = false;
+  PlagasModel? _model;
 
   @override
   void initState() {
@@ -28,6 +31,7 @@ class _RegistroPlagaState extends State<RegistroPlaga> {
 
   @override
   Widget build(BuildContext context) {
+    _model = Provider.of<PlagasModel>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Registrar Plaga'),
@@ -40,7 +44,8 @@ class _RegistroPlagaState extends State<RegistroPlaga> {
           child: Column(
             children: [
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Nombre de la plaga'),
+                decoration:
+                    const InputDecoration(labelText: 'Nombre de la plaga'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor introduce el nombre de la plaga';
@@ -62,14 +67,14 @@ class _RegistroPlagaState extends State<RegistroPlaga> {
                         : Plaga(nombre: _nombrePlaga);
 
                     if (isEditing) {
-                      PlagasProvider.db.update(plaga);
+                      _model?.update(plaga);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Plaga $_nombrePlaga actualizada!'),
                         ),
                       );
                     } else {
-                      PlagasProvider.db.insert(plaga);
+                      _model?.add(plaga);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Plaga $_nombrePlaga registrada!'),

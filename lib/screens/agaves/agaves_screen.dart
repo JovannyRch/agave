@@ -1,8 +1,8 @@
 import 'package:agave/backend/models/agave.dart';
-import 'package:agave/backend/models/database.dart';
-import 'package:agave/backend/providers/agave_provider.dart';
+import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/screens/agaves/registro_agave.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AgavesScreen extends StatefulWidget {
   const AgavesScreen({super.key});
@@ -16,23 +16,21 @@ class _AgavesScreenState extends State<AgavesScreen> {
       GlobalKey<RefreshIndicatorState>();
 
   Agave? agave;
+  AgavesModel? _model;
 
   @override
   Widget build(BuildContext context) {
+    _model = Provider.of<AgavesModel>(context);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
         onPressed: () async {
-          bool? check = await Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const RegistroAgave(),
             ),
           );
-
-          if (check != null && check) {
-            _refresh();
-          }
         },
         tooltip: 'Agregar tipo de Agave',
         child: const Icon(Icons.add),
@@ -44,69 +42,57 @@ class _AgavesScreenState extends State<AgavesScreen> {
       body: RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: _refresh,
-        child: FutureBuilder<List<Agave>>(
-          future: AgaveProvider.db.getAll(),
-          builder: (BuildContext context, AsyncSnapshot<List<Agave>> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return const Center(child: Text('Ha ocurrido un error'));
-            } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-              return const Center(
-                  child: Text('No hay tipos de agave disponibles'));
-            } else {
-              return SafeArea(
-                child: ListView.builder(
-                  itemCount: snapshot.data?.length,
-                  padding: const EdgeInsets.only(bottom: 80.0),
-                  itemBuilder: (context, index) {
-                    var agave = snapshot.data![index];
-                    return ListTile(
-                      title: Text(agave.nombre ?? ""),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () async {
-                              bool? check = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => RegistroAgave(
-                                    agave: agave,
-                                  ),
-                                ),
-                              );
-
-                              if (check != null && check) {
-                                _refresh();
-                              }
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () {
-                              setState(() {
-                                this.agave = agave;
-                              });
-                              _showDeleteConfirmationDialog(context);
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              );
-            }
-          },
-        ),
+        child: _model!.agaves.isEmpty ? _emptyList() : _agavesList(),
       ),
     );
   }
 
   Future<void> _refresh() async {
     setState(() {});
+  }
+
+  Widget _emptyList() {
+    return const Center(child: Text('No hay tipos de agave disponibles'));
+  }
+
+  Widget _agavesList() {
+    return ListView.builder(
+      itemCount: _model!.agaves.length,
+      padding: const EdgeInsets.only(bottom: 80.0),
+      itemBuilder: (context, index) {
+        var agave = _model!.agaves[index];
+        return ListTile(
+          title: Text(agave.nombre ?? ""),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RegistroAgave(
+                        agave: agave,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () {
+                  setState(() {
+                    this.agave = agave;
+                  });
+                  _showDeleteConfirmationDialog(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _showDeleteConfirmationDialog(BuildContext context) {
@@ -130,9 +116,8 @@ class _AgavesScreenState extends State<AgavesScreen> {
               ),
               onPressed: () {
                 if (agave != null) {
-                  AgaveProvider.db.delete(agave!.id ?? -1, DB.agaves);
+                  _model?.delete(agave!.id ?? -1);
                   Navigator.of(context).pop();
-                  _refresh();
                 }
               },
             ),

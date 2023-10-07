@@ -6,9 +6,12 @@ class AgaveProvider extends BaseProvider {
 
   AgaveProvider._();
 
-  insert(Agave item) async {
+  Future<Agave> insert(Agave item) async {
     final db = await database;
-    return await db!.insert("agaves", item.toJson());
+    await db!.insert("agaves", item.toJson());
+    final res =
+        await db.rawQuery("SELECT * FROM agaves ORDER BY id DESC LIMIT 1");
+    return Agave.fromJson(res.first);
   }
 
   Future<List<Agave>> getAll() async {

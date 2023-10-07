@@ -8,9 +8,13 @@ class PlagasProvider extends BaseProvider {
   String tabla = DB.plagas;
   PlagasProvider._();
 
-  insert(Plaga item) async {
+  Future<Plaga> insert(Plaga item) async {
     final db = await database;
-    return await db!.insert(tabla, item.toJson());
+    await db!.insert(tabla, item.toJson());
+
+    final res =
+        await db.rawQuery("SELECT * FROM $tabla ORDER BY id DESC LIMIT 1");
+    return Plaga.fromJson(res.first);
   }
 
   Future<List<Plaga>> getAll() async {

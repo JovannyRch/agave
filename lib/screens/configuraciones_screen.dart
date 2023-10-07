@@ -15,8 +15,8 @@ class ConfiguracionScreen extends StatelessWidget {
       body: ListView(
         children: <Widget>[
           _buildDataConfigSection(context),
-          _buildHelpSupportSection(),
-          _buildAppInfoSection(),
+          /*     _buildHelpSupportSection(),
+          _buildAppInfoSection(), */
         ],
       ),
     );
@@ -45,7 +45,7 @@ class ConfiguracionScreen extends StatelessWidget {
             ),
           ),
         ),
-        ListTile(
+        /*  ListTile(
           title: const Text('Exportar datos'),
           trailing: const Icon(Icons.arrow_forward),
           onTap: () {
@@ -66,7 +66,7 @@ class ConfiguracionScreen extends StatelessWidget {
             // Acción para respaldar datos
           },
         ),
-        /*  ListTile(
+         ListTile(
           title: const Text('Sincronizar datos entre dispositivos'),
           trailing: const Icon(Icons.arrow_forward),
           onTap: () {

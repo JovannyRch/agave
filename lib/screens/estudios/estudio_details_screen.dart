@@ -3,6 +3,7 @@ import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
+import 'package:agave/screens/parcelas/parcels_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -44,13 +45,12 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
         onPressed: () async {
-          /*  await Navigator.push(
+          Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => RegistroEstudioScreen(),
+              builder: (context) => ParcelasScreen(),
             ),
           );
-          setState(() {}); */
         },
         tooltip: 'Agregar Parcela',
         child: const Icon(Icons.add),
@@ -197,11 +197,12 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
           } else if (snapshot.hasError) {
             return const Center(
               child: Text(
-                  'Ha ocurrido un error al obtener las parcelas asociadas'),
+                'Ha ocurrido un error al obtener las parcelas asociadas',
+              ),
             );
           } else if (snapshot.data == null || snapshot.data!.isEmpty) {
             return const Center(
-              child: Text('No hay parcelas disponibles'),
+              child: Text('No hay parcelas asociadas'),
             );
           } else {
             Widget list = ListView.builder(
@@ -209,8 +210,9 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
               itemBuilder: (context, index) {
                 return ListTile(
                   title: const Text("Estudio"),
-                  subtitle:
-                      Text(formatDate(snapshot.data?[index].fechaCreacion)),
+                  subtitle: Text(
+                    formatDate(snapshot.data?[index].fechaCreacion),
+                  ),
                   onTap: () {
                     /* Estudio estudio = snapshot.data?[index] ?? Estudio();
                     Navigator.push(

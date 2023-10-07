@@ -34,16 +34,8 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text('Estudios'),
+        title: const Text('Parcelas'),
         backgroundColor: Theme.of(context).primaryColor,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () {
-              _showDeleteConfirmationDialog(context);
-            },
-          )
-        ],
       ),
       body: RefreshIndicator(
         key: _refreshIndicatorKey,
@@ -63,8 +55,6 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
                 itemCount: snapshot.data?.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    /*leading:  Image.network(snapshot.data[index]
-                      .rutaImagen), */
                     title: Text(snapshot.data?[index].nombre ?? ""),
                     subtitle: Text(
                         'Tipo de Agave: ${snapshot.data?[index].tipoAgave}'),

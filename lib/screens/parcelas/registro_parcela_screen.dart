@@ -1,6 +1,9 @@
+import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
+import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegistroParcelaScreen extends StatefulWidget {
   Parcela? parcela;
@@ -14,7 +17,7 @@ class RegistroParcelaScreen extends StatefulWidget {
 class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
   final _formKey = GlobalKey<FormState>();
   bool isEditing = false;
-  String? tipoAgave;
+  int? _idAgave;
   String? _nombreParcela = "";
   double? _superficie;
   String? _selectedAgave;
@@ -23,7 +26,6 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
 
   @override
   void initState() {
-    print("init state");
     if (widget.parcela != null) {
       isEditing = true;
       _nombreParcela = widget.parcela!.nombre;
@@ -39,6 +41,9 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final agavesModel = Provider.of<AgavesModel>(context);
+    print("agavesModel");
+    print(agavesModel.agaves);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Registrar Parcela'),
@@ -52,7 +57,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
             children: <Widget>[
               _nombreInput(),
               _superficieInput(),
-              _tipoDrowdown(),
+              _tipoDrowdown(agavesModel.agaves),
               _statusDropdown(),
               _obervacionesInput(),
               const SizedBox(height: 20),
@@ -152,31 +157,18 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
     );
   }
 
-  Widget _tipoDrowdown() {
-    return DropdownButtonFormField<String>(
-      value: _selectedAgave,
-      items: const [
-        DropdownMenuItem(
-            value: "Agave tequilana", child: Text("Agave tequilana (Azul)")),
-        DropdownMenuItem(
-            value: "Agave angustifolia",
-            child: Text("Agave angustifolia (Espadín)")),
-        DropdownMenuItem(
-            value: "Agave salmiana", child: Text("Agave salmiana")),
-        DropdownMenuItem(
-            value: "Agave americana", child: Text("Agave americana")),
-        DropdownMenuItem(
-          value: "Agave potatorum",
-          child: Text("Agave potatorum (Tobala)"),
-        ),
-        DropdownMenuItem(
-          value: "Otro",
-          child: Text("Otro"),
-        ),
-      ],
+  Widget _tipoDrowdown(List<Agave> list) {
+    return DropdownButtonFormField<int>(
+      value: _idAgave,
+      items: list.map((agave) {
+        return DropdownMenuItem<int>(
+          value: agave.id,
+          child: Text(agave!.nombre ?? ""),
+        );
+      }).toList(),
       onChanged: (value) {
         setState(() {
-          _selectedAgave = value;
+          _idAgave = value;
         });
       },
       decoration: const InputDecoration(

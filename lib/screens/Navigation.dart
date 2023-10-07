@@ -1,7 +1,9 @@
+import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/screens/configuraciones_screen.dart';
 import 'package:agave/screens/estudios/estudios_screen.dart';
 import 'package:agave/screens/inicio_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
@@ -22,6 +24,13 @@ class _NavigationState extends State<Navigation> {
     setState(() {
       _currentIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<PlagasModel>(context, listen: false).fetchData();
+    Provider.of<AgavesModel>(context, listen: false).fetchData();
   }
 
   @override
