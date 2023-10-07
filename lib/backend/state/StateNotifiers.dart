@@ -77,21 +77,41 @@ class AgavesModel with ChangeNotifier {
 
 class EstudiosModel with ChangeNotifier {
   List<Estudio> _estudios = [];
+  Estudio? _estudio;
 
   List<Estudio> get estudios => _estudios;
+  Estudio? get estudio => _estudio;
 
   fetchData() async {
     _estudios = await EstudiosProvider.db.getAll();
     notifyListeners();
   }
 
-  addEstudio(Estudio estudio) async {
-    await EstudiosProvider.db.insert(estudio);
-    fetchData();
+  add(Estudio estudio) async {
+    Estudio newItem = await EstudiosProvider.db.insert(estudio);
+    _estudios.add(newItem);
+    notifyListeners();
   }
 
   delete(int id) async {
     await EstudiosProvider.db.delete(id, DB.estudios);
-    fetchData();
+    _estudios.removeWhere((item) => item.id == id);
+    notifyListeners();
+  }
+
+  update(Estudio estudio) async {
+    await EstudiosProvider.db.update(estudio);
+    _estudios = _estudios.map((item) {
+      if (item.id == estudio.id) {
+        item = estudio;
+      }
+      return item;
+    }).toList();
+    notifyListeners();
+  }
+
+  setSelected(Estudio? estudio) {
+    _estudio = estudio;
+    notifyListeners();
   }
 }

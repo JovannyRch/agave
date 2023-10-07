@@ -1,7 +1,9 @@
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
+import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegistroEstudio extends StatefulWidget {
   Estudio? estudio;
@@ -17,6 +19,7 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
   String? _observaciones;
   Estudio? estudio;
   bool isEditing = false;
+  EstudiosModel? _model;
 
   @override
   void initState() {
@@ -31,6 +34,7 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
 
   @override
   Widget build(BuildContext context) {
+    _model = Provider.of<EstudiosModel>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Registrar Estudio"),
@@ -89,12 +93,14 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
     estudio.nombre = _nombre;
     estudio.observaciones = _observaciones ?? "";
 
-    await EstudiosProvider.db.update(estudio);
+    _model?.update(estudio);
+    _model?.setSelected(estudio);
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Estudio actualizado con éxito!')),
     );
 
-    Navigator.pop(context, estudio);
+    Navigator.pop(context);
   }
 
   void _saveEstudio() async {
@@ -107,11 +113,11 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
       estudio.observaciones = _observaciones;
     }
 
-    await EstudiosProvider.db.insert(estudio);
+    _model?.add(estudio);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Estudio guardado con éxito!')),
     );
-    Navigator.pop(context, true);
+    Navigator.pop(context);
   }
 
   Widget _obervacionesInput() {

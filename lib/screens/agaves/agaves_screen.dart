@@ -48,7 +48,7 @@ class _AgavesScreenState extends State<AgavesScreen> {
   }
 
   Future<void> _refresh() async {
-    setState(() {});
+    Provider.of<AgavesModel>(context, listen: false).fetchData();
   }
 
   Widget _emptyList() {

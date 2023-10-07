@@ -13,6 +13,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => PlagasModel()),
         ChangeNotifierProvider(create: (context) => AgavesModel()),
+        ChangeNotifierProvider(create: (context) => EstudiosModel()),
       ],
       child: MyApp(),
     ),

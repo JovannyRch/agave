@@ -1,17 +1,15 @@
-import 'package:agave/backend/models/database.dart';
-import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/parcela.dart';
-import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
+import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/screens/parcelas/parcels_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../utils.dart';
 
 class EstudioDetailsScreen extends StatefulWidget {
-  Estudio estudio;
-  EstudioDetailsScreen({super.key, required this.estudio});
+  EstudioDetailsScreen({super.key});
 
   @override
   State<EstudioDetailsScreen> createState() => _EstudioDetailsScreenState();
@@ -21,17 +19,18 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
-  late Estudio estudio;
   Size? size;
+  EstudiosModel? _model;
 
   @override
   void initState() {
-    estudio = widget.estudio;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    _model = Provider.of<EstudiosModel>(context);
+
     size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -61,7 +60,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Nombre: ${widget.estudio.nombre}',
+              'Nombre: ${_model?.estudio!.nombre ?? ''}',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
@@ -69,7 +68,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              'Fecha de Creación: ${formatDate(estudio!.fechaCreacion)}',
+              'Fecha de Creación: ${formatDate(_model?.estudio?.fechaCreacion)}',
             ),
             _renderObservaciones(),
             // Aquí puede ir la lista de Parcelas Asociadas
@@ -93,7 +92,8 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   }
 
   Widget _renderObservaciones() {
-    if (estudio!.observaciones == null || estudio!.observaciones == "") {
+    if (_model?.estudio!.observaciones == null ||
+        _model?.estudio!.observaciones == "") {
       return Container();
     }
     return Column(
@@ -106,7 +106,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
           style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10.0),
-        Text(estudio!.observaciones ?? ""),
+        Text(_model?.estudio!.observaciones ?? ""),
       ],
     );
   }
@@ -133,8 +133,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
                 foregroundColor: Theme.of(context).primaryColor,
               ),
               onPressed: () async {
-                await EstudiosProvider.db
-                    .delete(estudio!.id ?? -1, DB.estudios);
+                _model?.delete(_model?.estudio!.id ?? -1);
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
@@ -149,20 +148,15 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   Widget _editButton() {
     return IconButton(
       icon: const Icon(Icons.edit),
-      onPressed: () async {
-        Estudio? updatedEstudio = await Navigator.push(
+      onPressed: () {
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => RegistroEstudio(
-              estudio: estudio,
+              estudio: _model?.estudio,
             ),
           ),
         );
-        if (updatedEstudio != null) {
-          setState(() {
-            estudio = updatedEstudio;
-          });
-        }
       },
     );
   }
@@ -172,7 +166,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
       padding: const EdgeInsets.all(16.0),
       children: [
         Text(
-          estudio!.nombre ?? "",
+          _model?.estudio!.nombre ?? "",
           style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),

@@ -1,8 +1,10 @@
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
+import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/screens/estudios/estudio_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../utils.dart';
 
@@ -17,26 +19,26 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
+  EstudiosModel? _model;
+
   @override
   Widget build(BuildContext context) {
+    _model = Provider.of<EstudiosModel>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Estudios'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: _listaEstudios(),
+      body: _body(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          bool? check = await Navigator.push(
+        onPressed: () {
+          Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => RegistroEstudio(),
             ),
           );
-
-          if (check != null && check) {
-            _refresh();
-          }
         },
         tooltip: 'Crear nuevo estudio',
         backgroundColor: Theme.of(context).primaryColor,
@@ -46,49 +48,41 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
   }
 
   Future<void> _refresh() async {
-    setState(() {});
+    Provider.of<EstudiosModel>(context, listen: false).fetchData();
   }
 
-  Widget _listaEstudios() {
+  Widget _body() {
     return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: _refresh,
-      child: FutureBuilder<List<Estudio>>(
-        future: EstudiosProvider.db.getAll(),
-        builder: (BuildContext context, AsyncSnapshot<List<Estudio>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return const Center(child: Text('Ha ocurrido un error'));
-          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No hay estudios disponibles'));
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data?.length,
-              itemBuilder: (context, index) {
-                Estudio estudio = snapshot.data?[index] ?? Estudio();
+      child: _model?.estudios?.isEmpty ?? true
+          ? const Center(
+              child: Text('No hay estudios disponibles'),
+            )
+          : _list(),
+    );
+  }
 
-                return ListTile(
-                  title: Text(estudio.nombre ?? ""),
-                  subtitle: Text(formatDate(estudio.fechaCreacion)),
-                  onTap: () async {
-                    Estudio estudio = snapshot.data?[index] ?? Estudio();
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EstudioDetailsScreen(
-                          estudio: estudio,
-                        ),
-                      ),
-                    );
-                    _refresh();
-                  },
-                );
-              },
+  Widget _list() {
+    return ListView.builder(
+      itemCount: _model?.estudios?.length ?? 0,
+      itemBuilder: (context, index) {
+        Estudio estudio = _model?.estudios?[index] ?? Estudio();
+
+        return ListTile(
+          title: Text(estudio.nombre ?? ""),
+          subtitle: Text(formatDate(estudio.fechaCreacion)),
+          onTap: () {
+            _model?.setSelected(estudio);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EstudioDetailsScreen(),
+              ),
             );
-          }
-        },
-      ),
+          },
+        );
+      },
     );
   }
 }

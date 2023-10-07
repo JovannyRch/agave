@@ -217,7 +217,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
                   subtitle:
                       Text(formatDate(snapshot.data?[index].fechaCreacion)),
                   onTap: () async {
-                    Estudio estudio = snapshot.data?[index] ?? Estudio();
+                    /* Estudio estudio = snapshot.data?[index] ?? Estudio();
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -226,7 +226,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
                         ),
                       ),
                     );
-                    _refresh();
+                    _refresh(); */
                   },
                 );
               },

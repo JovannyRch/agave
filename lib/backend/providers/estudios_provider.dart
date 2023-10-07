@@ -9,9 +9,13 @@ class EstudiosProvider extends BaseProvider {
 
   EstudiosProvider._();
 
-  insert(Estudio item) async {
+  Future<Estudio> insert(Estudio item) async {
     final db = await database;
-    return await db!.insert(tabla, item.toJson());
+    await db!.insert(tabla, item.toJson());
+
+    final res =
+        await db.rawQuery("SELECT * FROM $tabla ORDER BY id DESC LIMIT 1");
+    return Estudio.fromJson(res.first);
   }
 
   Future<List<Estudio>> getAll() async {

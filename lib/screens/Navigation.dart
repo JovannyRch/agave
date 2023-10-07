@@ -31,6 +31,7 @@ class _NavigationState extends State<Navigation> {
     super.initState();
     Provider.of<PlagasModel>(context, listen: false).fetchData();
     Provider.of<AgavesModel>(context, listen: false).fetchData();
+    Provider.of<EstudiosModel>(context, listen: false).fetchData();
   }
 
   @override
