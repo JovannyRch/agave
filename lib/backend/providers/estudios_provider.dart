@@ -1,6 +1,8 @@
 import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/estudio.dart';
+import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/base_provider.dart';
+import 'package:agave/backend/providers/parcelas_provider.dart';
 
 class EstudiosProvider extends BaseProvider {
   static final EstudiosProvider db = EstudiosProvider._();
@@ -31,5 +33,27 @@ class EstudiosProvider extends BaseProvider {
     final res = await db!
         .update(tabla, item.toJson(), where: 'id = ?', whereArgs: [item.id]);
     return res;
+  }
+
+  Future<Parcela> joinParcela(int idEstudio, int idParcela) async {
+    final db = await database;
+    await db!.insert("estudios_parcelas", {
+      "idEstudio": idEstudio,
+      "idParcela": idParcela,
+    });
+
+    final res = await db.rawQuery(
+        "SELECT * FROM parcelas WHERE id = $idParcela ORDER BY id DESC LIMIT 1");
+    return Parcela.fromJson(res.first);
+  }
+
+  Future<List<Parcela>> getParcelas(int idEstudio) async {
+    final db = await database;
+    final parcelasIds = await db!.rawQuery(
+        "SELECT parcelas.id FROM parcelas INNER JOIN estudios_parcelas ON estudios_parcelas.idParcela = parcelas.id WHERE estudios_parcelas.idEstudio = $idEstudio");
+
+    return ParcelasProvider.db.getAllWithAgave(
+        parcelasIds:
+            parcelasIds.map((e) => e['id'].toString()).join(',') ?? '');
   }
 }

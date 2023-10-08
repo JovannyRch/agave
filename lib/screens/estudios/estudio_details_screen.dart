@@ -23,11 +23,6 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   EstudiosModel? _model;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     _model = Provider.of<EstudiosModel>(context);
 
@@ -71,11 +66,10 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
               'Fecha de Creación: ${formatDate(_model?.estudio?.fechaCreacion)}',
             ),
             _renderObservaciones(),
-            // Aquí puede ir la lista de Parcelas Asociadas
-            /* SizedBox(
-              height: size!.height * 0.7,
+            SizedBox(
+              height: size!.height * 0.8,
               child: _listaParcelas(),
-            ), */
+            ),
           ],
         ),
       ),
@@ -176,68 +170,43 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   }
 
   Future<void> _refresh() async {
-    setState(() {});
+    _model?.fetchParcelas();
   }
 
   Widget _listaParcelas() {
+    List<Parcela> list = _model?.parcelas ?? [];
     return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: _refresh,
-      child: FutureBuilder<List<Parcela>>(
-        future: ParcelasProvider.db.getAll(),
-        builder: (BuildContext context, AsyncSnapshot<List<Parcela>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return const Center(
-              child: Text(
-                'Ha ocurrido un error al obtener las parcelas asociadas',
-              ),
-            );
-          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('No hay parcelas asociadas'),
-            );
-          } else {
-            Widget list = ListView.builder(
-              itemCount: snapshot.data?.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: const Text("Estudio"),
-                  subtitle: Text(
-                    formatDate(snapshot.data?[index].fechaCreacion),
-                  ),
-                  onTap: () {
-                    /* Estudio estudio = snapshot.data?[index] ?? Estudio();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EstudioDetailsScreen(
-                          estudio: estudio,
-                        ),
-                      ),
-                    ); */
-                  },
-                );
-              },
-            );
+      child: list.isEmpty ? _emptyList() : _list(list),
+    );
+  }
 
-            return Column(
-              children: [
-                const SizedBox(height: 20),
-                const Text(
-                  'Parcelas Asociadas:',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                list,
-              ],
-            );
-          }
-        },
+  Widget _emptyList() {
+    return const Center(
+      child: Text(
+        'No hay parcelas registradas',
       ),
+    );
+  }
+
+  Widget _list(List<Parcela> list) {
+    return ListView.builder(
+      itemCount: list.length,
+      padding: const EdgeInsets.only(bottom: 100.0),
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(list[index].nombre ?? ""),
+          trailing: IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () async {
+              _model?.addParcela(list[index]);
+              Navigator.pop(context);
+            },
+          ),
+          subtitle: Text('${list[index].tipoAgave}'),
+        );
+      },
     );
   }
 }

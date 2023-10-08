@@ -79,10 +79,12 @@ class AgavesModel with ChangeNotifier {
 
 class EstudiosModel with ChangeNotifier {
   List<Estudio> _estudios = [];
+  List<Parcela> _parcelas = [];
   Estudio? _estudio;
 
   List<Estudio> get estudios => _estudios;
   Estudio? get estudio => _estudio;
+  List<Parcela> get parcelas => _parcelas;
 
   fetchData() async {
     _estudios = await EstudiosProvider.db.getAll();
@@ -114,6 +116,18 @@ class EstudiosModel with ChangeNotifier {
 
   setSelected(Estudio? estudio) {
     _estudio = estudio;
+    notifyListeners();
+  }
+
+  addParcela(Parcela parcela) async {
+    Parcela newItem = await EstudiosProvider.db
+        .joinParcela(_estudio!.id ?? 0, parcela.id ?? 0);
+    _parcelas.add(newItem);
+    notifyListeners();
+  }
+
+  fetchParcelas() async {
+    _parcelas = await EstudiosProvider.db.getParcelas(_estudio!.id ?? 0);
     notifyListeners();
   }
 }

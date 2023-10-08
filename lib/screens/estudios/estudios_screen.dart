@@ -74,6 +74,7 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
           subtitle: Text(formatDate(estudio.fechaCreacion)),
           onTap: () {
             _model?.setSelected(estudio);
+            Provider.of<EstudiosModel>(context, listen: false).fetchParcelas();
             Navigator.push(
               context,
               MaterialPageRoute(

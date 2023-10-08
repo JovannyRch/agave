@@ -19,10 +19,12 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
 
   String _searchText = "";
   ParcelaModel? _model;
+  EstudiosModel? _estudiosModel;
 
   @override
   Widget build(BuildContext context) {
     _model = Provider.of<ParcelaModel>(context);
+    _estudiosModel = Provider.of<EstudiosModel>(context);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
@@ -89,7 +91,10 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
           title: Text(list[index].nombre ?? ""),
           trailing: IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {},
+            onPressed: () async {
+              _estudiosModel!.addParcela(list[index]);
+              Navigator.pop(context);
+            },
           ),
           subtitle: Text('${list[index].tipoAgave}'),
         );
