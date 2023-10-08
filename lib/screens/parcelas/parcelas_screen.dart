@@ -1,9 +1,10 @@
 import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
-import 'package:agave/screens/parcelas_details_screen.dart';
+import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ParcelasScreen extends StatefulWidget {
   const ParcelasScreen({super.key});
@@ -16,19 +17,22 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
+  String _searchText = "";
+  ParcelaModel? _model;
+
   @override
   Widget build(BuildContext context) {
+    _model = Provider.of<ParcelaModel>(context);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
-        onPressed: () async {
-          await Navigator.push(
+        onPressed: () {
+          Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => RegistroParcelaScreen(),
             ),
           );
-          setState(() {});
         },
         tooltip: 'Agregar Parcela',
         child: const Icon(Icons.add),
@@ -37,51 +41,78 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
         title: const Text('Parcelas'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: RefreshIndicator(
-        key: _refreshIndicatorKey,
-        onRefresh: _refresh,
-        child: FutureBuilder<List<Parcela>>(
-          future: ParcelasProvider.db.getAll(),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<Parcela>> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return const Center(child: Text('Ha ocurrido un error'));
-            } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-              return const Center(child: Text('No hay parcelas disponibles'));
-            } else {
-              return ListView.builder(
-                itemCount: snapshot.data?.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(snapshot.data?[index].nombre ?? ""),
-                    subtitle: Text(
-                        'Tipo de Agave: ${snapshot.data?[index].tipoAgave}'),
-                    onTap: () async {
-                      Parcela parcela = snapshot.data?[index] ?? Parcela();
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetallesParcela(
-                            parcela: parcela,
-                          ),
-                        ),
-                      );
-                      _refresh();
-                    },
-                  );
-                },
-              );
-            }
-          },
-        ),
+      body: Column(
+        children: [
+          _search(),
+          Expanded(
+            child: _list(),
+          ),
+        ],
       ),
     );
   }
 
+  Widget _search() {
+    return Container(
+      padding: const EdgeInsets.all(10.0),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'Buscar parcela',
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
+        onChanged: (value) {
+          setState(() {
+            _searchText = value;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _list() {
+    List<Parcela> list = _model?.parcelas ?? [];
+
+    if (_searchText.isNotEmpty) {
+      list = list
+          .where((element) => element.nombre!.contains(_searchText))
+          .toList();
+    }
+
+    var listBuilder = ListView.builder(
+      itemCount: list.length,
+      padding: const EdgeInsets.only(bottom: 100.0),
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(list[index].nombre ?? ""),
+          trailing: IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {},
+          ),
+          subtitle: Text('${list[index].tipoAgave}'),
+        );
+      },
+    );
+
+    return RefreshIndicator(
+      key: _refreshIndicatorKey,
+      onRefresh: _refresh,
+      child: list.isEmpty
+          ? Center(
+              child: Text(
+                _searchText.isEmpty
+                    ? 'No hay parcelas registradas'
+                    : 'No hay resultados para la búsqueda',
+              ),
+            )
+          : listBuilder,
+    );
+  }
+
   Future<void> _refresh() async {
-    setState(() {});
+    Provider.of<ParcelaModel>(context, listen: false).fetchData();
   }
 
   void _showDeleteConfirmationDialog(BuildContext context) {

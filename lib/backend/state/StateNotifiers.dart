@@ -1,9 +1,11 @@
 import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/estudio.dart';
+import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/models/plaga.dart';
 import 'package:agave/backend/providers/agave_provider.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
+import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/providers/plagas_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -112,6 +114,19 @@ class EstudiosModel with ChangeNotifier {
 
   setSelected(Estudio? estudio) {
     _estudio = estudio;
+    notifyListeners();
+  }
+}
+
+class ParcelaModel with ChangeNotifier {
+  List<Parcela> _parcelas = [];
+  bool _isLoading = false;
+
+  List<Parcela> get parcelas => _parcelas;
+  bool get isLoading => _isLoading;
+
+  fetchData() async {
+    _parcelas = await ParcelasProvider.db.getAllWithAgave();
     notifyListeners();
   }
 }

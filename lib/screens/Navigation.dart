@@ -32,6 +32,7 @@ class _NavigationState extends State<Navigation> {
     Provider.of<PlagasModel>(context, listen: false).fetchData();
     Provider.of<AgavesModel>(context, listen: false).fetchData();
     Provider.of<EstudiosModel>(context, listen: false).fetchData();
+    Provider.of<ParcelaModel>(context, listen: false).fetchData();
   }
 
   @override

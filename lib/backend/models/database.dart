@@ -47,16 +47,17 @@ const studiesTable = """
 const parcelsTable = """
   CREATE TABLE ${DB.parcelas} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    idTipoAgave INTEGER NOT NULL,
     nombre TEXT NOT NULL,
     superficie REAL NOT NULL,
     fechaCreacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     latitud REAL,                   -- Ubicación geográfica
     longitud REAL,
-    tipoAgave TEXT,                 -- Tipo de Agave
     estadoCultivo TEXT,             -- Estado del cultivo (activo, en barbecho, etc.)
     observaciones TEXT,             -- Notas adicionales
-    fechaUltimoMuestreo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,       -- Fecha de último muestreo
-    rutaImagen TEXT                 -- Ruta de la imagen de la parcela
+    fechaUltimoMuestreo TIMESTAMP,       
+    rutaImagen TEXT,                 -- Ruta de la imagen de la parcela
+    FOREIGN KEY (idTipoAgave) REFERENCES ${DB.agaves}(id) ON DELETE CASCADE
   );
 """;
 

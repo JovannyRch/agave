@@ -14,6 +14,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => PlagasModel()),
         ChangeNotifierProvider(create: (context) => AgavesModel()),
         ChangeNotifierProvider(create: (context) => EstudiosModel()),
+        ChangeNotifierProvider(create: (context) => ParcelaModel()),
       ],
       child: MyApp(),
     ),

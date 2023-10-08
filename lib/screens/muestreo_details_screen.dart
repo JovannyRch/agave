@@ -145,14 +145,14 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 20.0),
-        parcela!.tipoAgave == null || parcela!.tipoAgave == ""
+        /*    parcela!.tipoAgave == null || parcela!.tipoAgave == ""
             ? Container()
             : Card(
                 child: ListTile(
                   title: const Text("Tipo de Agave"),
                   subtitle: Text(parcela!.tipoAgave ?? ""),
                 ),
-              ),
+              ), */
         Card(
           child: ListTile(
             title: const Text("Superficie"),

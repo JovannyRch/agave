@@ -21,6 +21,15 @@ class ParcelasProvider extends BaseProvider {
         : res.map((registro) => Parcela.fromJson(registro)).toList();
   }
 
+  Future<List<Parcela>> getAllWithAgave() async {
+    final db = await database;
+    final res = await db!.rawQuery(
+        "SELECT $table.*, agaves.nombre AS tipoAgave FROM $table INNER JOIN agaves ON $table.idTipoAgave = agaves.id");
+    return res.isEmpty
+        ? []
+        : res.map((registro) => Parcela.fromJson(registro)).toList();
+  }
+
   Future<Parcela?> getById(int id) async {
     final db = await database;
     final res = await db!.query(table, where: 'id = ?', whereArgs: [id]);

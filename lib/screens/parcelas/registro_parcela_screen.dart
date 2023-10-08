@@ -20,19 +20,17 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
   int? _idAgave;
   String? _nombreParcela = "";
   double? _superficie;
-  String? _selectedAgave;
   String? _selectedEstadoCultivo = "";
   String? _observaciones = "";
+  ParcelaModel? _model;
 
   @override
   void initState() {
     if (widget.parcela != null) {
       isEditing = true;
       _nombreParcela = widget.parcela!.nombre;
-      print(_nombreParcela);
-      print(widget.parcela!.nombre);
       _superficie = widget.parcela!.superficie;
-      _selectedAgave = widget.parcela!.tipoAgave;
+      _idAgave = widget.parcela!.idTipoAgave;
       _selectedEstadoCultivo = widget.parcela!.estadoCultivo;
       _observaciones = widget.parcela!.observaciones;
     }
@@ -41,9 +39,8 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _model = Provider.of<ParcelaModel>(context);
     final agavesModel = Provider.of<AgavesModel>(context);
-    print("agavesModel");
-    print(agavesModel.agaves);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Registrar Parcela'),
@@ -86,7 +83,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
 
   Widget _superficieInput() {
     return TextFormField(
-      decoration: const InputDecoration(labelText: 'Superficie (hectáreas)'),
+      decoration: const InputDecoration(labelText: 'Superficie (m²)'),
       keyboardType: TextInputType.number,
       initialValue: _superficie != null ? _superficie.toString() : "",
       validator: (value) {
@@ -198,8 +195,8 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
             observaciones: _observaciones!,
           );
 
-          if (_selectedAgave != null) {
-            parcela.tipoAgave = _selectedAgave!;
+          if (_idAgave != null) {
+            parcela.idTipoAgave = _idAgave;
           }
 
           if (_selectedEstadoCultivo != null) {
@@ -208,7 +205,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
 
           if (isEditing) {
             parcela.id = widget.parcela!.id;
-            ParcelasProvider.db.update(parcela);
+
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Parcela actualizada con éxito!')),
             );

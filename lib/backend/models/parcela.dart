@@ -5,11 +5,12 @@ class Parcela {
   String? fechaCreacion;
   double? latitud;
   double? longitud;
-  String? tipoAgave;
+  int? idTipoAgave;
   String? estadoCultivo;
   String? observaciones;
   String? fechaUltimoMuestreo;
   String? rutaImagen;
+  String? tipoAgave;
 
   Parcela({
     this.id,
@@ -18,11 +19,12 @@ class Parcela {
     this.fechaCreacion,
     this.latitud,
     this.longitud,
-    this.tipoAgave,
+    this.idTipoAgave,
     this.estadoCultivo,
     this.observaciones,
     this.fechaUltimoMuestreo,
     this.rutaImagen,
+    this.tipoAgave,
   });
 
   Parcela.fromJson(Map<String, dynamic> json) {
@@ -32,25 +34,23 @@ class Parcela {
     fechaCreacion = json['fechaCreacion'];
     latitud = json['latitud'];
     longitud = json['longitud'];
-    tipoAgave = json['tipoAgave'];
+    idTipoAgave = json['idTipoAgave'];
     estadoCultivo = json['estadoCultivo'];
     observaciones = json['observaciones'];
     fechaUltimoMuestreo = json['fechaUltimoMuestreo'];
     rutaImagen = json['rutaImagen'];
+    tipoAgave = json['tipoAgave'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
     data['nombre'] = nombre;
     data['superficie'] = superficie;
-    data['fechaCreacion'] = fechaCreacion;
     data['latitud'] = latitud;
     data['longitud'] = longitud;
-    data['tipoAgave'] = tipoAgave;
+    data['idTipoAgave'] = idTipoAgave;
     data['estadoCultivo'] = estadoCultivo;
     data['observaciones'] = observaciones;
-    data['fechaUltimoMuestreo'] = fechaUltimoMuestreo;
     data['rutaImagen'] = rutaImagen;
     return data;
   }

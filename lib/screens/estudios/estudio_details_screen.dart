@@ -1,7 +1,7 @@
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
-import 'package:agave/screens/parcelas/parcels_screen.dart';
+import 'package:agave/screens/parcelas/parcelas_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -72,10 +72,10 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
             ),
             _renderObservaciones(),
             // Aquí puede ir la lista de Parcelas Asociadas
-            SizedBox(
+            /* SizedBox(
               height: size!.height * 0.7,
               child: _listaParcelas(),
-            ),
+            ), */
           ],
         ),
       ),
