@@ -77,6 +77,8 @@ const muestreosTable = """
     idParcela INTEGER NOT NULL,
     idEstudio INTEGER NOT NULL,
     idPlaga INTEGER NOT NULL,
+    temperatura REAL,
+    humedad REAL,
     fechaCreacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (idParcela) REFERENCES ${DB.parcelas}(id) ON DELETE CASCADE,
     FOREIGN KEY (idEstudio) REFERENCES ${DB.estudios}(id) ON DELETE CASCADE,

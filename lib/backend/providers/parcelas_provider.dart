@@ -8,9 +8,14 @@ class ParcelasProvider extends BaseProvider {
   String table = DB.parcelas;
   ParcelasProvider._();
 
-  insert(Parcela scan) async {
+  Future<Parcela> insert(Parcela scan) async {
     final db = await database;
-    return await db!.insert(table, scan.toJson());
+
+    await db!.insert(table, scan.toJson());
+
+    final res =
+        await db.rawQuery("SELECT * FROM $table ORDER BY id DESC LIMIT 1");
+    return Parcela.fromJson(res.first);
   }
 
   Future<List<Parcela>> getAll() async {
@@ -28,6 +33,13 @@ class ParcelasProvider extends BaseProvider {
     return res.isEmpty
         ? []
         : res.map((registro) => Parcela.fromJson(registro)).toList();
+  }
+
+  Future<Parcela> getOneWithAgave(int id) async {
+    final db = await database;
+    final res = await db!.rawQuery(
+        "SELECT $table.*, agaves.nombre AS tipoAgave FROM $table INNER JOIN agaves ON $table.idTipoAgave = agaves.id WHERE $table.id = $id");
+    return res.isEmpty ? Parcela() : Parcela.fromJson(res.first);
   }
 
   Future<Parcela?> getById(int id) async {

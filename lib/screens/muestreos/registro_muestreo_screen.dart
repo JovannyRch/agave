@@ -4,63 +4,48 @@ import 'package:agave/backend/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class RegistroMuestreoScreen extends StatefulWidget {
-  int idParcela;
+class RegistroMuestreo extends StatefulWidget {
   int idEstudio;
-
-  RegistroMuestreoScreen({required this.idParcela, required this.idEstudio});
+  int idParcela;
+  RegistroMuestreo({required this.idEstudio, required this.idParcela});
 
   @override
-  State<RegistroMuestreoScreen> createState() => _RegistroMuestreoScreenState();
+  _RegistroMuestreoState createState() => _RegistroMuestreoState();
 }
 
-class _RegistroMuestreoScreenState extends State<RegistroMuestreoScreen> {
-  MuestreosModel? _model;
-  PlagasModel? _plagasModel;
+class _RegistroMuestreoState extends State<RegistroMuestreo> {
   final _formKey = GlobalKey<FormState>();
+
+  double? _humedad;
   int? _idPlaga;
+  double? _temperatura;
+  String? _nombre;
+  PlagasModel? _plagasModel;
+  MuestreosModel? _muestreosModel;
 
   @override
   Widget build(BuildContext context) {
-    _model = Provider.of<MuestreosModel>(context);
     _plagasModel = Provider.of<PlagasModel>(context);
+    _muestreosModel = Provider.of<MuestreosModel>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registrar Muestreo'),
+        title: const Text("Registrar Estudio"),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              _plagaDropdown(),
-              const SizedBox(height: 20),
-              SubmitButton(
-                text: "Registrar",
-                onPressed: _saveMuestreo,
-              ),
-            ],
-          ),
+          child: ListView(children: [
+            _plagaDropdown(),
+            _humedadInput(),
+            _temperaturaInput(),
+            const SizedBox(height: 20),
+            _submitButton(),
+          ]),
         ),
       ),
     );
-  }
-
-  void _saveMuestreo() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-
-      Muestreo muestreo = Muestreo(
-        idParcela: widget.idParcela,
-        idEstudio: widget.idEstudio,
-        idPlaga: _idPlaga,
-      );
-      _model!.add(muestreo);
-
-      Navigator.pop(context);
-    }
   }
 
   Widget _plagaDropdown() {
@@ -88,5 +73,54 @@ class _RegistroMuestreoScreenState extends State<RegistroMuestreoScreen> {
         return null;
       },
     );
+  }
+
+  Widget _humedadInput() {
+    return TextFormField(
+      decoration: const InputDecoration(labelText: 'Humedad'),
+      keyboardType: TextInputType.number,
+      onSaved: (value) => _humedad = double.tryParse(value!),
+      validator: (value) {
+        return null;
+      },
+    );
+  }
+
+  Widget _temperaturaInput() {
+    return TextFormField(
+      decoration: const InputDecoration(labelText: 'Temperatura'),
+      keyboardType: TextInputType.number,
+      onSaved: (value) => _humedad = double.tryParse(value!),
+      validator: (value) {
+        return null;
+      },
+    );
+  }
+
+  Widget _submitButton() {
+    return SubmitButton(text: "Registrar", onPressed: _guardarEstudio);
+  }
+
+  void _guardarEstudio() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      Muestreo muestreo = Muestreo(
+        idEstudio: widget.idEstudio,
+        idParcela: widget.idParcela,
+        idPlaga: _idPlaga!,
+      );
+
+      if (_humedad != null) {
+        muestreo.humedad = _humedad;
+      }
+
+      if (_temperatura != null) {
+        muestreo.temperatura = _temperatura;
+      }
+
+      _muestreosModel?.add(muestreo);
+
+      Navigator.pop(context);
+    }
   }
 }

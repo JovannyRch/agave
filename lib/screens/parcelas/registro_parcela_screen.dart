@@ -22,6 +22,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
   double? _superficie;
   String? _selectedEstadoCultivo = "";
   String? _observaciones = "";
+  ParcelaModel? _model;
 
   @override
   void initState() {
@@ -39,6 +40,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
   @override
   Widget build(BuildContext context) {
     final agavesModel = Provider.of<AgavesModel>(context);
+    _model = Provider.of<ParcelaModel>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Registrar Parcela'),
@@ -208,7 +210,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
               const SnackBar(content: Text('Parcela actualizada con éxito!')),
             );
           } else {
-            ParcelasProvider.db.insert(parcela);
+            _model!.add(parcela);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Parcela guardada con éxito!')),
             );
@@ -217,7 +219,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
           Navigator.pop(context);
         }
       },
-      child: Text(isEditing ? 'Actualizar' : 'Guardar'),
+      child: Text(isEditing ? 'Actualizar' : 'Registrar'),
     );
   }
 }

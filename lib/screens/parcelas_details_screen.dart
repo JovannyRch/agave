@@ -3,6 +3,7 @@ import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
+import 'package:agave/screens/muestreos/muestreo_details_screen.dart';
 import 'package:agave/screens/muestreos/registro_muestreo_screen.dart';
 import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
@@ -68,13 +69,12 @@ class _DetallesParcelaState extends State<DetallesParcela> {
             await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => RegistroMuestreoScreen(
+                builder: (context) => RegistroMuestreo(
                   idEstudio: widget.estudio.id ?? -1,
                   idParcela: widget.parcela.id ?? -1,
                 ),
               ),
             );
-            setState(() {});
           },
           child: const Icon(Icons.add),
         ),
@@ -236,17 +236,12 @@ class _DetallesParcelaState extends State<DetallesParcela> {
           title: Text(muestreo.nombrePlaga ?? ""),
           subtitle: Text(formatDate(muestreo.fechaCreacion ?? "")),
           onTap: () async {
-            await Navigator.push(
+            Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => RegistroMuestreoScreen(
-                  idEstudio: widget.estudio.id ?? -1,
-                  idParcela: widget.parcela.id ?? -1,
-                  muestreo: muestreo,
-                ),
+                builder: (context) => MuestreoDetailsScreen(muestreo: muestreo),
               ),
             );
-            setState(() {});
           },
         );
       },

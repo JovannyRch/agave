@@ -145,6 +145,14 @@ class ParcelaModel with ChangeNotifier {
     _parcelas = await ParcelasProvider.db.getAllWithAgave();
     notifyListeners();
   }
+
+  add(Parcela parcela) async {
+    Parcela newItem = await ParcelasProvider.db.insert(parcela);
+    Parcela newItemWithAgave =
+        await ParcelasProvider.db.getOneWithAgave(newItem.id ?? 0);
+    _parcelas.add(newItemWithAgave);
+    notifyListeners();
+  }
 }
 
 class MuestreosModel with ChangeNotifier {

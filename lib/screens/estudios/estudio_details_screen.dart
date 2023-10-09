@@ -186,7 +186,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   Widget _emptyList() {
     return const Center(
       child: Text(
-        'No hay parcelas registradas',
+        'No hay parcelas asociadas a este estudio',
       ),
     );
   }
