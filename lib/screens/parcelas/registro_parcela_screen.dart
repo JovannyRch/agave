@@ -22,7 +22,6 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
   double? _superficie;
   String? _selectedEstadoCultivo = "";
   String? _observaciones = "";
-  ParcelaModel? _model;
 
   @override
   void initState() {
@@ -39,7 +38,6 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _model = Provider.of<ParcelaModel>(context);
     final agavesModel = Provider.of<AgavesModel>(context);
     return Scaffold(
       appBar: AppBar(

@@ -157,4 +157,12 @@ class MuestreosModel with ChangeNotifier {
         await MuestreosProvider.db.getAllWithPlagas(idEstudio, idParcela);
     notifyListeners();
   }
+
+  add(Muestreo muestreo) async {
+    Muestreo newItem = await MuestreosProvider.db.insert(muestreo);
+    Muestreo newItemWithPlaga =
+        await MuestreosProvider.db.getOneWithPlaga(newItem.id ?? 0);
+    _muestreos.add(newItemWithPlaga);
+    notifyListeners();
+  }
 }

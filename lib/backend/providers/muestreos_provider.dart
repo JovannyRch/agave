@@ -36,9 +36,16 @@ class MuestreosProvider extends BaseProvider {
   Future<List<Muestreo>> getAllWithPlagas(int idEstudio, int idParcela) async {
     final db = await database;
     final res = await db!.rawQuery(
-        "SELECT $tabla.*, plagas.nombre AS nombrePlaga FROM $tabla INNER JOIN plagas ON $tabla.idPlaga = plagas.id where $tabla.idEstudio = $idEstudio AND $tabla.idParcela = $idParcela");
+        "SELECT $tabla.*, plagas.nombre AS nombrePlaga FROM $tabla INNER JOIN plagas ON $tabla.idPlaga = plagas.id WHERE $tabla.idEstudio = $idEstudio AND $tabla.idParcela = $idParcela");
     return res.isEmpty
         ? []
         : res.map((registro) => Muestreo.fromJson(registro)).toList();
+  }
+
+  Future<Muestreo> getOneWithPlaga(int idMuestreo) async {
+    final db = await database;
+    final res = await db!.rawQuery(
+        "SELECT $tabla.*, plagas.nombre AS nombrePlaga FROM $tabla INNER JOIN plagas ON $tabla.idPlaga = plagas.id WHERE $tabla.id = $idMuestreo");
+    return res.isEmpty ? Muestreo() : Muestreo.fromJson(res.first);
   }
 }

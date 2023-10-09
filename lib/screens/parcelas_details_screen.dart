@@ -3,7 +3,7 @@ import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
-import 'package:agave/screens/registro_estudio_screen.dart';
+import 'package:agave/screens/muestreos/registro_muestreo_screen.dart';
 import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +31,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
   void initState() {
     parcela = widget.parcela;
     estudio = widget.estudio;
-    _model?.fetchData(parcela!.id ?? 0, estudio!.id ?? 0);
+    _refresh();
     super.initState();
   }
 
@@ -68,7 +68,10 @@ class _DetallesParcelaState extends State<DetallesParcela> {
             await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => RegistroEstudio(),
+                builder: (context) => RegistroMuestreoScreen(
+                  idEstudio: widget.estudio.id ?? -1,
+                  idParcela: widget.parcela.id ?? -1,
+                ),
               ),
             );
             setState(() {});
@@ -181,7 +184,8 @@ class _DetallesParcelaState extends State<DetallesParcela> {
   }
 
   Future<void> _refresh() async {
-    _model?.fetchData(parcela!.id ?? 0, estudio!.id ?? 0);
+    Provider.of<MuestreosModel>(context, listen: false)
+        .fetchData(widget.estudio.id ?? -1, widget.parcela.id ?? -1);
   }
 
   Widget _renderObservaciones() {
@@ -206,7 +210,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
     return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: _refresh,
-      child: _model!.muestreos.isEmpty ? _emptyList() : _listaMuestreos(),
+      child: _model!.muestreos.isEmpty ? _emptyList() : _list(),
     );
   }
 
@@ -232,7 +236,17 @@ class _DetallesParcelaState extends State<DetallesParcela> {
           title: Text(muestreo.nombrePlaga ?? ""),
           subtitle: Text(formatDate(muestreo.fechaCreacion ?? "")),
           onTap: () async {
-            //TODO: Navigate to muestreo details
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RegistroMuestreoScreen(
+                  idEstudio: widget.estudio.id ?? -1,
+                  idParcela: widget.parcela.id ?? -1,
+                  muestreo: muestreo,
+                ),
+              ),
+            );
+            setState(() {});
           },
         );
       },
