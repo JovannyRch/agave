@@ -1,10 +1,12 @@
 import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/estudio.dart';
+import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/models/plaga.dart';
 import 'package:agave/backend/providers/agave_provider.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
+import 'package:agave/backend/providers/muestreos_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/providers/plagas_provider.dart';
 import 'package:flutter/material.dart';
@@ -134,13 +136,25 @@ class EstudiosModel with ChangeNotifier {
 
 class ParcelaModel with ChangeNotifier {
   List<Parcela> _parcelas = [];
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   List<Parcela> get parcelas => _parcelas;
   bool get isLoading => _isLoading;
 
   fetchData() async {
     _parcelas = await ParcelasProvider.db.getAllWithAgave();
+    notifyListeners();
+  }
+}
+
+class MuestreosModel with ChangeNotifier {
+  List<Muestreo> _muestreos = [];
+
+  List<Muestreo> get muestreos => _muestreos;
+
+  fetchData(int idEstudio, int idParcela) async {
+    _muestreos =
+        await MuestreosProvider.db.getAllWithPlagas(idEstudio, idParcela);
     notifyListeners();
   }
 }

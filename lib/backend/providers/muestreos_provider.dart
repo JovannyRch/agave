@@ -1,0 +1,44 @@
+import 'package:agave/backend/models/database.dart';
+import 'package:agave/backend/models/muestreo.dart';
+import 'package:agave/backend/providers/base_provider.dart';
+
+class MuestreosProvider extends BaseProvider {
+  static final MuestreosProvider db = MuestreosProvider._();
+
+  String tabla = DB.muestreos;
+
+  MuestreosProvider._();
+
+  Future<Muestreo> insert(Muestreo item) async {
+    final db = await database;
+    await db!.insert(tabla, item.toJson());
+
+    final res =
+        await db.rawQuery("SELECT * FROM $tabla ORDER BY id DESC LIMIT 1");
+    return Muestreo.fromJson(res.first);
+  }
+
+  Future<List<Muestreo>> getAll() async {
+    final db = await database;
+    final res = await db!.query(tabla);
+    return res.isEmpty
+        ? []
+        : res.map((registro) => Muestreo.fromJson(registro)).toList();
+  }
+
+  Future<int> update(Muestreo item) async {
+    final db = await database;
+    final res = await db!
+        .update(tabla, item.toJson(), where: 'id = ?', whereArgs: [item.id]);
+    return res;
+  }
+
+  Future<List<Muestreo>> getAllWithPlagas(int idEstudio, int idParcela) async {
+    final db = await database;
+    final res = await db!.rawQuery(
+        "SELECT $tabla.*, plagas.nombre AS nombrePlaga FROM $tabla INNER JOIN plagas ON $tabla.idPlaga = plagas.id where $tabla.idEstudio = $idEstudio AND $tabla.idParcela = $idParcela");
+    return res.isEmpty
+        ? []
+        : res.map((registro) => Muestreo.fromJson(registro)).toList();
+  }
+}

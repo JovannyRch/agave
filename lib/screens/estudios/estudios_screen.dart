@@ -1,5 +1,4 @@
 import 'package:agave/backend/models/estudio.dart';
-import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/screens/estudios/estudio_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
@@ -55,7 +54,7 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
     return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: _refresh,
-      child: _model?.estudios?.isEmpty ?? true
+      child: _model?.estudios.isEmpty ?? true
           ? const Center(
               child: Text('No hay estudios disponibles'),
             )
@@ -65,9 +64,9 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
 
   Widget _list() {
     return ListView.builder(
-      itemCount: _model?.estudios?.length ?? 0,
+      itemCount: _model?.estudios.length ?? 0,
       itemBuilder: (context, index) {
-        Estudio estudio = _model?.estudios?[index] ?? Estudio();
+        Estudio estudio = _model?.estudios[index] ?? Estudio();
 
         return ListTile(
           title: Text(estudio.nombre ?? ""),
@@ -78,7 +77,7 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EstudioDetailsScreen(),
+                builder: (context) => const EstudioDetailsScreen(),
               ),
             );
           },

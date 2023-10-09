@@ -1,17 +1,19 @@
 import 'package:agave/backend/models/estudio.dart';
+import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
-import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
-import 'package:agave/screens/estudios/estudio_details_screen.dart';
+import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../utils.dart';
 
 class DetallesParcela extends StatefulWidget {
   Parcela parcela;
-  DetallesParcela({super.key, required this.parcela});
+  Estudio estudio;
+  DetallesParcela({super.key, required this.parcela, required this.estudio});
 
   @override
   State<DetallesParcela> createState() => _DetallesParcelaState();
@@ -22,15 +24,20 @@ class _DetallesParcelaState extends State<DetallesParcela> {
       GlobalKey<RefreshIndicatorState>();
 
   Parcela? parcela;
+  Estudio? estudio;
+  MuestreosModel? _model;
 
   @override
   void initState() {
     parcela = widget.parcela;
+    estudio = widget.estudio;
+    _model?.fetchData(parcela!.id ?? 0, estudio!.id ?? 0);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    _model = Provider.of<MuestreosModel>(context);
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -52,7 +59,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
         body: TabBarView(
           children: [
             _detalleParcela(),
-            _listaEstudios(),
+            _listaMuestreos(),
           ],
         ),
         floatingActionButton: FloatingActionButton(
@@ -146,18 +153,18 @@ class _DetallesParcelaState extends State<DetallesParcela> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 20.0),
-        /*   parcela!.tipoAgave == null || parcela!.tipoAgave == ""
+        parcela!.tipoAgave == null || parcela!.tipoAgave == ""
             ? Container()
             : Card(
                 child: ListTile(
                   title: const Text("Tipo de Agave"),
                   subtitle: Text(parcela!.tipoAgave ?? ""),
                 ),
-              ), */
+              ),
         Card(
           child: ListTile(
             title: const Text("Superficie"),
-            subtitle: Text("${parcela!.superficie} ha"),
+            subtitle: Text("${parcela!.superficie} m²"),
           ),
         ),
         parcela!.estadoCultivo == null || parcela!.estadoCultivo == ""
@@ -174,7 +181,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
   }
 
   Future<void> _refresh() async {
-    setState(() {});
+    _model?.fetchData(parcela!.id ?? 0, estudio!.id ?? 0);
   }
 
   Widget _renderObservaciones() {
@@ -195,45 +202,40 @@ class _DetallesParcelaState extends State<DetallesParcela> {
     );
   }
 
-  Widget _listaEstudios() {
+  Widget _listaMuestreos() {
     return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: _refresh,
-      child: FutureBuilder<List<Estudio>>(
-        future: EstudiosProvider.db.getAll(),
-        builder: (BuildContext context, AsyncSnapshot<List<Estudio>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return const Center(child: Text('Ha ocurrido un error'));
-          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No hay estudios disponibles'));
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data?.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: const Text("Estdio"),
-                  subtitle:
-                      Text(formatDate(snapshot.data?[index].fechaCreacion)),
-                  onTap: () async {
-                    /* Estudio estudio = snapshot.data?[index] ?? Estudio();
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EstudioDetailsScreen(
-                          estudio: estudio,
-                        ),
-                      ),
-                    );
-                    _refresh(); */
-                  },
-                );
-              },
-            );
-          }
-        },
+      child: _model!.muestreos.isEmpty ? _emptyList() : _listaMuestreos(),
+    );
+  }
+
+  Widget _emptyList() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.bug_report, size: 50),
+          SizedBox(height: 20),
+          Text("No hay muestreos registrados"),
+        ],
       ),
+    );
+  }
+
+  Widget _list() {
+    return ListView.builder(
+      itemCount: _model!.muestreos.length,
+      itemBuilder: (context, index) {
+        Muestreo muestreo = _model!.muestreos[index];
+        return ListTile(
+          title: Text(muestreo.nombrePlaga ?? ""),
+          subtitle: Text(formatDate(muestreo.fechaCreacion ?? "")),
+          onTap: () async {
+            //TODO: Navigate to muestreo details
+          },
+        );
+      },
     );
   }
 }

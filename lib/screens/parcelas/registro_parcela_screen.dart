@@ -160,7 +160,7 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
       items: list.map((agave) {
         return DropdownMenuItem<int>(
           value: agave.id,
-          child: Text(agave!.nombre ?? ""),
+          child: Text(agave.nombre ?? ""),
         );
       }).toList(),
       onChanged: (value) {

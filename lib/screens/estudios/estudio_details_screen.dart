@@ -1,7 +1,8 @@
+import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/parcela.dart';
-import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/screens/parcelas/parcelas_screen.dart';
+import 'package:agave/screens/parcelas_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +10,7 @@ import 'package:provider/provider.dart';
 import '../../utils.dart';
 
 class EstudioDetailsScreen extends StatefulWidget {
-  EstudioDetailsScreen({super.key});
+  const EstudioDetailsScreen({super.key});
 
   @override
   State<EstudioDetailsScreen> createState() => _EstudioDetailsScreenState();
@@ -42,7 +43,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ParcelasScreen(),
+              builder: (context) => const ParcelasScreen(),
             ),
           );
         },
@@ -197,14 +198,18 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
       itemBuilder: (context, index) {
         return ListTile(
           title: Text(list[index].nombre ?? ""),
-          trailing: IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () async {
-              _model?.addParcela(list[index]);
-              Navigator.pop(context);
-            },
-          ),
           subtitle: Text('${list[index].tipoAgave}'),
+          onTap: () => {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetallesParcela(
+                  parcela: list[index],
+                  estudio: _model!.estudio ?? Estudio(),
+                ),
+              ),
+            ),
+          },
         );
       },
     );
