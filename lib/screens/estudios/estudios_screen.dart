@@ -1,5 +1,6 @@
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
+import 'package:agave/backend/widgets/list_item.dart';
 import 'package:agave/screens/estudios/estudio_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,13 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
           ? const Center(
               child: Text('No hay estudios disponibles'),
             )
-          : _list(),
+          : Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 16.0,
+              ),
+              child: _list(),
+            ),
     );
   }
 
@@ -68,20 +75,21 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
       itemBuilder: (context, index) {
         Estudio estudio = _model?.estudios[index] ?? Estudio();
 
-        return ListTile(
-          title: Text(estudio.nombre ?? ""),
-          subtitle: Text(formatDate(estudio.fechaCreacion)),
-          onTap: () {
-            _model?.setSelected(estudio);
-            Provider.of<EstudiosModel>(context, listen: false).fetchParcelas();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const EstudioDetailsScreen(),
-              ),
-            );
-          },
-        );
+        return ListItem(
+            title: estudio.nombre ?? "",
+            icon: Icons.folder,
+            subtitle: formatDate(estudio.fechaCreacion ?? ""),
+            onTap: () {
+              _model?.setSelected(estudio);
+              Provider.of<EstudiosModel>(context, listen: false)
+                  .fetchParcelas();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const EstudioDetailsScreen(),
+                ),
+              );
+            });
       },
     );
   }

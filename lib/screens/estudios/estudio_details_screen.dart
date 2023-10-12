@@ -1,6 +1,9 @@
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
+import 'package:agave/backend/widgets/list_item.dart';
+import 'package:agave/backend/widgets/screen_title.dart';
+import 'package:agave/backend/widgets/single_card_detail.dart';
 import 'package:agave/screens/parcelas/parcelas_screen.dart';
 import 'package:agave/screens/parcelas_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
@@ -55,18 +58,18 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Nombre: ${_model?.estudio!.nombre ?? ''}',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Fecha de Creación: ${formatDate(_model?.estudio?.fechaCreacion)}',
+            ScreenTitle(title: _model?.estudio?.nombre ?? ""),
+            SingleCardDetail(
+              title: "Fecha creación",
+              value: formatDate(_model?.estudio?.fechaCreacion ?? ""),
             ),
             _renderObservaciones(),
+            const SizedBox(height: 20.0),
+            const Text(
+              "Parcelas",
+              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10.0),
             SizedBox(
               height: size!.height * 0.8,
               child: _listaParcelas(),
@@ -196,21 +199,21 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
       itemCount: list.length,
       padding: const EdgeInsets.only(bottom: 100.0),
       itemBuilder: (context, index) {
-        return ListTile(
-          title: Text(list[index].nombre ?? ""),
-          subtitle: Text('${list[index].tipoAgave}'),
-          onTap: () => {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DetallesParcela(
-                  parcela: list[index],
-                  estudio: _model!.estudio ?? Estudio(),
+        return ListItem(
+            title: list[index].nombre ?? "",
+            subtitle: list[index].tipoAgave ?? "",
+            icon: Icons.nature,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetallesParcela(
+                    parcela: list[index],
+                    estudio: _model!.estudio ?? Estudio(),
+                  ),
                 ),
-              ),
-            ),
-          },
-        );
+              );
+            });
       },
     );
   }
