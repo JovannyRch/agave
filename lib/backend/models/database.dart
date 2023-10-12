@@ -91,8 +91,11 @@ const incidenciasTable = """
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     idMuestreo INTEGER NOT NULL,
     cantidad INTEGER NOT NULL,
-    latitud REAL,                   -- Ubicación geográfica
+    latitud REAL,                   
     longitud REAL,
+    norte REAL,
+    este REAL,
+    zona TEXT,
     FOREIGN KEY (idMuestreo) REFERENCES ${DB.muestreos}(id) ON DELETE CASCADE
   );
 """;

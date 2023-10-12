@@ -6,7 +6,7 @@ import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../utils.dart';
+import '../utils/formatDate.dart';
 
 class MuestreoDetailsScreen extends StatefulWidget {
   Parcela parcela;

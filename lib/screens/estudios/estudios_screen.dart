@@ -5,7 +5,7 @@ import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../utils.dart';
+import '../../utils/formatDate.dart';
 
 class EstudiosScreen extends StatefulWidget {
   const EstudiosScreen({super.key});

@@ -9,7 +9,7 @@ import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../utils.dart';
+import '../utils/formatDate.dart';
 
 class DetallesParcela extends StatefulWidget {
   Parcela parcela;

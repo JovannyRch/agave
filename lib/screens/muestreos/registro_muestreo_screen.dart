@@ -90,7 +90,7 @@ class _RegistroMuestreoState extends State<RegistroMuestreo> {
     return TextFormField(
       decoration: const InputDecoration(labelText: 'Temperatura'),
       keyboardType: TextInputType.number,
-      onSaved: (value) => _humedad = double.tryParse(value!),
+      onSaved: (value) => _temperatura = double.tryParse(value!),
       validator: (value) {
         return null;
       },

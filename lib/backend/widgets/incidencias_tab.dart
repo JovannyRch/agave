@@ -18,7 +18,7 @@ class _TabIncidenciasState extends State<TabIncidencias> {
       itemBuilder: (context, index) {
         return ListTile(
           title: Text(
-              'Ubicación: (${widget.incidencias[index].ubicacion.latitude}, ${widget.incidencias[index].ubicacion.longitude})'),
+              'Ubicación: (${widget.incidencias[index].latitud}, ${widget.incidencias[index].longitud})'),
           subtitle: Text('Incidencias: ${widget.incidencias[index].cantidad}'),
           leading: const Icon(Icons.bug_report),
           // Puedes agregar más interacciones o detalles si lo deseas

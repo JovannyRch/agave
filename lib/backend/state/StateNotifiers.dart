@@ -1,3 +1,4 @@
+import 'package:agave/backend/models/Incidencia.dart';
 import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/estudio.dart';
@@ -6,6 +7,7 @@ import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/models/plaga.dart';
 import 'package:agave/backend/providers/agave_provider.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
+import 'package:agave/backend/providers/incidencias_provider.dart';
 import 'package:agave/backend/providers/muestreos_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/providers/plagas_provider.dart';
@@ -171,6 +173,23 @@ class MuestreosModel with ChangeNotifier {
     Muestreo newItemWithPlaga =
         await MuestreosProvider.db.getOneWithPlaga(newItem.id ?? 0);
     _muestreos.add(newItemWithPlaga);
+    notifyListeners();
+  }
+}
+
+class IncidenciasModel with ChangeNotifier {
+  List<Incidencia> _incidencias = [];
+
+  List<Incidencia> get incidencias => _incidencias;
+
+  fetchData(int idMuestreo) async {
+    _incidencias = await IncidenciasProvider.db.getAll(idMuestreo);
+    notifyListeners();
+  }
+
+  add(Incidencia item) async {
+    Incidencia newItem = await IncidenciasProvider.db.insert(item);
+    _incidencias.add(newItem);
     notifyListeners();
   }
 }

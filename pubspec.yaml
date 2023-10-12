@@ -17,6 +17,9 @@ dependencies:
   google_maps_flutter: ^2.5.0
   flutter_heat_map: ^1.2.1
   intl: ^0.18.1
+  proj4dart: ^2.1.0
+  location: ^5.0.3
+  http: ^1.1.0
 
 dev_dependencies:
   flutter_test:
