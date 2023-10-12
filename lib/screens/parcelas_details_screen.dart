@@ -3,7 +3,9 @@ import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
+import 'package:agave/backend/widgets/card_detail.dart';
 import 'package:agave/backend/widgets/screen_title.dart';
+import 'package:agave/const.dart';
 import 'package:agave/screens/muestreos/muestreo_details_screen.dart';
 import 'package:agave/screens/muestreos/registro_muestreo_screen.dart';
 import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
@@ -40,45 +42,37 @@ class _DetallesParcelaState extends State<DetallesParcela> {
   @override
   Widget build(BuildContext context) {
     _model = Provider.of<MuestreosModel>(context);
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).primaryColor,
-          title: const Text('Detalles Parcela'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: "Detalles"),
-              Tab(text: "Muestreos"),
-            ],
-            indicatorColor: Colors.white,
-          ),
-          actions: [
-            _deleteButton(),
-            _editButton(),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
+        title: const Text('Detalles Parcela'),
+        /*   bottom: const TabBar(
+          tabs: [
+            Tab(text: "Detalles"),
+            Tab(text: "Muestreos"),
           ],
-        ),
-        body: TabBarView(
-          children: [
-            _detalleParcela(),
-            _listaMuestreos(),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Theme.of(context).primaryColor,
-          onPressed: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RegistroMuestreo(
-                  idEstudio: widget.estudio.id ?? -1,
-                  idParcela: widget.parcela.id ?? -1,
-                ),
+          indicatorColor: Colors.white,
+        ), */
+        actions: [
+          _deleteButton(),
+          _editButton(),
+        ],
+      ),
+      body: _body(),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).primaryColor,
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RegistroMuestreo(
+                idEstudio: widget.estudio.id ?? -1,
+                idParcela: widget.parcela.id ?? -1,
               ),
-            );
-          },
-          child: const Icon(Icons.add),
-        ),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -147,7 +141,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
     );
   }
 
-  Widget _detalleParcela() {
+  Widget _body() {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
@@ -155,32 +149,56 @@ class _DetallesParcelaState extends State<DetallesParcela> {
           title: widget.parcela.nombre ?? "",
           subtitle: widget.estudio.nombre,
         ),
-        const SizedBox(height: 20.0),
-        parcela!.tipoAgave == null || parcela!.tipoAgave == ""
-            ? Container()
-            : Card(
-                child: ListTile(
-                  title: const Text("Tipo de Agave"),
-                  subtitle: Text(parcela!.tipoAgave ?? ""),
-                ),
-              ),
+        if (parcela!.tipoAgave != null && parcela!.tipoAgave!.isNotEmpty)
+          Card(
+            child: CardDetail(
+              title: "Tipo de Agave",
+              value: parcela!.tipoAgave ?? "",
+            ),
+          ),
+        if (parcela!.estadoCultivo != null &&
+            parcela!.estadoCultivo!.isNotEmpty)
+          Card(
+            child: CardDetail(
+              title: "Estado de Cultivo",
+              value: parcela!.estadoCultivo ?? "",
+            ),
+          ),
         Card(
-          child: ListTile(
-            title: const Text("Superficie"),
-            subtitle: Text("${parcela!.superficie} m²"),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              CardDetail(
+                title: "Superficie",
+                value: "${parcela!.superficie}",
+                unit: " m²",
+              ),
+              CardDetail(
+                title: "Muestreos",
+                value: "${(_model!.muestreos.length).toString()}",
+              ),
+            ],
           ),
         ),
-        parcela!.estadoCultivo == null || parcela!.estadoCultivo == ""
-            ? Container()
-            : Card(
-                child: ListTile(
-                  title: const Text("Estado del Cultivo"),
-                  subtitle: Text(parcela!.estadoCultivo ?? ""),
-                ),
-              ),
         _renderObservaciones(),
+        const SizedBox(height: 20.0),
+        const Text(
+          "Muestreos",
+          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10.0),
+        ..._renderMuestreos(),
       ],
     );
+  }
+
+  List<Widget> _renderMuestreos() {
+    return [
+      Container(
+        height: 300,
+        child: _listaMuestreos(),
+      )
+    ];
   }
 
   Future<void> _refresh() async {
@@ -219,10 +237,35 @@ class _DetallesParcelaState extends State<DetallesParcela> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.bug_report, size: 50),
+          Icon(
+            Icons.bug_report,
+            size: 50,
+            color: Colors.black45,
+          ),
           SizedBox(height: 20),
-          Text("No hay muestreos registrados"),
+          Text(
+            "No hay muestreos registrados",
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.black38,
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  void onClickMuestreo(Muestreo muestreo, int index) {
+    _model!.setSelected(muestreo);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MuestreoDetailsScreen(
+          muestreo: muestreo,
+          parcela: parcela!,
+          estudio: widget.estudio,
+          index: index + 1,
+        ),
       ),
     );
   }
@@ -232,23 +275,65 @@ class _DetallesParcelaState extends State<DetallesParcela> {
       itemCount: _model!.muestreos.length,
       itemBuilder: (context, index) {
         Muestreo muestreo = _model!.muestreos[index];
-        return ListTile(
-          title: Text(muestreo.nombrePlaga ?? ""),
-          subtitle: Text(formatDate(muestreo.fechaCreacion ?? "")),
-          onTap: () async {
-            _model!.setSelected(muestreo);
-            _model!.selectedMuestreo!.hacerCalculos();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MuestreoDetailsScreen(
-                  muestreo: muestreo,
-                  parcela: parcela!,
-                  index: index + 1,
+        return InkWell(
+          child: Container(
+            height: 70.0,
+            margin: const EdgeInsets.only(
+              bottom: 5.0,
+              top: 2.5,
+            ),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+              color: kMainColor.withOpacity(0.1),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(left: 10.0),
+                  child: Icon(
+                    Icons.bug_report,
+                    size: 30.0,
+                    color: kMainColor.withOpacity(0.75),
+                  ),
                 ),
-              ),
-            );
-          },
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10.0,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(left: 10.0),
+                        child: Text(
+                          muestreo.nombrePlaga ?? "",
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 2.0),
+                      Container(
+                        margin: const EdgeInsets.only(left: 10.0),
+                        child: Text(
+                          formatDate(muestreo.fechaCreacion),
+                          style: const TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.black45,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+          onTap: () => onClickMuestreo(muestreo, index),
         );
       },
     );

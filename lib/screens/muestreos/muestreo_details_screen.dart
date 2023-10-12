@@ -1,4 +1,5 @@
 import 'package:agave/backend/models/Incidencia.dart';
+import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
@@ -15,12 +16,14 @@ import 'package:provider/provider.dart';
 class MuestreoDetailsScreen extends StatefulWidget {
   Muestreo muestreo;
   Parcela parcela;
+  Estudio estudio;
   int index;
 
   MuestreoDetailsScreen({
     required this.muestreo,
     required this.index,
     required this.parcela,
+    required this.estudio,
   });
 
   @override
@@ -113,7 +116,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       children: [
         ScreenTitle(
           title: widget.muestreo.nombrePlaga ?? "",
-          subtitle: widget.parcela.nombre ?? "",
+          subtitle: "${widget.estudio.nombre} > ${widget.parcela.nombre ?? ""}",
         ),
         Card(
           child: Row(
