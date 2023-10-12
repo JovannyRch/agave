@@ -3,6 +3,7 @@ import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
+import 'package:agave/backend/widgets/screen_title.dart';
 import 'package:agave/screens/muestreos/muestreo_details_screen.dart';
 import 'package:agave/screens/muestreos/registro_muestreo_screen.dart';
 import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
@@ -150,10 +151,9 @@ class _DetallesParcelaState extends State<DetallesParcela> {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
-        Text(
-          parcela!.nombre ?? "",
-          style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
+        ScreenTitle(
+          title: widget.parcela.nombre ?? "",
+          subtitle: widget.estudio.nombre,
         ),
         const SizedBox(height: 20.0),
         parcela!.tipoAgave == null || parcela!.tipoAgave == ""
@@ -236,10 +236,16 @@ class _DetallesParcelaState extends State<DetallesParcela> {
           title: Text(muestreo.nombrePlaga ?? ""),
           subtitle: Text(formatDate(muestreo.fechaCreacion ?? "")),
           onTap: () async {
+            _model!.setSelected(muestreo);
+            _model!.selectedMuestreo!.hacerCalculos();
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => MuestreoDetailsScreen(muestreo: muestreo),
+                builder: (context) => MuestreoDetailsScreen(
+                  muestreo: muestreo,
+                  parcela: parcela!,
+                  index: index + 1,
+                ),
               ),
             );
           },

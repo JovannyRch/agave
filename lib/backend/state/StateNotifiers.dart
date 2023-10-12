@@ -159,8 +159,10 @@ class ParcelaModel with ChangeNotifier {
 
 class MuestreosModel with ChangeNotifier {
   List<Muestreo> _muestreos = [];
+  Muestreo? _selectedMuestreo;
 
   List<Muestreo> get muestreos => _muestreos;
+  Muestreo? get selectedMuestreo => _selectedMuestreo;
 
   fetchData(int idEstudio, int idParcela) async {
     _muestreos =
@@ -175,6 +177,11 @@ class MuestreosModel with ChangeNotifier {
     _muestreos.add(newItemWithPlaga);
     notifyListeners();
   }
+
+  setSelected(Muestreo muestreo) {
+    _selectedMuestreo = muestreo;
+    notifyListeners();
+  }
 }
 
 class IncidenciasModel with ChangeNotifier {
@@ -187,7 +194,7 @@ class IncidenciasModel with ChangeNotifier {
     notifyListeners();
   }
 
-  add(Incidencia item) async {
+  Future add(Incidencia item) async {
     Incidencia newItem = await IncidenciasProvider.db.insert(item);
     _incidencias.add(newItem);
     notifyListeners();

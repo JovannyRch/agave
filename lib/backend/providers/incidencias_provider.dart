@@ -26,4 +26,15 @@ class IncidenciasProvider extends BaseProvider {
         ? []
         : res.map((registro) => Incidencia.fromJson(registro)).toList();
   }
+
+  Future<double> getPromedio(int idMuestreo) async {
+    final db = await database;
+    final res = await db!.rawQuery(
+        "SELECT avg(cantidad) promedio from $tabla where idMuestreo = $idMuestreo");
+
+    return res.first['promedio'] == null
+        ? 0
+        : double.parse(
+            double.parse(res.first['promedio'].toString()).toStringAsFixed(1));
+  }
 }

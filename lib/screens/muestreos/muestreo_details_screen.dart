@@ -1,9 +1,11 @@
 import 'package:agave/backend/models/Incidencia.dart';
 import 'package:agave/backend/models/muestreo.dart';
+import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/widgets/card_detail.dart';
 import 'package:agave/backend/widgets/heat_map.dart';
 import 'package:agave/backend/widgets/incidencias_tab.dart';
+import 'package:agave/backend/widgets/screen_title.dart';
 import 'package:agave/screens/incidencias/registro_indicencias_screen.dart';
 
 import 'package:fl_chart/fl_chart.dart';
@@ -12,8 +14,14 @@ import 'package:provider/provider.dart';
 
 class MuestreoDetailsScreen extends StatefulWidget {
   Muestreo muestreo;
+  Parcela parcela;
+  int index;
 
-  MuestreoDetailsScreen({required this.muestreo});
+  MuestreoDetailsScreen({
+    required this.muestreo,
+    required this.index,
+    required this.parcela,
+  });
 
   @override
   State<MuestreoDetailsScreen> createState() => _MuestreoDetailsScreenState();
@@ -21,6 +29,7 @@ class MuestreoDetailsScreen extends StatefulWidget {
 
 class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   IncidenciasModel? _model;
+  MuestreosModel? _muestreosModel;
 
   @override
   void initState() {
@@ -33,6 +42,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     _model = Provider.of<IncidenciasModel>(context);
+    _muestreosModel = Provider.of<MuestreosModel>(context);
     List<Incidencia> incidencias = _model?.incidencias ?? [];
     return DefaultTabController(
       length: 4,
@@ -68,9 +78,6 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   AppBar _appBar() {
     return AppBar(
       backgroundColor: Theme.of(context).primaryColor,
-      title: Text(
-        widget.muestreo.nombrePlaga ?? "",
-      ), // Puedes personalizar el título aquí
       actions: [
         IconButton(
           icon: const Icon(Icons.share),
@@ -104,6 +111,10 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
     return ListView(
       padding: const EdgeInsets.all(16.0),
       children: [
+        ScreenTitle(
+          title: widget.muestreo.nombrePlaga ?? "",
+          subtitle: widget.parcela.nombre ?? "",
+        ),
         Card(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -121,8 +132,29 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
                   unit: "°C",
                 ),
               CardDetail(
-                title: "Incidencias",
+                title: "Registros",
                 value: _model!.incidencias.length.toString(),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        Card(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              CardDetail(
+                title: "Media",
+                value: _muestreosModel!.selectedMuestreo!.media.toString(),
+              ),
+              CardDetail(
+                title: "Varianza",
+                value: _muestreosModel!.selectedMuestreo!.varianza.toString(),
+              ),
+              CardDetail(
+                title: "DE",
+                value: _muestreosModel!.selectedMuestreo!.desviacionEstandar
+                    .toString(),
               ),
             ],
           ),

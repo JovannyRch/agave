@@ -29,6 +29,7 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
   double? _este;
   String? _zona;
   IncidenciasModel? _incidenciasModel;
+  MuestreosModel? _muestreosModel;
   bool _loading = true;
   FocusNode focus = FocusNode();
 
@@ -71,6 +72,7 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
   @override
   Widget build(BuildContext context) {
     _incidenciasModel = Provider.of<IncidenciasModel>(context);
+    _muestreosModel = Provider.of<MuestreosModel>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Registro de Incidencias'),
@@ -127,7 +129,7 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
     );
   }
 
-  void _saveIncidencia() {
+  void _saveIncidencia() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -144,7 +146,8 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
       newItem.este = result.northing;
       newItem.zona = result.zone;
 
-      _incidenciasModel!.add(newItem);
+      await _incidenciasModel!.add(newItem);
+      _muestreosModel!.selectedMuestreo!.hacerCalculos();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
