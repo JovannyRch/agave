@@ -1,4 +1,4 @@
-import 'package:agave/backend/widgets/card_detail.dart';
+import 'package:agave/widgets/card_detail.dart';
 import 'package:flutter/material.dart';
 
 class SingleCardDetail extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
-import 'package:agave/backend/widgets/list_item.dart';
+import 'package:agave/widgets/list_item.dart';
 import 'package:agave/screens/estudios/estudio_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:flutter/material.dart';

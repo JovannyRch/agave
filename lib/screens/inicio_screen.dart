@@ -1,10 +1,35 @@
+import 'package:agave/backend/models/actividad.dart';
+import 'package:agave/backend/user_data.dart';
+import 'package:agave/const.dart';
+import 'package:agave/widgets/actividad_item.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-  HomeScreen({super.key});
+  bool isLoading = true;
+  List<Actividad> actividades = [];
+
+  @override
+  void initState() {
+    _loadData();
+    super.initState();
+  }
+
+  void _loadData() async {
+    actividades = await UserData.obtenerActividadReciente();
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,25 +38,37 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Inicio'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          children: [
-            /*  _accesoDirectoWidget(context), */
-            _busquedaRapidaWidget(),
-            _estadoDelCultivoWidget(),
-            const SizedBox(height: 10), // Espaciado entre widgets
-            _ultimaPlagaDetectadaWidget(),
-            const SizedBox(height: 10),
-            _actividadRecienteWidget(),
-            const SizedBox(height: 20),
-            _distribucionPlagasWidget(),
-            const SizedBox(height: 20),
-            _evolucionCultivoWidget(),
-            const SizedBox(height: 20),
-            _incidenciasParcelaWidget(),
-          ],
+      body: _body(),
+    );
+  }
+
+  Widget _body() {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          color: kMainColor,
         ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListView(
+        children: [
+          /*  _accesoDirectoWidget(context), */
+          _busquedaRapidaWidget(),
+          _estadoDelCultivoWidget(),
+          const SizedBox(height: 10), // Espaciado entre widgets
+          _ultimaPlagaDetectadaWidget(),
+          const SizedBox(height: 10),
+          _actividadRecienteWidget(),
+          const SizedBox(height: 20),
+          _distribucionPlagasWidget(),
+          const SizedBox(height: 20),
+          _evolucionCultivoWidget(),
+          const SizedBox(height: 20),
+          _incidenciasParcelaWidget(),
+        ],
       ),
     );
   }
@@ -60,28 +97,21 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _actividadRecienteWidget() {
-    return const Card(
+    if (actividades.isEmpty) return Container();
+
+    return Card(
       elevation: 4.0,
       child: Column(
         children: [
-          ListTile(
+          const ListTile(
             title: Text('Actividad Reciente'),
           ),
-          Divider(), // Línea separadora
-          ListTile(
-            leading: Icon(Icons.add_circle_outline),
-            title: Text('Nueva Parcela "El Sol"'),
-            subtitle: Text('27 Sept'),
-          ),
-          ListTile(
-            leading: Icon(Icons.warning),
-            title: Text('Plaga detectada "Trips"'),
-            subtitle: Text('26 Sept'),
-          ),
-          ListTile(
-            leading: Icon(Icons.update),
-            title: Text('Estado cambiado a "En cosecha"'),
-            subtitle: Text('25 Sept'),
+          const Divider(),
+          Column(
+            children: [
+              for (var actividad in actividades)
+                ActividadItem(actividad: actividad),
+            ],
           ),
         ],
       ),

@@ -1,7 +1,7 @@
 import 'package:agave/api/utmApi.dart';
 import 'package:agave/backend/models/Incidencia.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
-import 'package:agave/backend/widgets/submit_button.dart';
+import 'package:agave/widgets/submit_button.dart';
 import 'package:agave/utils/latLongToUTM.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
@@ -164,6 +164,12 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
       focusNode: focus,
       controller: _incidenciasController,
       keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor ingrese la cantidad de incidencias';
+        }
+        return null;
+      },
       decoration: InputDecoration(
         labelText: 'Cantidad de Incidencias',
       ),

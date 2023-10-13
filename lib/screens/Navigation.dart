@@ -49,7 +49,7 @@ class _NavigationState extends State<Navigation> {
             label: 'Inicio',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.folder),
             label: 'Estudios',
           ),
           BottomNavigationBarItem(

@@ -1,9 +1,9 @@
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
-import 'package:agave/backend/widgets/list_item.dart';
-import 'package:agave/backend/widgets/screen_title.dart';
-import 'package:agave/backend/widgets/single_card_detail.dart';
+import 'package:agave/widgets/list_item.dart';
+import 'package:agave/widgets/screen_title.dart';
+import 'package:agave/widgets/single_card_detail.dart';
 import 'package:agave/screens/parcelas/parcelas_screen.dart';
 import 'package:agave/screens/parcelas_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';

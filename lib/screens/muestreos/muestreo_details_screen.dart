@@ -3,10 +3,11 @@ import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
-import 'package:agave/backend/widgets/card_detail.dart';
-import 'package:agave/backend/widgets/heat_map.dart';
-import 'package:agave/backend/widgets/incidencias_tab.dart';
-import 'package:agave/backend/widgets/screen_title.dart';
+import 'package:agave/widgets/card_detail.dart';
+import 'package:agave/widgets/contour_map.dart';
+import 'package:agave/widgets/heat_map.dart';
+import 'package:agave/widgets/incidencias_tab.dart';
+import 'package:agave/widgets/screen_title.dart';
 import 'package:agave/screens/incidencias/registro_indicencias_screen.dart';
 
 import 'package:fl_chart/fl_chart.dart';
@@ -69,7 +70,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
         body: TabBarView(
           children: [
             _buildGeneralTab(),
-            const HeatmapScreen(),
+            ContourMap(),
             _buildSemivariogramaChart(),
             TabIncidencias(incidencias: incidencias),
           ],
@@ -161,7 +162,19 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
               ),
             ],
           ),
-        )
+        ),
+
+        /*    const SizedBox(height: 20),
+        const Text(
+          "Mapa de Calor",
+          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10.0),
+        Card(
+          child: Image.asset(
+            'images/krigeado.png',
+          ),
+        ), */
       ],
     );
   }

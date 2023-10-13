@@ -6,8 +6,7 @@ String formatDate(String? dateStr) {
 
     DateTime parsedDate = DateTime.parse(dateStr);
 
-    String formattedDate =
-        DateFormat("dd 'de' MMM 'del' y", 'es_ES').format(parsedDate);
+    String formattedDate = DateFormat("dd MMM y", 'es_ES').format(parsedDate);
 
     return formattedDate;
   } catch (e) {
