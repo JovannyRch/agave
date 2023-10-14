@@ -1,3 +1,4 @@
+import 'package:agave/backend/user_data.dart';
 import 'package:agave/screens/agaves/agaves_screen.dart';
 import 'package:agave/screens/plagas/plagas_screen.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +46,12 @@ class ConfiguracionScreen extends StatelessWidget {
             ),
           ),
         ),
+        ListTile(
+            title: const Text('Limpiar actividad reciente'),
+            trailing: const Icon(Icons.cleaning_services_outlined),
+            onTap: () {
+              _clearUserData(context);
+            }),
         /*  ListTile(
           title: const Text('Exportar datos'),
           trailing: const Icon(Icons.arrow_forward),
@@ -74,6 +81,33 @@ class ConfiguracionScreen extends StatelessWidget {
           },
         ), */
       ],
+    );
+  }
+
+  void _clearUserData(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('¿Estás seguro?'),
+          content: const Text(
+            'Esta acción eliminará todos los datos de la actividad reciente. Esta acción no se puede deshacer.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                UserData.clear();
+                Navigator.pop(context);
+              },
+              child: const Text('Aceptar'),
+            ),
+          ],
+        );
+      },
     );
   }
 

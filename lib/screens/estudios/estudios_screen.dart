@@ -81,12 +81,10 @@ class _EstudiosScreenState extends State<EstudiosScreen> {
             subtitle: formatDate(estudio.fechaCreacion ?? ""),
             onTap: () {
               _model?.setSelected(estudio);
-              Provider.of<EstudiosModel>(context, listen: false)
-                  .fetchParcelas();
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const EstudioDetailsScreen(),
+                  builder: (context) => EstudioDetailsScreen(),
                 ),
               );
             });

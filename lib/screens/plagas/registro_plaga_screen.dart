@@ -1,5 +1,8 @@
+import 'package:agave/backend/models/actividad.dart';
 import 'package:agave/backend/models/plaga.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
+import 'package:agave/backend/user_data.dart';
+import 'package:agave/widgets/actividad_item.dart';
 import 'package:agave/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -74,6 +77,7 @@ class _RegistroPlagaState extends State<RegistroPlaga> {
                       );
                     } else {
                       _model?.add(plaga);
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Plaga $_nombrePlaga registrada!'),

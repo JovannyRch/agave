@@ -5,7 +5,6 @@ import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/widgets/card_detail.dart';
 import 'package:agave/widgets/contour_map.dart';
-import 'package:agave/widgets/heat_map.dart';
 import 'package:agave/widgets/incidencias_tab.dart';
 import 'package:agave/widgets/screen_title.dart';
 import 'package:agave/screens/incidencias/registro_indicencias_screen.dart';
@@ -18,11 +17,9 @@ class MuestreoDetailsScreen extends StatefulWidget {
   Muestreo muestreo;
   Parcela parcela;
   Estudio estudio;
-  int index;
 
   MuestreoDetailsScreen({
     required this.muestreo,
-    required this.index,
     required this.parcela,
     required this.estudio,
   });
@@ -60,6 +57,8 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
               MaterialPageRoute(
                 builder: (context) => RegistroIncidenciasScreen(
                   idMuestreo: widget.muestreo.id ?? -1,
+                  muestreo: widget.muestreo,
+                  parcela: widget.parcela,
                 ),
               ),
             );

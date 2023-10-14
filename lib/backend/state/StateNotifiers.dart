@@ -1,16 +1,20 @@
 import 'package:agave/backend/models/Incidencia.dart';
+import 'package:agave/backend/models/actividad.dart';
 import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/models/plaga.dart';
+import 'package:agave/backend/models/ultima_plaga.dart';
 import 'package:agave/backend/providers/agave_provider.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/incidencias_provider.dart';
 import 'package:agave/backend/providers/muestreos_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/providers/plagas_provider.dart';
+import 'package:agave/backend/user_data.dart';
+import 'package:agave/widgets/actividad_item.dart';
 import 'package:flutter/material.dart';
 
 class PlagasModel with ChangeNotifier {
@@ -60,6 +64,14 @@ class AgavesModel with ChangeNotifier {
   add(Agave agave) async {
     Agave newItem = await AgaveProvider.db.insert(agave);
     _agaves.add(newItem);
+    UserData.addActividad(
+      Actividad(
+        id: newItem.id ?? -1,
+        titulo: newItem.nombre ?? "",
+        fecha: DateTime.now().toIso8601String(),
+        tipo: TipoActividad.nuevo_tipo_agave,
+      ),
+    );
     notifyListeners();
   }
 
@@ -98,6 +110,16 @@ class EstudiosModel with ChangeNotifier {
   add(Estudio estudio) async {
     Estudio newItem = await EstudiosProvider.db.insert(estudio);
     _estudios.add(newItem);
+
+    UserData.addActividad(
+      Actividad(
+        id: newItem.id ?? -1,
+        titulo: estudio.nombre ?? "",
+        fecha: DateTime.now().toIso8601String(),
+        tipo: TipoActividad.nuevo_estudio,
+      ),
+    );
+
     notifyListeners();
   }
 
@@ -115,12 +137,20 @@ class EstudiosModel with ChangeNotifier {
       }
       return item;
     }).toList();
+    /* UserData.addActividad(
+      Actividad(
+        id: estudio.id ?? -1,
+        titulo: estudio.nombre ?? "",
+        fecha: DateTime.now().toIso8601String(),
+        tipo: TipoActividad.update_estudio,
+      ),
+    ); */
     notifyListeners();
   }
 
   setSelected(Estudio? estudio) {
     _estudio = estudio;
-    notifyListeners();
+    fetchParcelas(estudio?.id ?? 0);
   }
 
   addParcela(Parcela parcela) async {
@@ -130,7 +160,7 @@ class EstudiosModel with ChangeNotifier {
     notifyListeners();
   }
 
-  fetchParcelas() async {
+  fetchParcelas(int id) async {
     _parcelas = await EstudiosProvider.db.getParcelas(_estudio!.id ?? 0);
     notifyListeners();
   }
@@ -153,6 +183,16 @@ class ParcelaModel with ChangeNotifier {
     Parcela newItemWithAgave =
         await ParcelasProvider.db.getOneWithAgave(newItem.id ?? 0);
     _parcelas.add(newItemWithAgave);
+
+    UserData.addActividad(
+      Actividad(
+        id: newItem.id ?? -1,
+        titulo: newItem.nombre ?? "",
+        fecha: DateTime.now().toIso8601String(),
+        tipo: TipoActividad.nueva_parcela,
+      ),
+    );
+
     notifyListeners();
   }
 }
@@ -175,11 +215,21 @@ class MuestreosModel with ChangeNotifier {
     Muestreo newItemWithPlaga =
         await MuestreosProvider.db.getOneWithPlaga(newItem.id ?? 0);
     _muestreos.add(newItemWithPlaga);
+    UserData.addActividad(
+      Actividad(
+        id: newItem.id ?? -1,
+        titulo: newItemWithPlaga.nombrePlaga ?? "",
+        fecha: DateTime.now().toIso8601String(),
+        tipo: TipoActividad.new_muestreo,
+      ),
+    );
+
     notifyListeners();
   }
 
   setSelected(Muestreo muestreo) {
     _selectedMuestreo = muestreo;
+    _selectedMuestreo?.hacerCalculos();
     notifyListeners();
   }
 }
@@ -197,6 +247,7 @@ class IncidenciasModel with ChangeNotifier {
   Future add(Incidencia item) async {
     Incidencia newItem = await IncidenciasProvider.db.insert(item);
     _incidencias.add(newItem);
+
     notifyListeners();
   }
 }

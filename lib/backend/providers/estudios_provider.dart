@@ -28,6 +28,12 @@ class EstudiosProvider extends BaseProvider {
         : res.map((registro) => Estudio.fromJson(registro)).toList();
   }
 
+  Future<Estudio> getById(int id) async {
+    final db = await database;
+    final res = await db!.query(tabla, where: 'id = ?', whereArgs: [id]);
+    return Estudio.fromJson(res.first);
+  }
+
   Future<int> update(Estudio item) async {
     final db = await database;
     final res = await db!

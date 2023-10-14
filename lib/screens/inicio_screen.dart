@@ -1,9 +1,21 @@
 import 'package:agave/backend/models/actividad.dart';
+import 'package:agave/backend/models/estudio.dart';
+import 'package:agave/backend/models/muestreo.dart';
+import 'package:agave/backend/models/parcela.dart';
+import 'package:agave/backend/models/ultima_plaga.dart';
+import 'package:agave/backend/providers/estudios_provider.dart';
+import 'package:agave/backend/providers/muestreos_provider.dart';
+import 'package:agave/backend/providers/parcelas_provider.dart';
+import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/user_data.dart';
 import 'package:agave/const.dart';
+import 'package:agave/screens/muestreos/muestreo_details_screen.dart';
+import 'package:agave/utils/formatDate.dart';
 import 'package:agave/widgets/actividad_item.dart';
+import 'package:agave/widgets/home_list_item.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -17,6 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool isLoading = true;
   List<Actividad> actividades = [];
+  UltimaPlaga? ultimaPlaga;
+  MuestreosModel? _muestreosModel;
 
   @override
   void initState() {
@@ -26,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _loadData() async {
     actividades = await UserData.obtenerActividadReciente();
+    ultimaPlaga = await UserData.obtenerUltimaPlaga();
     setState(() {
       isLoading = false;
     });
@@ -33,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _muestreosModel = Provider.of<MuestreosModel>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inicio'),
@@ -57,10 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           /*  _accesoDirectoWidget(context), */
           _busquedaRapidaWidget(),
-          _estadoDelCultivoWidget(),
-          const SizedBox(height: 10), // Espaciado entre widgets
-          _ultimaPlagaDetectadaWidget(),
-          const SizedBox(height: 10),
+          /*    _estadoDelCultivoWidget(),
+          const SizedBox(height: 10), // Espaciado entre widgets */
+          if (ultimaPlaga != null) _ultimaPlagaDetectadaWidget(),
+          if (ultimaPlaga != null) const SizedBox(height: 20),
           _actividadRecienteWidget(),
           const SizedBox(height: 20),
           _distribucionPlagasWidget(),
@@ -86,12 +102,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _ultimaPlagaDetectadaWidget() {
-    return const Card(
+    String nombre = ultimaPlaga!.nombre;
+    String fecha = formatDate(ultimaPlaga!.fecha);
+    String parcela = ultimaPlaga!.parcela;
+    return Card(
       elevation: 4.0,
-      child: ListTile(
-        leading: Icon(Icons.bug_report, size: 40), // Puedes cambiar este ícono
-        title: Text('Última Plaga Detectada'),
-        subtitle: Text('Pulgones - 28 Sept, Parcela "La Luz"'),
+      child: HomeListItem(
+        subtitle: "$fecha - $parcela",
+        title: "$nombre",
+        description: "Última plaga detectada",
+        actionText: "Continuar muestreo",
+        icon: const Icon(
+          Icons.search,
+          color: kMainColor,
+          size: 50.0,
+        ),
+        onTap: () async {
+          Muestreo? muestreo = await MuestreosProvider.db
+              .getOneWithPlaga(ultimaPlaga!.idMuestreo ?? -1);
+          if (muestreo != null) {
+            goToMuestreo(muestreo);
+          }
+        },
       ),
     );
   }
@@ -106,7 +138,6 @@ class _HomeScreenState extends State<HomeScreen> {
           const ListTile(
             title: Text('Actividad Reciente'),
           ),
-          const Divider(),
           Column(
             children: [
               for (var actividad in actividades)
@@ -303,5 +334,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _accionReportePlagas() {
     // Navegación o acción para "Reporte de Plagas"
+  }
+
+  void goToMuestreo(Muestreo muestreo) async {
+    Parcela? parcela =
+        await ParcelasProvider.db.getById(muestreo.idParcela ?? -1);
+
+    Estudio? estudio =
+        await EstudiosProvider.db.getById(muestreo.idEstudio ?? -1);
+
+    _muestreosModel!.setSelected(muestreo);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MuestreoDetailsScreen(
+          parcela: parcela!,
+          estudio: estudio,
+          muestreo: muestreo,
+        ),
+      ),
+    );
   }
 }

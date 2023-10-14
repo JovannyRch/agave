@@ -1,5 +1,8 @@
+import 'package:agave/backend/models/actividad.dart';
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
+import 'package:agave/backend/user_data.dart';
+import 'package:agave/widgets/actividad_item.dart';
 import 'package:agave/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -113,6 +116,7 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
     }
 
     _model?.add(estudio);
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Estudio guardado con éxito!')),
     );

@@ -174,7 +174,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   }
 
   Future<void> _refresh() async {
-    _model?.fetchParcelas();
+    _model?.fetchParcelas(_model!.estudio!.id ?? -1);
   }
 
   Widget _listaParcelas() {

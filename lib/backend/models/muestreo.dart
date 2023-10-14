@@ -60,6 +60,12 @@ class Muestreo {
     this.incidencias = await IncidenciasProvider.db.getAll(this.id!);
 
     if (this.incidencias!.isEmpty) {
+      this.totalIncidencias = 0;
+      this.totalMuestreos = 0;
+      this.media = 0;
+      this.varianza = 0;
+      this.desviacionEstandar = 0;
+
       return 0;
     }
 

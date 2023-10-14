@@ -1,6 +1,10 @@
 import 'package:agave/api/utmApi.dart';
 import 'package:agave/backend/models/Incidencia.dart';
+import 'package:agave/backend/models/muestreo.dart';
+import 'package:agave/backend/models/parcela.dart';
+import 'package:agave/backend/models/ultima_plaga.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
+import 'package:agave/backend/user_data.dart';
 import 'package:agave/widgets/submit_button.dart';
 import 'package:agave/utils/latLongToUTM.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +13,14 @@ import 'package:provider/provider.dart';
 
 class RegistroIncidenciasScreen extends StatefulWidget {
   int idMuestreo;
+  Parcela parcela;
+  Muestreo muestreo;
 
-  RegistroIncidenciasScreen({required this.idMuestreo});
+  RegistroIncidenciasScreen({
+    required this.idMuestreo,
+    required this.parcela,
+    required this.muestreo,
+  });
 
   @override
   _RegistroIncidenciasScreenState createState() =>
@@ -148,6 +158,15 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
 
       await _incidenciasModel!.add(newItem);
       _muestreosModel!.selectedMuestreo!.hacerCalculos();
+
+      UltimaPlaga ultimaPlaga = UltimaPlaga(
+        nombre: widget.muestreo.nombrePlaga ?? "",
+        fecha: DateTime.now().toIso8601String(),
+        parcela: widget.parcela.nombre ?? "",
+        idMuestreo: widget.muestreo.id ?? -1,
+      );
+
+      UserData.guardarUltimaPlaga(ultimaPlaga);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

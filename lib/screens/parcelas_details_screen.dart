@@ -266,7 +266,6 @@ class _DetallesParcelaState extends State<DetallesParcela> {
           muestreo: muestreo,
           parcela: parcela!,
           estudio: widget.estudio,
-          index: index + 1,
         ),
       ),
     );
