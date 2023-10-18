@@ -81,9 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 20),
           _distribucionPlagasWidget(),
           const SizedBox(height: 20),
-          _evolucionCultivoWidget(),
+          /*  _evolucionCultivoWidget(),
           const SizedBox(height: 20),
-          _incidenciasParcelaWidget(),
+          _incidenciasParcelaWidget(), */
         ],
       ),
     );
@@ -138,6 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const ListTile(
             title: Text('Actividad Reciente'),
           ),
+          const Divider(),
           Column(
             children: [
               for (var actividad in actividades)
@@ -344,6 +345,7 @@ class _HomeScreenState extends State<HomeScreen> {
         await EstudiosProvider.db.getById(muestreo.idEstudio ?? -1);
 
     _muestreosModel!.setSelected(muestreo);
+    _muestreosModel!.selectedMuestreo!.hacerCalculos();
 
     Navigator.push(
       context,

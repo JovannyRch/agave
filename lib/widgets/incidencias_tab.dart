@@ -21,6 +21,7 @@ class _TabIncidenciasState extends State<TabIncidencias> {
               'Ubicación: (${widget.incidencias[index].latitud}, ${widget.incidencias[index].longitud})'),
           subtitle: Text('Incidencias: ${widget.incidencias[index].cantidad}'),
           leading: const Icon(Icons.bug_report),
+          onTap: () {},
           // Puedes agregar más interacciones o detalles si lo deseas
         );
       },

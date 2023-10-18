@@ -49,5 +49,9 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Necesitamos acceder a tu ubicación para poder</string>
+	<key>io.flutter.embedded_views_preview</key>
+	<string>YES</string>
+	<key>com.google.android.geo.API_KEY</key>
+	<string>AIzaSyAql34T4IrMPnXk-19n-c-5uQ28DaUt8dM</string>
 </dict>
 </plist>

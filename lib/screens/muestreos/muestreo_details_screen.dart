@@ -148,16 +148,19 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
             children: [
               CardDetail(
                 title: "Media",
-                value: _muestreosModel!.selectedMuestreo!.media.toString(),
+                value: (_muestreosModel!.selectedMuestreo?.media ?? 0.0)
+                    .toStringAsFixed(2),
               ),
               CardDetail(
                 title: "Varianza",
-                value: _muestreosModel!.selectedMuestreo!.varianza.toString(),
+                value: (_muestreosModel!.selectedMuestreo?.varianza ?? 0.0)
+                    .toStringAsFixed(2),
               ),
               CardDetail(
                 title: "DE",
-                value: _muestreosModel!.selectedMuestreo!.desviacionEstandar
-                    .toString(),
+                value: (_muestreosModel!.selectedMuestreo?.desviacionEstandar ??
+                        0.0)
+                    .toStringAsFixed(2),
               ),
             ],
           ),
