@@ -1,5 +1,6 @@
 import 'package:agave/backend/models/actividad.dart';
 import 'package:agave/backend/models/estudio.dart';
+import 'package:agave/backend/models/incidencia_plaga.dart';
 import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/models/ultima_plaga.dart';
@@ -11,6 +12,8 @@ import 'package:agave/backend/user_data.dart';
 import 'package:agave/const.dart';
 import 'package:agave/screens/muestreos/muestreo_details_screen.dart';
 import 'package:agave/utils/formatDate.dart';
+import 'package:agave/utils/randomColor.dart';
+import 'package:agave/utils/truncateText.dart';
 import 'package:agave/widgets/actividad_item.dart';
 import 'package:agave/widgets/home_list_item.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -27,6 +30,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
 
+  ReportesModel? _reportesModel;
+
   bool isLoading = true;
   List<Actividad> actividades = [];
   UltimaPlaga? ultimaPlaga;
@@ -35,12 +40,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     _loadData();
+
     super.initState();
   }
 
   void _loadData() async {
     actividades = await UserData.obtenerActividadReciente();
     ultimaPlaga = await UserData.obtenerUltimaPlaga();
+
     setState(() {
       isLoading = false;
     });
@@ -49,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     _muestreosModel = Provider.of<MuestreosModel>(context);
+    _reportesModel = Provider.of<ReportesModel>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inicio'),
@@ -70,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListView(
+        physics: const BouncingScrollPhysics(),
         children: [
           /*  _accesoDirectoWidget(context), */
           _busquedaRapidaWidget(),
@@ -172,18 +181,29 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _distribucionPlagasWidget() {
+    List<IncidenciaPlaga> list = _reportesModel?.incidenciasPlaga ?? [];
+
+    if (list.isEmpty) {
+      return Container();
+    }
+
     Widget content = PieChart(
       PieChartData(
-        sections: [
-          // Aquí puedes agregar las diferentes secciones del gráfico de pastel
-          // Por ejemplo:
-          PieChartSectionData(
-              value: 40, color: Colors.red, title: 'Pulgon (40)'),
-          PieChartSectionData(
-              value: 30, color: Colors.blue, title: 'Trips (30)'),
-          PieChartSectionData(
-              value: 20, color: Colors.green, title: 'Escarabajo (20)'),
-        ],
+        sections: list
+            .map(
+              (e) => PieChartSectionData(
+                color: getRandomColor(),
+                value: e.cantidad.toDouble(),
+                title:
+                    "${truncateText(e.plaga, 12)} (${e.cantidad.toDouble()})",
+                radius: 50,
+                titleStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+            .toList(),
       ),
     );
     return _chartCard('Distribución de plagas', content);

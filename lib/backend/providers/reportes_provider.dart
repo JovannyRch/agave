@@ -3,7 +3,8 @@ import 'package:agave/backend/models/incidencia_plaga.dart';
 import 'package:agave/backend/providers/base_provider.dart';
 
 class ReportesProvider extends BaseProvider {
-  String tabla = DB.parcelas;
+  static final ReportesProvider db = ReportesProvider._();
+
   ReportesProvider._();
 
   Future<int> total(String table) async {
@@ -14,22 +15,44 @@ class ReportesProvider extends BaseProvider {
     return int.parse(res.first['total'].toString());
   }
 
-  Future<List<IncidenciaPlaga>> incidenciasPorPlaga(String table) async {
+  Future<List<IncidenciaPlaga>> incidenciasPorPlaga() async {
     final db = await database;
-    List<IncidenciaPlaga> incidencias = [];
+    List<IncidenciaPlaga> resultado = [];
 
-    /* Group by idPlaga from table muestreos */
-    final res =
-        await db!.rawQuery("SELECT idPlaga total from $table group by idPlaga");
-
-    List<int> ids = [];
-
-    /* Get all plaga names */
-    final res2 = await db
-        .rawQuery("SELECT * from ${DB.plagas} where id in (${ids.join(',')})");
+    final res = await db!.rawQuery("SELECT id,nombre from ${DB.plagas}");
 
     if (res.isEmpty) return [];
 
-    return incidencias;
+    resultado = res
+        .map(
+          (e) => IncidenciaPlaga(
+            cantidad: 0,
+            id: int.parse(e['id'].toString()),
+            plaga: e['nombre'].toString(),
+          ),
+        )
+        .toList();
+
+    for (var inicidencia in resultado) {
+      final res = await db.rawQuery(
+          "SELECT id from ${DB.muestreos} where idPlaga = ${inicidencia.id}");
+
+      if (res.isEmpty) continue;
+
+      List<int> muestreosIds =
+          res.map((e) => int.parse(e['id'].toString())).toList();
+      final res2 = await db.rawQuery(
+          "SELECT sum(cantidad) cantidad from ${DB.incidencias} where id in (${muestreosIds.join(',')}) ");
+
+      int cantidad = res2.first['cantidad'] == null
+          ? 0
+          : int.parse(res2.first['cantidad'].toString());
+
+      inicidencia.cantidad = cantidad;
+    }
+
+    resultado = resultado.where((element) => element.cantidad != 0).toList();
+
+    return resultado;
   }
 }

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:agave/backend/models/Incidencia.dart';
+import 'package:agave/backend/models/incidencia.dart';
 import 'package:agave/backend/providers/incidencias_provider.dart';
 
 class Muestreo {

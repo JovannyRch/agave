@@ -1,4 +1,6 @@
-import 'package:agave/backend/models/Incidencia.dart';
+import 'package:agave/backend/models/incidencia.dart';
+import 'package:agave/screens/incidencias/location_screen.dart';
+import 'package:agave/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
 
 class TabIncidencias extends StatefulWidget {
@@ -13,7 +15,10 @@ class TabIncidencias extends StatefulWidget {
 class _TabIncidenciasState extends State<TabIncidencias> {
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    var list = ListView.builder(
+      padding: const EdgeInsets.only(
+        bottom: 60.0,
+      ),
       itemCount: widget.incidencias.length,
       itemBuilder: (context, index) {
         return ListTile(
@@ -21,10 +26,40 @@ class _TabIncidenciasState extends State<TabIncidencias> {
               'Ubicación: (${widget.incidencias[index].latitud}, ${widget.incidencias[index].longitud})'),
           subtitle: Text('Incidencias: ${widget.incidencias[index].cantidad}'),
           leading: const Icon(Icons.bug_report),
-          onTap: () {},
-          // Puedes agregar más interacciones o detalles si lo deseas
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MultipleLocationMap(
+                  incidencias: [widget.incidencias[index]],
+                ),
+              ),
+            );
+          },
         );
       },
     );
+    return Column(children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          SubmitButton(
+              text: 'Ver mapa',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MultipleLocationMap(
+                      incidencias: widget.incidencias,
+                    ),
+                  ),
+                );
+              })
+        ],
+      ),
+      Expanded(
+        child: list,
+      ),
+    ]);
   }
 }

@@ -1,5 +1,5 @@
 import 'package:agave/api/utmApi.dart';
-import 'package:agave/backend/models/Incidencia.dart';
+import 'package:agave/backend/models/incidencia.dart';
 import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/models/ultima_plaga.dart';
@@ -8,8 +8,8 @@ import 'package:agave/backend/user_data.dart';
 import 'package:agave/widgets/submit_button.dart';
 import 'package:agave/utils/latLongToUTM.dart';
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
 import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
 
 class RegistroIncidenciasScreen extends StatefulWidget {
   int idMuestreo;
@@ -31,8 +31,6 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
   final TextEditingController _incidenciasController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  LocationData? _currentLocation;
-  final Location _location = Location();
   double? _latitude;
   double? _longitude;
   double? _norte;
@@ -42,6 +40,34 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
   MuestreosModel? _muestreosModel;
   bool _loading = true;
   FocusNode focus = FocusNode();
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    return position;
+  }
 
   @override
   void initState() {
@@ -55,15 +81,13 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
     });
 
     try {
-      final locationData = await _location.getLocation();
+      final locationData = await _determinePosition();
       UtmApiResponse? response = await latLongToUTM(
           locationData.latitude ?? 0, locationData.longitude ?? 0);
 
       setState(() {
-        _currentLocation = locationData;
-
-        _latitude = _currentLocation!.latitude;
-        _longitude = _currentLocation!.longitude;
+        _latitude = locationData.latitude;
+        _longitude = locationData.longitude;
 
         _este = response!.easting;
         _norte = response.northing;
@@ -97,7 +121,7 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 if (_loading) CircularProgressIndicator(),
-                if (!(_loading) && _currentLocation != null) ...[
+                if (!_loading) ...[
                   TextFormField(
                     initialValue: '${_norte}',
                     readOnly: true,

@@ -1,18 +1,19 @@
-import 'package:agave/backend/models/Incidencia.dart';
+import 'package:agave/backend/models/incidencia.dart';
 import 'package:agave/backend/models/actividad.dart';
 import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/estudio.dart';
+import 'package:agave/backend/models/incidencia_plaga.dart';
 import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/models/plaga.dart';
-import 'package:agave/backend/models/ultima_plaga.dart';
 import 'package:agave/backend/providers/agave_provider.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/incidencias_provider.dart';
 import 'package:agave/backend/providers/muestreos_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/providers/plagas_provider.dart';
+import 'package:agave/backend/providers/reportes_provider.dart';
 import 'package:agave/backend/user_data.dart';
 import 'package:agave/widgets/actividad_item.dart';
 import 'package:flutter/material.dart';
@@ -248,6 +249,17 @@ class IncidenciasModel with ChangeNotifier {
     Incidencia newItem = await IncidenciasProvider.db.insert(item);
     _incidencias.add(newItem);
 
+    notifyListeners();
+  }
+}
+
+class ReportesModel with ChangeNotifier {
+  List<IncidenciaPlaga> _incidenciasPlaga = [];
+
+  List<IncidenciaPlaga> get incidenciasPlaga => _incidenciasPlaga;
+
+  fetchData() async {
+    _incidenciasPlaga = await ReportesProvider.db.incidenciasPorPlaga();
     notifyListeners();
   }
 }

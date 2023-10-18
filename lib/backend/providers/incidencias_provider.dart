@@ -1,4 +1,4 @@
-import 'package:agave/backend/models/Incidencia.dart';
+import 'package:agave/backend/models/incidencia.dart';
 import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/providers/base_provider.dart';
 

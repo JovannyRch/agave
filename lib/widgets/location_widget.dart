@@ -19,7 +19,7 @@ class _MapLocationWidgetState extends State<MapLocationWidget> {
     return GoogleMap(
       initialCameraPosition: CameraPosition(
         target: LatLng(widget.latitude, widget.longitude),
-        zoom: 15,
+        zoom: 30,
       ),
       onMapCreated: (GoogleMapController controller) {
         _controller = controller;
