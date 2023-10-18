@@ -29,6 +29,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   ReportesModel? _reportesModel;
 
@@ -45,12 +47,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _loadData() async {
+    setState(() {
+      isLoading = true;
+    });
     actividades = await UserData.obtenerActividadReciente();
     ultimaPlaga = await UserData.obtenerUltimaPlaga();
 
     setState(() {
       isLoading = false;
     });
+  }
+
+  Future<void> _refresh() async {
+    _loadData();
   }
 
   @override
@@ -62,7 +71,11 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Inicio'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: _body(),
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: _refresh,
+        child: _body(),
+      ),
     );
   }
 
