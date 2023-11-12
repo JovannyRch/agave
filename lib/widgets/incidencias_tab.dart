@@ -44,7 +44,7 @@ class _TabIncidenciasState extends State<TabIncidencias> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           SubmitButton(
-              text: 'Ver mapa',
+              text: 'Ver mapa completo',
               onPressed: () {
                 Navigator.push(
                   context,

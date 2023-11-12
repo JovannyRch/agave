@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class SubmitButton extends StatelessWidget {
   final String text;
-  final Function onPressed;
+  final Function? onPressed;
 
-  const SubmitButton({Key? key, required this.text, required this.onPressed})
+  const SubmitButton({Key? key, required this.text, this.onPressed})
       : super(key: key);
 
   @override
@@ -16,9 +16,7 @@ class SubmitButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Theme.of(context).primaryColor,
           ),
-          onPressed: () {
-            onPressed();
-          },
+          onPressed: onPressed as void Function()?,
           child: Text(text),
         ),
       ]),

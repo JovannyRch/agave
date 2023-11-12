@@ -26,14 +26,12 @@ class UtmApiResponse {
 }
 
 Future<UtmApiResponse?> latLongToUTM(double lat, double long) async {
-  print("lat: $lat, long: $long");
   final baseUrl = "https://www.latlong.net/dec2utm.php";
   final fullUrl = "$baseUrl?lat=$lat&long=$long";
 
   final response = await http.get(Uri.parse(fullUrl));
 
   if (response.statusCode == 200) {
-    print(response.body);
     final jsonResponse = json.decode(response.body) as List<dynamic>;
     if (jsonResponse.isNotEmpty) {
       final utmData = jsonResponse[0] as Map<String, dynamic>;

@@ -1,13 +1,18 @@
+import 'package:agave/api/api.dart';
+import 'package:agave/api/responses/kriging_contour_response.dart';
+import 'package:agave/api/responses/semivariograma_response.dart';
 import 'package:agave/backend/models/incidencia.dart';
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
+import 'package:agave/screens/kriging/ajuste_screen.dart';
+import 'package:agave/screens/kriging/kriging_contour_screen.dart';
 import 'package:agave/widgets/card_detail.dart';
-import 'package:agave/widgets/contour_map.dart';
 import 'package:agave/widgets/incidencias_tab.dart';
 import 'package:agave/widgets/screen_title.dart';
 import 'package:agave/screens/incidencias/registro_indicencias_screen.dart';
+import 'package:agave/widgets/submit_button.dart';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +37,8 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   IncidenciasModel? _model;
   MuestreosModel? _muestreosModel;
 
+  bool isLoading = false;
+
   @override
   void initState() {
     Provider.of<IncidenciasModel>(context, listen: false)
@@ -46,7 +53,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
     _muestreosModel = Provider.of<MuestreosModel>(context);
     List<Incidencia> incidencias = _model?.incidencias ?? [];
     return DefaultTabController(
-      length: 4,
+      length: 2,
       child: Scaffold(
         appBar: _appBar(),
         floatingActionButton: FloatingActionButton(
@@ -69,8 +76,6 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
         body: TabBarView(
           children: [
             _buildGeneralTab(),
-            ContourMap(),
-            _buildSemivariogramaChart(),
             TabIncidencias(incidencias: incidencias),
           ],
         ),
@@ -96,12 +101,6 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
               icon: Icon(
             Icons.info,
           )),
-          Tab(
-            icon: Icon(Icons.map),
-          ),
-          Tab(
-            icon: Icon(Icons.line_axis),
-          ),
           Tab(
             icon: Icon(Icons.table_chart),
           ),
@@ -165,20 +164,112 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
             ],
           ),
         ),
-
-        /*    const SizedBox(height: 20),
-        const Text(
-          "Mapa de Calor",
-          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SubmitButton(
+              text: "Iniciar Ajuste",
+              onPressed: isLoading ? null : _getSemivariograma,
+            ),
+          ],
         ),
-        const SizedBox(height: 10.0),
-        Card(
-          child: Image.asset(
-            'images/krigeado.png',
-          ),
-        ), */
       ],
     );
+  }
+
+  void _krigingContour() async {
+    setState(() {
+      isLoading = true;
+    });
+    List<double> lats =
+        widget.muestreo.incidencias!.map((e) => e.latitud ?? 0.0).toList();
+    List<double> lons =
+        widget.muestreo.incidencias!.map((e) => e.longitud ?? 0.0).toList();
+    List<int> values = widget.muestreo.incidencias!
+        .map((e) => (e.cantidad ?? 0.0).toInt())
+        .toList();
+    try {
+      KrigingContourResponse? response =
+          await Api.getKrigingContour(lats, lons, values);
+
+      if (response != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => KrigingContour(
+              krigingContourResponse: response,
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo obtener el semivariograma'),
+          ),
+        );
+      }
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo obtener el semivariograma'),
+        ),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _getSemivariograma() async {
+    setState(() {
+      isLoading = true;
+    });
+    List<List<double>> points = widget.muestreo.incidencias!
+        .map(
+          (e) => [
+            e.longitud ?? 0.0,
+            e.latitud ?? 0.0,
+            e.cantidad!.toDouble() ?? 0.0
+          ],
+        )
+        .toList();
+    try {
+      SemivariogramaResponse? response =
+          await Api.getExperimentalSemivariogram(points);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AjusteScreen(
+            lags: response?.lags ?? [],
+            semivariance: response?.semivariance ?? [],
+          ),
+        ),
+      );
+
+      if (response != null) {
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo obtener el semivariograma'),
+          ),
+        );
+      }
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo obtener el semivariograma'),
+        ),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Widget _buildSemivariogramaChart() {

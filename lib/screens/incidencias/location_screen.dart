@@ -9,15 +9,22 @@ class MultipleLocationMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
+        title: const Text('Ubicaciones'),
+      ),
       body: SafeArea(
         child: MultiLocationMapWidget(
           locations: incidencias
+              .asMap()
+              .keys
+              .toList()
               .map(
-                (e) => Location(
-                  incidents: e.cantidad ?? 0,
-                  id: e.id ?? -1,
-                  latitude: e.latitud ?? 0.0,
-                  longitude: e.longitud ?? 0.0,
+                (index) => Location(
+                  incidents: incidencias[index].cantidad ?? 0,
+                  id: index + 1,
+                  latitude: incidencias[index].latitud ?? 0.0,
+                  longitude: incidencias[index].longitud ?? 0.0,
                 ),
               )
               .toList(),
