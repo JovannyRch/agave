@@ -24,6 +24,8 @@ dependencies:
   google_maps_flutter: ^2.5.0
   flutter_cache_manager: ^3.3.1
   geolocator: ^10.0.1
+  easy_image_viewer: ^1.2.1
+  map_location_picker: ^1.2.7
 
 dev_dependencies:
   flutter_test:

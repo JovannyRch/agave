@@ -5,9 +5,11 @@ import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/models/ultima_plaga.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/user_data.dart';
+import 'package:agave/const.dart';
 import 'package:agave/widgets/submit_button.dart';
 import 'package:agave/utils/latLongToUTM.dart';
 import 'package:flutter/material.dart';
+import 'package:map_location_picker/map_location_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -139,14 +141,27 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
                   ),
                 ],
                 SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _loading ? null : _getLocation,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                  ),
-                  child: Text(
-                    'Volver a obtener ubicación',
-                  ),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: _loading ? null : _getLocation,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                      ),
+                      child: Text(
+                        'Volver a obtener',
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: _loading ? null : _pickLocation,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                      ),
+                      child: Text(
+                        'Seleccionar ubicación',
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 20),
                 _cantidadIncidenciasInput(),
@@ -159,6 +174,17 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _pickLocation() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return MapLocationPicker(a);
+        },
       ),
     );
   }

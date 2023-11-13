@@ -5,6 +5,26 @@ import 'package:agave/api/responses/semivariograma_response.dart';
 
 String API_BASE_URL = "https://goldfish-app-oqgqm.ondigitalocean.app";
 
+class ModelParams {
+  double sill;
+  double range;
+  double nugget;
+
+  ModelParams({
+    required this.sill,
+    required this.range,
+    required this.nugget,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      "sill": sill,
+      "range": range,
+      "nugget": nugget,
+    };
+  }
+}
+
 class Api {
   static String getApiUrl(String endpoint) {
     return API_BASE_URL + endpoint;
@@ -28,21 +48,31 @@ class Api {
   }
 
   static Future<KrigingContourResponse?> getKrigingContour(
-      List<double> lats, List<double> lons, List<int> values) async {
+    List<List<double>> points,
+    String variogram_model,
+    ModelParams modelParams,
+  ) async {
     final response = await http.post(
-      Uri.parse(getApiUrl("/kriging_contour")),
+      Uri.parse(getApiUrl("/generate_contour")),
       headers: {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        "lats": lats,
-        "lons": lons,
-        "values": values,
+        "points": points,
+        "variogram_model": variogram_model,
+        "testing": true,
+        "model_params": modelParams.toJson(),
       }),
     );
 
+    print({
+      "points": points,
+      "variogram_model": variogram_model,
+      "testing": true,
+      "model_params": modelParams.toJson(),
+    });
+
     if (response.statusCode == 200) {
-      print(response.body);
       return KrigingContourResponse.fromJson(response.body);
     }
     throw Exception('Failed to load semivariogram');

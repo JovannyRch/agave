@@ -1,5 +1,4 @@
 import 'package:agave/api/api.dart';
-import 'package:agave/api/responses/kriging_contour_response.dart';
 import 'package:agave/api/responses/semivariograma_response.dart';
 import 'package:agave/backend/models/incidencia.dart';
 import 'package:agave/backend/models/estudio.dart';
@@ -7,7 +6,6 @@ import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/screens/kriging/ajuste_screen.dart';
-import 'package:agave/screens/kriging/kriging_contour_screen.dart';
 import 'package:agave/widgets/card_detail.dart';
 import 'package:agave/widgets/incidencias_tab.dart';
 import 'package:agave/widgets/screen_title.dart';
@@ -178,51 +176,6 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
     );
   }
 
-  void _krigingContour() async {
-    setState(() {
-      isLoading = true;
-    });
-    List<double> lats =
-        widget.muestreo.incidencias!.map((e) => e.latitud ?? 0.0).toList();
-    List<double> lons =
-        widget.muestreo.incidencias!.map((e) => e.longitud ?? 0.0).toList();
-    List<int> values = widget.muestreo.incidencias!
-        .map((e) => (e.cantidad ?? 0.0).toInt())
-        .toList();
-    try {
-      KrigingContourResponse? response =
-          await Api.getKrigingContour(lats, lons, values);
-
-      if (response != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => KrigingContour(
-              krigingContourResponse: response,
-            ),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No se pudo obtener el semivariograma'),
-          ),
-        );
-      }
-    } catch (e) {
-      print(e);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No se pudo obtener el semivariograma'),
-        ),
-      );
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
   void _getSemivariograma() async {
     setState(() {
       isLoading = true;
@@ -246,6 +199,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
           builder: (context) => AjusteScreen(
             lags: response?.lags ?? [],
             semivariance: response?.semivariance ?? [],
+            points: points,
           ),
         ),
       );

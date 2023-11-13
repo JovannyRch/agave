@@ -1,7 +1,11 @@
+import 'package:agave/api/api.dart';
+import 'package:agave/api/responses/kriging_contour_response.dart';
 import 'package:agave/const.dart';
 import 'package:agave/utils/models.dart';
 import 'package:agave/widgets/semivariograma_widget.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
 
 /* const lags = [
   21.015123121183937,
@@ -24,11 +28,13 @@ const semivariance = [
 class AjusteScreen extends StatefulWidget {
   final List<double> lags;
   final List<double> semivariance;
+  final List<List<double>> points;
 
   const AjusteScreen({
     super.key,
     required this.lags,
     required this.semivariance,
+    required this.points,
   });
 
   @override
@@ -47,6 +53,8 @@ class _AjusteScreenState extends State<AjusteScreen> {
   double nugget = 0;
   List<double> modelSemivariance = [];
   Model selectedModel = Model.spherical;
+  Api api = Api();
+  bool isLoadingHeatMap = false;
 
   @override
   void initState() {
@@ -64,16 +72,62 @@ class _AjusteScreenState extends State<AjusteScreen> {
       appBar: AppBar(
         title: const Text('Ajuste'),
         actions: [
-          /* Save button */
-          IconButton(
+          /*  IconButton(
             onPressed: _save,
             icon: const Icon(Icons.save),
+          ), */
+          IconButton(
+            onPressed: (isLoadingHeatMap || modelSemivariance.isEmpty)
+                ? null
+                : _viewHeatMap,
+            icon: const Icon(Icons.map),
           ),
         ],
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: _body,
     );
+  }
+
+  void _viewHeatMap() async {
+    setState(() {
+      isLoadingHeatMap = true;
+    });
+    try {
+      KrigingContourResponse? krigingContourResponse =
+          await Api.getKrigingContour(
+        widget.points,
+        selectedModel.toString().split('.').last,
+        ModelParams(
+          sill: sill,
+          range: range,
+          nugget: nugget,
+        ),
+      );
+
+      if (krigingContourResponse != null) {
+        String imageBase64 = krigingContourResponse.image_base64 ?? "";
+        final imageProvider = Image.memory(
+          fit: BoxFit.cover,
+          Base64Decoder().convert(
+            imageBase64,
+          ),
+        ).image;
+        showImageViewer(context, imageProvider, onViewerDismissed: () {
+          print("dismissed");
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo obtener el mapa de contorno'),
+        ),
+      );
+    } finally {
+      setState(() {
+        isLoadingHeatMap = false;
+      });
+    }
   }
 
   void _save() {
