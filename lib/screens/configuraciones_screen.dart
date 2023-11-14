@@ -37,7 +37,7 @@ class ConfiguracionScreen extends StatelessWidget {
           ),
         ),
         ListTile(
-          title: const Text('Tipos de agave'),
+          title: const Text('Tipos de planta'),
           trailing: const Icon(Icons.arrow_forward),
           onTap: () => Navigator.push(
             context,

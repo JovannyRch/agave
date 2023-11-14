@@ -32,11 +32,11 @@ class _AgavesScreenState extends State<AgavesScreen> {
             ),
           );
         },
-        tooltip: 'Agregar tipo de Agave',
+        tooltip: 'Agregar tipo de planta',
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text('Tipos de Agave'),
+        title: const Text('Tipos de plantas'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: RefreshIndicator(
@@ -52,7 +52,7 @@ class _AgavesScreenState extends State<AgavesScreen> {
   }
 
   Widget _emptyList() {
-    return const Center(child: Text('No hay tipos de agave disponibles'));
+    return const Center(child: Text('No hay tipos de planta disponibles'));
   }
 
   Widget _agavesList() {

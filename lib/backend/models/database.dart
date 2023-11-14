@@ -1,7 +1,7 @@
 import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/plaga.dart';
 
-const String kDBname = "agave_2_database";
+const String kDBname = "agave_3_database";
 
 class DB {
   static const String parcelas = 'parcelas';
@@ -13,6 +13,23 @@ class DB {
   static const String logs = "logs";
 }
 
+List<Plaga> kPlagues = [
+  Plaga(id: 1, nombre: "Broca del café"),
+  Plaga(id: 2, nombre: "Roya del café"),
+  Plaga(id: 3, nombre: "Minador de las hojas del café"),
+  Plaga(id: 4, nombre: "Nematodos"),
+  Plaga(id: 5, nombre: "Cercospora"),
+  Plaga(id: 6, nombre: "Ácaro rojo del café"),
+];
+
+List<Agave> kAgaves = [
+  Agave(id: 1, nombre: "Coffea arabica (Arábica)"),
+  Agave(id: 2, nombre: "Coffea canephora (Robusta)"),
+  Agave(id: 3, nombre: "Coffea liberica (Liberica)"),
+  Agave(id: 4, nombre: "Coffea excelsa (Excelsa)"),
+  Agave(id: 5, nombre: "Coffea racemosa (Racemosa)"),
+];
+/* 
 List<Plaga> kPlagues = [
   Plaga(id: 1, nombre: "Picudo del agave"),
   Plaga(id: 2, nombre: "Gusano barrenador del cogollo"),
@@ -34,7 +51,7 @@ List<Agave> kAgaves = [
   Agave(id: 4, nombre: "Agave americana"),
   Agave(id: 5, nombre: "Agave potatorum (Tobala)"),
 ];
-
+ */
 const studiesTable = """
   CREATE TABLE ${DB.estudios} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -9,7 +9,8 @@ import 'package:agave/const.dart';
 import 'package:agave/widgets/submit_button.dart';
 import 'package:agave/utils/latLongToUTM.dart';
 import 'package:flutter/material.dart';
-import 'package:map_location_picker/map_location_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -84,18 +85,7 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
 
     try {
       final locationData = await _determinePosition();
-      UtmApiResponse? response = await latLongToUTM(
-          locationData.latitude ?? 0, locationData.longitude ?? 0);
-
-      setState(() {
-        _latitude = locationData.latitude;
-        _longitude = locationData.longitude;
-
-        _este = response!.easting;
-        _norte = response.northing;
-        _zona = response.zone;
-        focus.requestFocus();
-      });
+      _updateLocation(locationData);
     } catch (e) {
       print('Error obteniendo ubicación: $e');
     } finally {
@@ -103,6 +93,24 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
         _loading = false;
       });
     }
+  }
+
+  void _updateLocation(Position locationData) async {
+    print(locationData);
+    UtmApiResponse? response = await latLongToUTM(
+      locationData.latitude ?? 0,
+      locationData.longitude ?? 0,
+    );
+
+    setState(() {
+      _latitude = locationData.latitude;
+      _longitude = locationData.longitude;
+
+      _este = response!.easting;
+      _norte = response.northing;
+      _zona = response.zone;
+      focus.requestFocus();
+    });
   }
 
   @override
@@ -142,6 +150,7 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
                 ],
                 SizedBox(height: 20),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
                       onPressed: _loading ? null : _getLocation,
@@ -182,9 +191,21 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) {
-          return MapLocationPicker(a);
-        },
+        builder: (context) => PlacePicker(
+          apiKey: MAP_KEY,
+          onPlacePicked: (result) {
+            _updateLocation(Position.fromMap(
+              {
+                'latitude': result.geometry!.location.lat,
+                'longitude': result.geometry!.location.lng
+              },
+            ));
+            Navigator.of(context).pop();
+          },
+          initialPosition: LatLng(_latitude!, _longitude!),
+          useCurrentLocation: true,
+          resizeToAvoidBottomInset: false,
+        ),
       ),
     );
   }

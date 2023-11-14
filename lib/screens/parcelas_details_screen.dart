@@ -153,7 +153,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
         if (parcela!.tipoAgave != null && parcela!.tipoAgave!.isNotEmpty)
           Card(
             child: CardDetail(
-              title: "Tipo de Agave",
+              title: "Tipo de planta",
               value: parcela!.tipoAgave ?? "",
             ),
           ),
