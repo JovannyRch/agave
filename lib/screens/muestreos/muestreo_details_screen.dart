@@ -11,6 +11,7 @@ import 'package:agave/screens/incidencias/location_screen.dart';
 import 'package:agave/screens/kriging/ajuste_screen.dart';
 import 'package:agave/utils/formatDate.dart';
 import 'package:agave/widgets/RoundedButton.dart';
+import 'package:agave/widgets/calculos_bottom_sheet.dart';
 import 'package:agave/widgets/card_detail.dart';
 import 'package:agave/widgets/screen_title.dart';
 import 'package:agave/screens/incidencias/registro_indicencias_screen.dart';
@@ -36,7 +37,6 @@ class MuestreoDetailsScreen extends StatefulWidget {
 
 class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   IncidenciasModel? _model;
-  IncidenciasModel? _incidenciasModel;
 
   bool isLoading = true;
   late Size size;
@@ -65,9 +65,8 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     _model = Provider.of<IncidenciasModel>(context);
-    _incidenciasModel = Provider.of<IncidenciasModel>(context);
 
-    hasIncidencias = _incidenciasModel?.incidencias.isNotEmpty ?? false;
+    hasIncidencias = _model?.incidencias.isNotEmpty ?? false;
 
     return Scaffold(
       appBar: _appBar(),
@@ -164,7 +163,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
         title: Text(
           _getCoordenadas(incidencia),
           style: const TextStyle(
-            fontSize: 1.0,
+            fontSize: 11.0,
           ),
         ),
         subtitle: Text(
@@ -232,7 +231,23 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
           RoundedButton(
             icon: Icons.percent,
             text: 'Calculos',
-            onPressed: _iniciarAjuste,
+            onPressed: () {
+              //Open bottom sheet dialog
+              showModalBottomSheet(
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
+                ),
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+                builder: (context) {
+                  return CalculosBottomSheet(
+                    incidencias: _model?.incidencias ?? [],
+                  );
+                },
+              );
+            },
           ),
         ],
       ),

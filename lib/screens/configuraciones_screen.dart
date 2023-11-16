@@ -1,4 +1,5 @@
 import 'package:agave/backend/user_data.dart';
+import 'package:agave/const.dart';
 import 'package:agave/screens/agaves/agaves_screen.dart';
 import 'package:agave/screens/plagas/plagas_screen.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,10 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+              color: kMainColor,
+            ))
           : ListView(
               children: [
                 _buildDataConfigSection(context),

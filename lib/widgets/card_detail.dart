@@ -6,6 +6,7 @@ class CardDetail extends StatelessWidget {
   String? unit;
   IconData? icon;
   Color? color;
+  bool isCenter = false;
 
   CardDetail({
     required this.title,
@@ -13,6 +14,7 @@ class CardDetail extends StatelessWidget {
     this.unit,
     this.icon,
     this.color,
+    this.isCenter = false,
   });
 
   @override
@@ -40,7 +42,8 @@ class CardDetail extends StatelessWidget {
   Widget _content() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          isCenter ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
         Text(
           title,
@@ -52,6 +55,8 @@ class CardDetail extends StatelessWidget {
         const SizedBox(height: 10),
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment:
+              isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
           children: [
             Text(
               value,
