@@ -20,7 +20,7 @@ class CardDetail extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.all(10),
-      height: 100.0,
+      height: 70.0,
       decoration: BoxDecoration(
         color: color ?? Colors.white,
         borderRadius: BorderRadius.circular(10),
@@ -45,7 +45,7 @@ class CardDetail extends StatelessWidget {
         Text(
           title,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 13,
             color: Colors.black38,
           ),
         ),
@@ -56,7 +56,7 @@ class CardDetail extends StatelessWidget {
             Text(
               value,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
               ),
             ),

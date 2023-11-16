@@ -1,7 +1,7 @@
 import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/plaga.dart';
 
-const String kDBname = "agave_3_database";
+const String kDBname = "agave_4_database";
 
 class DB {
   static const String parcelas = 'parcelas';

@@ -5,13 +5,15 @@ import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
+import 'package:agave/backend/user_data.dart';
+import 'package:agave/const.dart';
+import 'package:agave/screens/incidencias/location_screen.dart';
 import 'package:agave/screens/kriging/ajuste_screen.dart';
 import 'package:agave/utils/formatDate.dart';
+import 'package:agave/widgets/RoundedButton.dart';
 import 'package:agave/widgets/card_detail.dart';
-import 'package:agave/widgets/incidencias_tab.dart';
 import 'package:agave/widgets/screen_title.dart';
 import 'package:agave/screens/incidencias/registro_indicencias_screen.dart';
-import 'package:agave/widgets/submit_button.dart';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -34,127 +36,265 @@ class MuestreoDetailsScreen extends StatefulWidget {
 
 class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   IncidenciasModel? _model;
-  MuestreosModel? _muestreosModel;
+  IncidenciasModel? _incidenciasModel;
 
-  bool isLoading = false;
+  bool isLoading = true;
   late Size size;
+  bool isUTM = false;
+  bool hasIncidencias = false;
 
   @override
   void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() async {
     Provider.of<IncidenciasModel>(context, listen: false)
         .fetchData(widget.muestreo.id ?? -1);
-
-    super.initState();
+    String tipoCoordenadas = await UserData.obtenerTipoCoordenadas() ?? "UTM";
+    if (tipoCoordenadas == "UTM") {
+      isUTM = true;
+    }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     _model = Provider.of<IncidenciasModel>(context);
-    _muestreosModel = Provider.of<MuestreosModel>(context);
-    List<Incidencia> incidencias = _model?.incidencias ?? [];
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: _appBar(),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Theme.of(context).primaryColor,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RegistroIncidenciasScreen(
-                  idMuestreo: widget.muestreo.id ?? -1,
-                  muestreo: widget.muestreo,
-                  parcela: widget.parcela,
-                ),
+    _incidenciasModel = Provider.of<IncidenciasModel>(context);
+
+    hasIncidencias = _incidenciasModel?.incidencias.isNotEmpty ?? false;
+
+    return Scaffold(
+      appBar: _appBar(),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).primaryColor,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RegistroIncidenciasScreen(
+                idMuestreo: widget.muestreo.id ?? -1,
+                muestreo: widget.muestreo,
+                parcela: widget.parcela,
               ),
-            );
-          },
-          tooltip: 'Agregar Incidencia',
-          child: const Icon(Icons.pin_drop),
-        ),
-        body: _body(),
+            ),
+          );
+        },
+        tooltip: 'Agregar Incidencia',
+        child: const Icon(Icons.pin_drop),
       ),
+      body: _body(),
     );
   }
 
   Widget _body() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16.0,
-        vertical: 8.0,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ScreenTitle(
-            subtitle: "Plaga",
-            title: widget.muestreo.nombrePlaga ?? "",
+    return SizedBox(
+      height: size.height,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 8.0,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ScreenTitle(
+                subtitle: "Plaga",
+                title: widget.muestreo.nombrePlaga ?? "",
+              ),
+              _grid(),
+              hasIncidencias ? const Divider() : Container(),
+              scrollableActionRowList(),
+              const Divider(),
+              const SizedBox(
+                height: 30.0,
+              ),
+              const Text(
+                "Registros",
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              ..._incidenciasList(),
+              const SizedBox(height: 80.0),
+            ],
           ),
-          Container(
-            height: 250.0,
-            /* decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10.0),
-              color: Colors.white,
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 5.0,
-                  offset: Offset(0, 5),
-                ),
-              ],
-            ), */
-            child: GridView.count(
-              crossAxisCount: 2,
-              childAspectRatio: 2.2,
-              children: [
-                CardDetail(
-                  color: Colors.transparent,
-                  title: "Estudio",
-                  value: widget.estudio.nombre ?? "",
-                  icon: Icons.folder,
-                ),
-                CardDetail(
-                  title: "Parcela",
-                  value: widget.parcela.nombre ?? "",
-                  color: Colors.transparent,
-                  icon: Icons.nature,
-                ),
-                CardDetail(
-                  title: "Creación",
-                  value: formatDate(widget.muestreo.fechaCreacion),
-                  color: Colors.transparent,
-                  icon: Icons.calendar_today,
-                ),
-                CardDetail(
-                  title: "Registros",
-                  value: _model!.incidencias.length.toString(),
-                  color: Colors.transparent,
-                  icon: Icons.list,
-                ),
-                if (widget.muestreo.humedad != null)
-                  CardDetail(
-                    title: "Humedad",
-                    value: widget.muestreo.humedad.toString(),
-                    unit: "%",
-                    color: Colors.transparent,
-                    icon: Icons.water,
-                  ),
-                if (widget.muestreo.temperatura != null)
-                  CardDetail(
-                    title: "Temperatura",
-                    value: widget.muestreo.temperatura.toString(),
-                    unit: "°C",
-                    color: Colors.transparent,
-                    icon: Icons.thermostat,
-                  ),
-              ],
+        ),
+      ),
+    );
+  }
+
+  Widget _rowDetails(Widget child1, Widget child2) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Expanded(child: child1),
+        Expanded(child: child2),
+      ],
+    );
+  }
+
+  List<Widget> _incidenciasList() {
+    if (!hasIncidencias) {
+      return [
+        const SizedBox(
+          height: 150.0,
+          child: Center(
+            child: Text('No hay registros'),
+          ),
+        ),
+      ];
+    }
+
+    return _model!.incidencias.map((incidencia) {
+      return ListTile(
+        leading: const Icon(
+          Icons.location_on,
+          color: kMainColor,
+        ),
+        title: Text(
+          _getCoordenadas(incidencia),
+          style: const TextStyle(
+            fontSize: 1.0,
+          ),
+        ),
+        subtitle: Text(
+          'Incidencias: ${incidencia.cantidad}',
+          style: const TextStyle(
+            fontSize: 12.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MultipleLocationMap(
+                incidencias: [incidencia],
+              ),
             ),
-          )
+          );
+        },
+      );
+    }).toList();
+  }
+
+  String _getCoordenadas(Incidencia incidencia) {
+    if (isUTM) {
+      return 'N: ${incidencia.norte}, E: ${incidencia.este}';
+    } else {
+      return 'Ltd: ${incidencia.latitud}, Lng: ${incidencia.longitud}';
+    }
+  }
+
+  Widget scrollableActionRowList() {
+    //If total number of items is even then remove 1 from total count
+    int total = _model?.incidencias.length ?? 0;
+    if (total == 0) {
+      return Container();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          RoundedButton(
+            text: 'Mapa',
+            icon: Icons.map,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MultipleLocationMap(
+                    incidencias: _model?.incidencias ?? [],
+                  ),
+                ),
+              );
+            },
+          ),
+          RoundedButton(
+            text: 'Ajustar',
+            onPressed: _iniciarAjuste,
+            icon: Icons.settings,
+          ),
+          RoundedButton(
+            icon: Icons.percent,
+            text: 'Calculos',
+            onPressed: _iniciarAjuste,
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _grid() {
+    bool hasHumedad = widget.muestreo.humedad != null;
+    bool hasTemperatura = widget.muestreo.temperatura != null;
+    return Column(
+      children: [
+        _rowDetails(
+          CardDetail(
+            color: Colors.transparent,
+            title: "Estudio",
+            value: widget.estudio.nombre ?? "",
+            icon: Icons.folder,
+          ),
+          CardDetail(
+            title: "Parcela",
+            value: widget.parcela.nombre ?? "",
+            color: Colors.transparent,
+            icon: Icons.nature,
+          ),
+        ),
+        _rowDetails(
+          CardDetail(
+            title: "Creación",
+            value: formatDate(widget.muestreo.fechaCreacion),
+            color: Colors.transparent,
+            icon: Icons.calendar_today,
+          ),
+          CardDetail(
+            title: "Registros",
+            value: _model!.incidencias.length.toString(),
+            color: Colors.transparent,
+            icon: Icons.list,
+          ),
+        ),
+        (hasHumedad || hasTemperatura)
+            ? _rowDetails(
+                hasHumedad
+                    ? CardDetail(
+                        title: "Humedad",
+                        value: widget.muestreo.humedad.toString(),
+                        unit: "%",
+                        color: Colors.transparent,
+                        icon: Icons.water,
+                      )
+                    : Container(),
+                hasTemperatura
+                    ? CardDetail(
+                        title: "Temperatura",
+                        value: widget.muestreo.temperatura.toString(),
+                        unit: "°C",
+                        color: Colors.transparent,
+                        icon: Icons.thermostat,
+                      )
+                    : Container(),
+              )
+            : Container(),
+      ],
     );
   }
 
