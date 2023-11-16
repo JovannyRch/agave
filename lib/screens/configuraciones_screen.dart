@@ -3,8 +3,29 @@ import 'package:agave/screens/agaves/agaves_screen.dart';
 import 'package:agave/screens/plagas/plagas_screen.dart';
 import 'package:flutter/material.dart';
 
-class ConfiguracionScreen extends StatelessWidget {
+class ConfiguracionScreen extends StatefulWidget {
   const ConfiguracionScreen({super.key});
+
+  @override
+  State<ConfiguracionScreen> createState() => _ConfiguracionScreenState();
+}
+
+class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
+  String tipoCoordenadas = "UTM";
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() async {
+    tipoCoordenadas = await UserData.obtenerTipoCoordenadas() ?? "UTM";
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +34,84 @@ class ConfiguracionScreen extends StatelessWidget {
         title: const Text('Configuración'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: ListView(
-        children: <Widget>[
-          _buildDataConfigSection(context),
-          /*     _buildHelpSupportSection(),
-          _buildAppInfoSection(), */
-        ],
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              children: [
+                _buildDataConfigSection(context),
+                /*   const SizedBox(height: 20),
+                _buildHelpSupportSection(),
+                const SizedBox(height: 20),
+                _buildAppInfoSection(),
+                const SizedBox(height: 20), */
+              ],
+            ),
+    );
+  }
+
+  Widget _plagas(BuildContext context) {
+    return ListTile(
+      title: const Text('Plagas'),
+      trailing: const Icon(Icons.arrow_forward),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const PlagasScreen(),
+        ),
+      ),
+    );
+  }
+
+  Widget _tiposPlanta(BuildContext context) {
+    return ListTile(
+      title: const Text('Tipos de planta'),
+      trailing: const Icon(Icons.arrow_forward),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const AgavesScreen(),
+        ),
+      ),
+    );
+  }
+
+  Widget _limpiarActividad(BuildContext context) {
+    return ListTile(
+      title: const Text('Limpiar actividad reciente'),
+      trailing: const Icon(Icons.cleaning_services_outlined),
+      onTap: () {
+        _clearUserData(context);
+      },
+    );
+  }
+
+  Widget _tipoCoordenadasDropDown(BuildContext context) {
+    //Return a drowpdonw button with the list of the types of coordinates
+    return ListTile(
+      title: const Text('Tipo de coordenadas'),
+      trailing: DropdownButton<String>(
+        value: tipoCoordenadas,
+        icon: const Icon(Icons.arrow_downward),
+        iconSize: 24,
+        elevation: 16,
+        style: const TextStyle(color: Colors.black),
+        underline: Container(
+          height: 2,
+          color: Colors.black,
+        ),
+        onChanged: (String? newValue) {
+          setState(() {
+            tipoCoordenadas = newValue!;
+            UserData.guardarTipoCoordenadas(tipoCoordenadas);
+          });
+        },
+        items: <String>['UTM', 'Latitud/Longitud']
+            .map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value, style: const TextStyle(color: Colors.black)),
+          );
+        }).toList(),
       ),
     );
   }
@@ -26,32 +119,11 @@ class ConfiguracionScreen extends StatelessWidget {
   Widget _buildDataConfigSection(BuildContext context) {
     return Column(
       children: [
-        ListTile(
-          title: const Text('Plagas'),
-          trailing: const Icon(Icons.arrow_forward),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const PlagasScreen(),
-            ),
-          ),
-        ),
-        ListTile(
-          title: const Text('Tipos de planta'),
-          trailing: const Icon(Icons.arrow_forward),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AgavesScreen(),
-            ),
-          ),
-        ),
-        ListTile(
-            title: const Text('Limpiar actividad reciente'),
-            trailing: const Icon(Icons.cleaning_services_outlined),
-            onTap: () {
-              _clearUserData(context);
-            }),
+        _plagas(context),
+        _tiposPlanta(context),
+        _tipoCoordenadasDropDown(context),
+        _limpiarActividad(context),
+
         /*  ListTile(
           title: const Text('Exportar datos'),
           trailing: const Icon(Icons.arrow_forward),

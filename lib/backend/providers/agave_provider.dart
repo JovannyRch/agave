@@ -1,4 +1,5 @@
 import 'package:agave/backend/models/agave.dart';
+import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/providers/base_provider.dart';
 
 class AgaveProvider extends BaseProvider {
@@ -8,15 +9,15 @@ class AgaveProvider extends BaseProvider {
 
   Future<Agave> insert(Agave item) async {
     final db = await database;
-    await db!.insert("agaves", item.toJson());
-    final res =
-        await db.rawQuery("SELECT * FROM agaves ORDER BY id DESC LIMIT 1");
+    await db!.insert(DB.plantas, item.toJson());
+    final res = await db
+        .rawQuery("SELECT * FROM ${DB.plantas} ORDER BY id DESC LIMIT 1");
     return Agave.fromJson(res.first);
   }
 
   Future<List<Agave>> getAll() async {
     final db = await database;
-    final res = await db!.query("agaves");
+    final res = await db!.query(DB.plantas);
 
     return res.isEmpty
         ? []
@@ -25,8 +26,8 @@ class AgaveProvider extends BaseProvider {
 
   Future<int> update(Agave item) async {
     final db = await database;
-    final res = await db!
-        .update("agaves", item.toJson(), where: 'id = ?', whereArgs: [item.id]);
+    final res = await db!.update(DB.plantas, item.toJson(),
+        where: 'id = ?', whereArgs: [item.id]);
     return res;
   }
 }

@@ -77,7 +77,7 @@ class AgavesModel with ChangeNotifier {
   }
 
   delete(int id) async {
-    await AgaveProvider.db.delete(id, DB.agaves);
+    await AgaveProvider.db.delete(id, DB.plantas);
     _agaves.removeWhere((item) => item.id == id);
     notifyListeners();
   }

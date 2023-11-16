@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:agave/api/responses/kriging_contour_response.dart';
+import 'package:agave/const.dart';
 import 'package:http/http.dart' as http;
 import 'package:agave/api/responses/semivariograma_response.dart';
 
@@ -32,12 +33,13 @@ class Api {
 
   static Future<SemivariogramaResponse?> getExperimentalSemivariogram(
       List<List<double>> points) async {
+    print(points);
     final response = await http.post(
       Uri.parse(getApiUrl("/semivariogram")),
       headers: {
         'Content-Type': 'application/json',
       },
-      body: jsonEncode({"points": points, "testing": true}),
+      body: jsonEncode({"points": points, "testing": IS_TESTING}),
     );
 
     if (response.statusCode == 200) {
@@ -60,17 +62,10 @@ class Api {
       body: jsonEncode({
         "points": points,
         "variogram_model": variogram_model,
-        "testing": true,
+        "testing": IS_TESTING,
         "model_params": modelParams.toJson(),
       }),
     );
-
-    print({
-      "points": points,
-      "variogram_model": variogram_model,
-      "testing": true,
-      "model_params": modelParams.toJson(),
-    });
 
     if (response.statusCode == 200) {
       return KrigingContourResponse.fromJson(response.body);

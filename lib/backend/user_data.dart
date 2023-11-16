@@ -5,6 +5,16 @@ import 'package:agave/backend/models/ultima_plaga.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserData {
+  static Future<String?> obtenerTipoCoordenadas() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('tipoCoordenadas');
+  }
+
+  static Future<void> guardarTipoCoordenadas(String tipoCoordenadas) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('tipoCoordenadas', tipoCoordenadas);
+  }
+
   static Future<void> guardarEstadoCultivo(String estado) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('estadoCultivo', estado);

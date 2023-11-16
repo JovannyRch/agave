@@ -12,7 +12,7 @@ class ScreenTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -20,14 +20,16 @@ class ScreenTitle extends StatelessWidget {
             Text(
               subtitle!,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 color: Colors.black38,
+                fontWeight: FontWeight.bold,
               ),
             ),
+          SizedBox(height: subtitle != null ? 4 : 0),
           Text(
             title,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 25,
               fontWeight: FontWeight.bold,
             ),
           ),

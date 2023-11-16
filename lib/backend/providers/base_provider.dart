@@ -35,7 +35,7 @@ class BaseProvider {
         }
 
         for (Agave agave in kAgaves) {
-          await db.insert(DB.agaves, agave.toJson());
+          await db.insert(DB.plantas, agave.toJson());
         }
       },
     );

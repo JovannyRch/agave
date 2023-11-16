@@ -7,7 +7,7 @@ class DB {
   static const String parcelas = 'parcelas';
   static const String estudios = 'estudios';
   static const String plagas = 'plagas';
-  static const String agaves = 'agaves';
+  static const String plantas = 'plantas';
   static const String muestreos = "muestreos";
   static const String incidencias = "incidencias";
   static const String logs = "logs";
@@ -74,7 +74,7 @@ const parcelsTable = """
     observaciones TEXT,             -- Notas adicionales
     fechaUltimoMuestreo TIMESTAMP,       
     rutaImagen TEXT,                 -- Ruta de la imagen de la parcela
-    FOREIGN KEY (idTipoAgave) REFERENCES ${DB.agaves}(id) ON DELETE CASCADE
+    FOREIGN KEY (idTipoAgave) REFERENCES ${DB.plantas}(id) ON DELETE CASCADE
   );
 """;
 
@@ -124,15 +124,15 @@ const plaguesTable = """
 );
 """;
 
-const agavesTable = """
-  CREATE TABLE ${DB.agaves} (
+const plantasTable = """
+  CREATE TABLE ${DB.plantas} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT NOT NULL
 );
 """;
 
 final List<String> kTables = [
-  agavesTable,
+  plantasTable,
   plaguesTable,
   studiesTable,
   parcelsTable,

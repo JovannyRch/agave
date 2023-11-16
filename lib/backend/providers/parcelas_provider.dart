@@ -29,7 +29,7 @@ class ParcelasProvider extends BaseProvider {
   Future<List<Parcela>> getAllWithAgave({String? parcelasIds}) async {
     final db = await database;
     final res = await db!.rawQuery(
-        "SELECT $table.*, agaves.nombre AS tipoAgave FROM $table INNER JOIN agaves ON $table.idTipoAgave = agaves.id ${(parcelasIds == null || parcelasIds.isEmpty) ? '' : 'WHERE $table.id IN ($parcelasIds)'}");
+        "SELECT $table.*, ${DB.plantas}.nombre AS tipoAgave FROM $table INNER JOIN ${DB.plantas} ON $table.idTipoAgave = ${DB.plantas}.id ${(parcelasIds == null || parcelasIds.isEmpty) ? '' : 'WHERE $table.id IN ($parcelasIds)'}");
     return res.isEmpty
         ? []
         : res.map((registro) => Parcela.fromJson(registro)).toList();
@@ -38,7 +38,7 @@ class ParcelasProvider extends BaseProvider {
   Future<Parcela> getOneWithAgave(int id) async {
     final db = await database;
     final res = await db!.rawQuery(
-        "SELECT $table.*, agaves.nombre AS tipoAgave FROM $table INNER JOIN agaves ON $table.idTipoAgave = agaves.id WHERE $table.id = $id");
+        "SELECT $table.*, ${DB.plantas}.nombre AS tipoAgave FROM $table INNER JOIN ${DB.plantas} ON $table.idTipoAgave = ${DB.plantas}.id WHERE $table.id = $id");
     return res.isEmpty ? Parcela() : Parcela.fromJson(res.first);
   }
 

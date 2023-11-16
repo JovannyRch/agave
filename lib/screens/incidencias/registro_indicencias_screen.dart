@@ -75,7 +75,27 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
   @override
   void initState() {
     super.initState();
-    _getLocation();
+    _getLocationAndOpenPicker();
+  }
+
+  void _getLocationAndOpenPicker() {
+    _determinePosition().then((value) async {
+      double latitude = value.latitude;
+      double longitude = value.longitude;
+
+      UtmApiResponse? response = await latLongToUTM(latitude, longitude);
+
+      setState(() {
+        _latitude = value.latitude;
+        _longitude = value.longitude;
+
+        _este = response!.easting;
+        _norte = response.northing;
+        _zona = response.zone;
+        focus.requestFocus();
+      });
+      _pickLocation(LatLng(latitude, longitude));
+    });
   }
 
   _getLocation() async {
@@ -85,7 +105,18 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
 
     try {
       final locationData = await _determinePosition();
-      _updateLocation(locationData);
+      UtmApiResponse? response = await latLongToUTM(
+          locationData.latitude ?? 0, locationData.longitude ?? 0);
+
+      setState(() {
+        _latitude = locationData.latitude;
+        _longitude = locationData.longitude;
+
+        _este = response!.easting;
+        _norte = response.northing;
+        _zona = response.zone;
+        focus.requestFocus();
+      });
     } catch (e) {
       print('Error obteniendo ubicación: $e');
     } finally {
@@ -93,24 +124,6 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
         _loading = false;
       });
     }
-  }
-
-  void _updateLocation(Position locationData) async {
-    print(locationData);
-    UtmApiResponse? response = await latLongToUTM(
-      locationData.latitude ?? 0,
-      locationData.longitude ?? 0,
-    );
-
-    setState(() {
-      _latitude = locationData.latitude;
-      _longitude = locationData.longitude;
-
-      _este = response!.easting;
-      _norte = response.northing;
-      _zona = response.zone;
-      focus.requestFocus();
-    });
   }
 
   @override
@@ -150,7 +163,7 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
                 ],
                 SizedBox(height: 20),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
                       onPressed: _loading ? null : _getLocation,
@@ -159,15 +172,6 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
                       ),
                       child: Text(
                         'Volver a obtener',
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: _loading ? null : _pickLocation,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).primaryColor,
-                      ),
-                      child: Text(
-                        'Seleccionar ubicación',
                       ),
                     ),
                   ],
@@ -187,22 +191,24 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
     );
   }
 
-  void _pickLocation() async {
+  void _pickLocation(LatLng initialPosition) async {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => PlacePicker(
           apiKey: MAP_KEY,
           onPlacePicked: (result) {
-            _updateLocation(Position.fromMap(
-              {
-                'latitude': result.geometry!.location.lat,
-                'longitude': result.geometry!.location.lng
-              },
-            ));
+            setState(() {
+              _latitude = result.geometry!.location.lat;
+              _longitude = result.geometry!.location.lng;
+              _loading = false;
+            });
+
             Navigator.of(context).pop();
           },
-          initialPosition: LatLng(_latitude!, _longitude!),
+          initialPosition: initialPosition,
+          desiredLocationAccuracy: LocationAccuracy.best,
+          initialMapType: MapType.satellite,
           useCurrentLocation: true,
           resizeToAvoidBottomInset: false,
         ),

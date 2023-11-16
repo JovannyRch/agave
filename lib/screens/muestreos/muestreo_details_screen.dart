@@ -6,6 +6,7 @@ import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/screens/kriging/ajuste_screen.dart';
+import 'package:agave/utils/formatDate.dart';
 import 'package:agave/widgets/card_detail.dart';
 import 'package:agave/widgets/incidencias_tab.dart';
 import 'package:agave/widgets/screen_title.dart';
@@ -36,6 +37,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   MuestreosModel? _muestreosModel;
 
   bool isLoading = false;
+  late Size size;
 
   @override
   void initState() {
@@ -47,6 +49,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    size = MediaQuery.of(context).size;
     _model = Provider.of<IncidenciasModel>(context);
     _muestreosModel = Provider.of<MuestreosModel>(context);
     List<Incidencia> incidencias = _model?.incidencias ?? [];
@@ -69,14 +72,88 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
             );
           },
           tooltip: 'Agregar Incidencia',
-          child: const Icon(Icons.add),
+          child: const Icon(Icons.pin_drop),
         ),
-        body: TabBarView(
-          children: [
-            _buildGeneralTab(),
-            TabIncidencias(incidencias: incidencias),
-          ],
-        ),
+        body: _body(),
+      ),
+    );
+  }
+
+  Widget _body() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 8.0,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ScreenTitle(
+            subtitle: "Plaga",
+            title: widget.muestreo.nombrePlaga ?? "",
+          ),
+          Container(
+            height: 250.0,
+            /* decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10.0),
+              color: Colors.white,
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 5.0,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ), */
+            child: GridView.count(
+              crossAxisCount: 2,
+              childAspectRatio: 2.2,
+              children: [
+                CardDetail(
+                  color: Colors.transparent,
+                  title: "Estudio",
+                  value: widget.estudio.nombre ?? "",
+                  icon: Icons.folder,
+                ),
+                CardDetail(
+                  title: "Parcela",
+                  value: widget.parcela.nombre ?? "",
+                  color: Colors.transparent,
+                  icon: Icons.nature,
+                ),
+                CardDetail(
+                  title: "Creación",
+                  value: formatDate(widget.muestreo.fechaCreacion),
+                  color: Colors.transparent,
+                  icon: Icons.calendar_today,
+                ),
+                CardDetail(
+                  title: "Registros",
+                  value: _model!.incidencias.length.toString(),
+                  color: Colors.transparent,
+                  icon: Icons.list,
+                ),
+                if (widget.muestreo.humedad != null)
+                  CardDetail(
+                    title: "Humedad",
+                    value: widget.muestreo.humedad.toString(),
+                    unit: "%",
+                    color: Colors.transparent,
+                    icon: Icons.water,
+                  ),
+                if (widget.muestreo.temperatura != null)
+                  CardDetail(
+                    title: "Temperatura",
+                    value: widget.muestreo.temperatura.toString(),
+                    unit: "°C",
+                    color: Colors.transparent,
+                    icon: Icons.thermostat,
+                  ),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
@@ -84,99 +161,17 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   AppBar _appBar() {
     return AppBar(
       backgroundColor: Theme.of(context).primaryColor,
+      title: const Text('Muestreo'),
       actions: [
         IconButton(
-          icon: const Icon(Icons.share),
-          onPressed: () {
-            // Acción para compartir
-          },
-        ),
-        // Puedes agregar más iconos para otras acciones aquí
-      ],
-      bottom: const TabBar(
-        tabs: [
-          Tab(
-              icon: Icon(
-            Icons.info,
-          )),
-          Tab(
-            icon: Icon(Icons.table_chart),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGeneralTab() {
-    return ListView(
-      padding: const EdgeInsets.all(16.0),
-      children: [
-        ScreenTitle(
-          title: widget.muestreo.nombrePlaga ?? "",
-          subtitle: "${widget.estudio.nombre} > ${widget.parcela.nombre ?? ""}",
-        ),
-        Card(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              if (widget.muestreo.humedad != null)
-                CardDetail(
-                  title: "Humedad",
-                  value: widget.muestreo.humedad.toString(),
-                  unit: "%",
-                ),
-              if (widget.muestreo.temperatura != null)
-                CardDetail(
-                  title: "Temperatura",
-                  value: widget.muestreo.temperatura.toString(),
-                  unit: "°C",
-                ),
-              CardDetail(
-                title: "Registros",
-                value: _model!.incidencias.length.toString(),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        Card(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              CardDetail(
-                title: "Media",
-                value: (_muestreosModel!.selectedMuestreo?.media ?? 0.0)
-                    .toStringAsFixed(2),
-              ),
-              CardDetail(
-                title: "Varianza",
-                value: (_muestreosModel!.selectedMuestreo?.varianza ?? 0.0)
-                    .toStringAsFixed(2),
-              ),
-              CardDetail(
-                title: "DE",
-                value: (_muestreosModel!.selectedMuestreo?.desviacionEstandar ??
-                        0.0)
-                    .toStringAsFixed(2),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SubmitButton(
-              text: "Iniciar Ajuste",
-              onPressed: isLoading ? null : _getSemivariograma,
-            ),
-          ],
+          onPressed: () {},
+          icon: const Icon(Icons.more_vert),
         ),
       ],
     );
   }
 
-  void _getSemivariograma() async {
+  void _iniciarAjuste() async {
     setState(() {
       isLoading = true;
     });

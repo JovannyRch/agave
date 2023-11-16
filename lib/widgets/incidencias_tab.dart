@@ -1,4 +1,6 @@
 import 'package:agave/backend/models/incidencia.dart';
+import 'package:agave/backend/user_data.dart';
+import 'package:agave/const.dart';
 import 'package:agave/screens/incidencias/location_screen.dart';
 import 'package:agave/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,33 @@ class TabIncidencias extends StatefulWidget {
 }
 
 class _TabIncidenciasState extends State<TabIncidencias> {
+  bool isLoading = true;
+  bool isUTM = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() async {
+    String tipoCoordenadas = await UserData.obtenerTipoCoordenadas() ?? "UTM";
+    if (tipoCoordenadas == "UTM") {
+      isUTM = true;
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  String _getCoordenadas(Incidencia incidencia) {
+    if (isUTM) {
+      return 'N: ${incidencia.norte}, E: ${incidencia.este}';
+    } else {
+      return 'Ltd: ${incidencia.latitud}, Lng: ${incidencia.longitud}';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var list = ListView.builder(
@@ -23,9 +52,13 @@ class _TabIncidenciasState extends State<TabIncidencias> {
       itemBuilder: (context, index) {
         return ListTile(
           title: Text(
-              'Ubicación: (${widget.incidencias[index].latitud}, ${widget.incidencias[index].longitud})'),
+            _getCoordenadas(widget.incidencias[index]),
+          ),
           subtitle: Text('Incidencias: ${widget.incidencias[index].cantidad}'),
-          leading: const Icon(Icons.bug_report),
+          leading: const Icon(
+            Icons.search,
+            color: kMainColor,
+          ),
           onTap: () {
             Navigator.push(
               context,
