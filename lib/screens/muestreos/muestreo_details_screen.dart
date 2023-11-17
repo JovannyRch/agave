@@ -177,11 +177,16 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
         ),
         trailing: const Icon(Icons.arrow_forward_ios),
         onTap: () {
+          print("incidencia");
+          print(incidencia);
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => MultipleLocationMap(
-                incidencias: [incidencia],
+              builder: (context) => RegistroIncidenciasScreen(
+                idMuestreo: widget.muestreo.id ?? -1,
+                muestreo: widget.muestreo,
+                parcela: widget.parcela,
+                incidencia: incidencia,
               ),
             ),
           );
@@ -199,7 +204,6 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   }
 
   Widget scrollableActionRowList() {
-    //If total number of items is even then remove 1 from total count
     int total = _model?.incidencias.length ?? 0;
     if (total == 0) {
       return Container();
@@ -489,22 +493,46 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   }
 
   void _iniciarAjuste() async {
+    List<Incidencia> incidencias = _model?.incidencias ?? [];
+
+    if (incidencias.length < 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content:
+              Text('Se necesitan al menos 3 registros para realizar el ajuste'),
+        ),
+      );
+      return;
+    }
+
+    //Show loading dialog
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const AlertDialog(
+            title: Text(
+              'Calculando semivariograma',
+              textAlign: TextAlign.center,
+            ),
+            content: LinearProgressIndicator(),
+          );
+        });
+
     setState(() {
       isLoading = true;
     });
-    List<List<double>> points = widget.muestreo.incidencias!
+
+    List<List<double>> points = incidencias
         .map(
-          (e) => [
-            e.longitud ?? 0.0,
-            e.latitud ?? 0.0,
-            e.cantidad!.toDouble() ?? 0.0
-          ],
+          (e) => isUTM
+              ? [e.norte!, e.este!, e.cantidad!.toDouble() ?? 0.0]
+              : [e.latitud!, e.longitud!, e.cantidad!.toDouble() ?? 0.0],
         )
         .toList();
     try {
       SemivariogramaResponse? response =
           await Api.getExperimentalSemivariogram(points);
-
+      Navigator.of(context).pop();
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -536,44 +564,5 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
         isLoading = false;
       });
     }
-  }
-
-  Widget _buildSemivariogramaChart() {
-    return LineChart(
-      LineChartData(
-        gridData: const FlGridData(show: true),
-        titlesData: const FlTitlesData(show: true),
-        borderData: FlBorderData(
-          show: true,
-          border: Border.all(color: const Color(0xff37434d), width: 1),
-        ),
-        minX: 0,
-        maxX: 7,
-        minY: 0,
-        maxY: 1.5,
-        lineBarsData: [
-          LineChartBarData(
-            spots: [
-              const FlSpot(0.303, 0.201),
-              const FlSpot(0.606, 0.403),
-              // ... (añade tus datos aquí)
-            ],
-            isCurved: true,
-            gradient: LinearGradient(
-              colors: [
-                Colors.blue,
-                Colors.blue.withOpacity(0.3),
-              ],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            ),
-            barWidth: 4,
-            isStrokeCapRound: true,
-            belowBarData: BarAreaData(show: false),
-          ),
-          // Puedes añadir más líneas si es necesario
-        ],
-      ),
-    );
   }
 }

@@ -38,4 +38,11 @@ class IncidenciasProvider extends BaseProvider {
         : double.parse(
             double.parse(res.first['promedio'].toString()).toStringAsFixed(1));
   }
+
+  Future<int> update(Incidencia item) async {
+    final db = await database;
+    final res = await db!
+        .update(tabla, item.toJson(), where: 'id = ?', whereArgs: [item.id]);
+    return res;
+  }
 }

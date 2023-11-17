@@ -230,7 +230,6 @@ class MuestreosModel with ChangeNotifier {
 
   setSelected(Muestreo muestreo) {
     _selectedMuestreo = muestreo;
-    _selectedMuestreo?.hacerCalculos();
     notifyListeners();
   }
 }
@@ -249,6 +248,23 @@ class IncidenciasModel with ChangeNotifier {
     Incidencia newItem = await IncidenciasProvider.db.insert(item);
     _incidencias.add(newItem);
 
+    notifyListeners();
+  }
+
+  Future delete(int id) async {
+    await IncidenciasProvider.db.delete(id, DB.incidencias);
+    _incidencias.removeWhere((item) => item.id == id);
+    notifyListeners();
+  }
+
+  Future update(Incidencia item) async {
+    await IncidenciasProvider.db.update(item);
+    _incidencias = _incidencias.map((incidencia) {
+      if (incidencia.id == item.id) {
+        incidencia = item;
+      }
+      return incidencia;
+    }).toList();
     notifyListeners();
   }
 

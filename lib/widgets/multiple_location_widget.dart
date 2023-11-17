@@ -68,7 +68,7 @@ class _MultiLocationMapWidgetState extends State<MultiLocationMapWidget> {
       initialCameraPosition: CameraPosition(
         target:
             LatLng(widget.locations[0].latitude, widget.locations[0].longitude),
-        zoom: 20,
+        zoom: 17,
       ),
       markers: _markers,
     );

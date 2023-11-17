@@ -4,12 +4,14 @@ class RoundedButton extends StatelessWidget {
   final String text;
   final Function? onPressed;
   final IconData? icon;
+  final Color? color;
 
   const RoundedButton({
     Key? key,
     required this.text,
     this.onPressed,
     this.icon,
+    this.color,
   }) : super(key: key);
 
   @override
@@ -25,7 +27,7 @@ class RoundedButton extends StatelessWidget {
             height: 50,
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
+              color: color ?? Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(100),
             ),
             child: icon != null

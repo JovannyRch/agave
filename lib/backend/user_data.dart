@@ -7,7 +7,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserData {
   static Future<String?> obtenerTipoCoordenadas() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('tipoCoordenadas');
+    return prefs.getString('tipoCoordenadas') ?? 'UTM';
+  }
+
+  static Future<bool> isUtm() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? tipoCoordenadas = prefs.getString('tipoCoordenadas') ?? 'UTM';
+    print('tipoCoordenadas: $tipoCoordenadas');
+    return tipoCoordenadas == 'UTM';
   }
 
   static Future<void> guardarTipoCoordenadas(String tipoCoordenadas) async {

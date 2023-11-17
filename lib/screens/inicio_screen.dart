@@ -378,7 +378,6 @@ class _HomeScreenState extends State<HomeScreen> {
         await EstudiosProvider.db.getById(muestreo.idEstudio ?? -1);
 
     _muestreosModel!.setSelected(muestreo);
-    _muestreosModel!.selectedMuestreo!.hacerCalculos();
 
     Navigator.push(
       context,

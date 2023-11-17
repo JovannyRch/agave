@@ -258,7 +258,6 @@ class _DetallesParcelaState extends State<DetallesParcela> {
 
   void onClickMuestreo(Muestreo muestreo, int index) {
     _model!.setSelected(muestreo);
-    _model!.selectedMuestreo!.hacerCalculos();
     Navigator.push(
       context,
       MaterialPageRoute(

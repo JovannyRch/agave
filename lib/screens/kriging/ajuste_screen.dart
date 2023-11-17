@@ -2,6 +2,7 @@ import 'package:agave/api/api.dart';
 import 'package:agave/api/responses/kriging_contour_response.dart';
 import 'package:agave/const.dart';
 import 'package:agave/utils/models.dart';
+import 'package:agave/widgets/RoundedButton.dart';
 import 'package:agave/widgets/semivariograma_widget.dart';
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
@@ -191,55 +192,55 @@ class _AjusteScreenState extends State<AjusteScreen> {
       );
 
   Widget _form() {
-    return Container(
-      child: Column(
-        children: [
-          _modelSelector(),
-          _buildRange(),
-          SizedBox(height: 5.0),
-          _buildSill(),
-          SizedBox(height: 5.0),
-          _buildNugget(),
-        ],
-      ),
+    return Column(
+      children: [
+        _modelSelector(),
+        SizedBox(height: 15.0),
+        _buildRange(),
+        SizedBox(height: 5.0),
+        _buildSill(),
+        SizedBox(height: 5.0),
+        _buildNugget(),
+      ],
     );
   }
 
   Widget _modelSelector() {
-    return Container(
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              modelButton("Esférico", Model.spherical),
-              modelButton("Lineal", Model.linear),
-            ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        const Text(
+          "Modelo",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              modelButton("Gaussiano", Model.gaussian),
-              modelButton("Exponencial", Model.exponential),
-            ],
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 5.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            modelButton("Esférico", Model.spherical),
+            modelButton("Lineal", Model.linear),
+            modelButton("Gaussiano", Model.gaussian),
+            modelButton("Exponencial", Model.exponential),
+          ],
+        ),
+      ],
     );
   }
 
   Widget modelButton(String text, Model model) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        primary: selectedModel == model ? kMainColor : Colors.grey,
-      ),
+    return RoundedButton(
+      text: text,
+      color: selectedModel == model ? kMainColor : Colors.black54,
       onPressed: () {
         setState(() {
           selectedModel = model;
           updateModelSemivariance();
         });
       },
-      child: Text(text),
+      icon: selectedModel == model ? Icons.check : null,
     );
   }
 
