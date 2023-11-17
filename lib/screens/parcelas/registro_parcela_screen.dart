@@ -169,12 +169,12 @@ class _RegistroParcelaScreenState extends State<RegistroParcelaScreen> {
         });
       },
       decoration: const InputDecoration(
-        labelText: 'Tipo de Agave',
-        hintText: 'Selecciona un tipo de agave',
+        labelText: 'Tipo de planta',
+        hintText: 'Selecciona un tipo de planta',
       ),
       validator: (value) {
         if (value == null) {
-          return 'Por favor selecciona un tipo de agave';
+          return 'Por favor selecciona un tipo de planta';
         }
         return null;
       },

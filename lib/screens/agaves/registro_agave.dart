@@ -33,7 +33,7 @@ class _RegistroAgaveState extends State<RegistroAgave> {
     _model = Provider.of<AgavesModel>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registrar Tipo de Agave'),
+        title: const Text('Registrar Tipo de Planta'),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Padding(
@@ -44,10 +44,10 @@ class _RegistroAgaveState extends State<RegistroAgave> {
             children: [
               TextFormField(
                 decoration: const InputDecoration(
-                    labelText: 'Nombre del tipo de agave'),
+                    labelText: 'Nombre del tipo de planta'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Por favor introduce el nombre del tipo de agave';
+                    return 'Por favor introduce el nombre del tipo de planta';
                   }
                   return null;
                 },
@@ -69,14 +69,14 @@ class _RegistroAgaveState extends State<RegistroAgave> {
                       _model?.update(item);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Tipo de agave $_nombre actualizada!'),
+                          content: Text('Tipo de planta $_nombre actualizada!'),
                         ),
                       );
                     } else {
                       _model?.add(item);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Tipo de agave $_nombre registrada!'),
+                          content: Text('Tipo de planta $_nombre registrada!'),
                         ),
                       );
                     }

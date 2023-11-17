@@ -9,12 +9,15 @@ import 'package:agave/backend/user_data.dart';
 import 'package:agave/const.dart';
 import 'package:agave/screens/incidencias/location_screen.dart';
 import 'package:agave/screens/kriging/ajuste_screen.dart';
+import 'package:agave/utils/exportIncidencias.dart';
 import 'package:agave/utils/formatDate.dart';
 import 'package:agave/widgets/RoundedButton.dart';
 import 'package:agave/widgets/calculos_bottom_sheet.dart';
 import 'package:agave/widgets/card_detail.dart';
 import 'package:agave/widgets/screen_title.dart';
 import 'package:agave/screens/incidencias/registro_indicencias_screen.dart';
+import 'package:csv/csv.dart';
+import 'package:file_picker/file_picker.dart';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -225,7 +228,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
           ),
           RoundedButton(
             text: 'Ajustar',
-            onPressed: _iniciarAjuste,
+            onPressed: isLoading ? null : _iniciarAjuste,
             icon: Icons.settings,
           ),
           RoundedButton(
@@ -318,12 +321,123 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       backgroundColor: Theme.of(context).primaryColor,
       title: const Text('Muestreo'),
       actions: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.more_vert),
-        ),
+        if (_model?.incidencias.isNotEmpty ?? false)
+          PopupMenuButton<String>(
+            onSelected: handleClick,
+            itemBuilder: (BuildContext context) {
+              return {'Importar', 'Compartir'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          ),
       ],
     );
+  }
+
+  void handleClick(String value) {
+    switch (value) {
+      case 'Compartir':
+        _compartir();
+        break;
+      case 'Importar':
+        _importar();
+        break;
+    }
+  }
+
+  void _compartir() {
+    String defaultFileName = "${(widget.muestreo.nombrePlaga ?? "muestreo")}_" +
+        "${formatDate(widget.muestreo.fechaCreacion)}";
+    TextEditingController _controller = TextEditingController(
+      text: defaultFileName.replaceAll(" ", "_"),
+    );
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Exportar datos'),
+          content: TextField(
+            controller: _controller,
+            decoration: const InputDecoration(
+              hintText: 'Nombre del archivo',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                String csvContent = convertirIncidenciasACsv(
+                  _model?.incidencias ?? [],
+                );
+                bool response = await guardarCsv(
+                  csvContent,
+                  _controller.text,
+                );
+
+                if (response) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Archivo guardado'),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                          'No se pudo guardar el archivo, revise los permisos de almacenamiento en su dispositivo'),
+                    ),
+                  );
+                }
+
+                Navigator.of(context).pop();
+              },
+              child: const Text('Aceptar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _importar() async {
+    try {
+      FilePickerResult? result = await pickCsvFile();
+
+      if (result != null) {
+        String csvContent = await readCsvFileFromPath(result);
+
+        List<Incidencia> incidencias = await parseIncidencias(
+          widget.muestreo.id!,
+          await loadCsvData(csvContent),
+        );
+
+        int total = incidencias.length;
+
+        incidencias.forEach((element) async {
+          await _model?.add(element);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Se importaron $total registros'),
+          ),
+        );
+      }
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ocurrío un error al importar el archivo'),
+        ),
+      );
+    }
   }
 
   void _iniciarAjuste() async {

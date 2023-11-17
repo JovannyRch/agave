@@ -100,8 +100,8 @@ class _AgavesScreenState extends State<AgavesScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Eliminar tipo de agave'),
-          content: const Text('¿Estás seguro de eliminar este tipo de agave?'),
+          title: const Text('Eliminar tipo de planta'),
+          content: const Text('¿Estás seguro de eliminar este tipo de planta?'),
           actions: [
             TextButton(
               child: const Text('Cancelar'),

@@ -39,4 +39,20 @@ class Incidencia {
         "este": este,
         "zona": zona,
       };
+
+  factory Incidencia.fromCsv(int idMuestreo, List<dynamic> row) {
+    return Incidencia(
+      idMuestreo: idMuestreo,
+      latitud: row[0],
+      longitud: row[1],
+      norte: row[2],
+      este: row[3],
+      zona: row[4],
+      cantidad: row[5],
+    );
+  }
+}
+
+List<Incidencia> parseIncidencias(int idMuestreo, List<List<dynamic>> csvData) {
+  return csvData.map((row) => Incidencia.fromCsv(idMuestreo, row)).toList();
 }
