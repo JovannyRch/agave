@@ -40,8 +40,8 @@ class RoundedButton extends StatelessWidget {
           Text(
             text,
             style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

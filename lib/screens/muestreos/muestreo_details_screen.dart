@@ -16,7 +16,6 @@ import 'package:agave/widgets/calculos_bottom_sheet.dart';
 import 'package:agave/widgets/card_detail.dart';
 import 'package:agave/widgets/screen_title.dart';
 import 'package:agave/screens/incidencias/registro_indicencias_screen.dart';
-import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:fl_chart/fl_chart.dart';
@@ -41,7 +40,7 @@ class MuestreoDetailsScreen extends StatefulWidget {
 class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   IncidenciasModel? _model;
 
-  bool isLoading = true;
+  bool isLoading = false;
   late Size size;
   bool isUTM = false;
   bool hasIncidencias = false;
@@ -234,26 +233,31 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
           RoundedButton(
             icon: Icons.percent,
             text: 'Calculos',
-            onPressed: () {
-              //Open bottom sheet dialog
-              showModalBottomSheet(
-                context: context,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(20),
-                  ),
-                ),
-                clipBehavior: Clip.antiAliasWithSaveLayer,
-                builder: (context) {
-                  return CalculosBottomSheet(
-                    incidencias: _model?.incidencias ?? [],
-                  );
-                },
-              );
-            },
+            onPressed: _openCalculosBottomSheet,
           ),
+          /*  RoundedButton(
+            icon: Icons.upload,
+            text: 'Exportar',
+            onPressed: _openCalculosBottomSheet,
+          ),
+          RoundedButton(
+            icon: Icons.download,
+            text: 'Importar',
+            onPressed: _openCalculosBottomSheet,
+          ), */
         ],
       ),
+    );
+  }
+
+  void _openCalculosBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return CalculosBottomSheet(
+          incidencias: _model?.incidencias ?? [],
+        );
+      },
     );
   }
 
@@ -325,7 +329,8 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
           PopupMenuButton<String>(
             onSelected: handleClick,
             itemBuilder: (BuildContext context) {
-              return {'Importar', 'Compartir'}.map((String choice) {
+              return {'Importar', 'Compartir', 'Eliminar registros'}
+                  .map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Text(choice),
@@ -345,7 +350,37 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       case 'Importar':
         _importar();
         break;
+      case 'Eliminar registros':
+        _eliminarRegistros();
+        break;
     }
+  }
+
+  void _eliminarRegistros() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Eliminar registros'),
+          content: const Text('¿Está seguro de eliminar todos los registros?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _model?.deleteAllIncidencias(_model?.incidencias ?? []);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Aceptar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _compartir() {
@@ -414,6 +449,16 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       if (result != null) {
         String csvContent = await readCsvFileFromPath(result);
 
+        showDialog(
+          context: context,
+          builder: (context) {
+            return const AlertDialog(
+              title: Text('Importando datos'),
+              content: LinearProgressIndicator(),
+            );
+          },
+        );
+
         List<Incidencia> incidencias = await parseIncidencias(
           widget.muestreo.id!,
           await loadCsvData(csvContent),
@@ -424,6 +469,9 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
         incidencias.forEach((element) async {
           await _model?.add(element);
         });
+
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Se importaron $total registros'),

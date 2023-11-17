@@ -251,6 +251,14 @@ class IncidenciasModel with ChangeNotifier {
 
     notifyListeners();
   }
+
+  deleteAllIncidencias(List<Incidencia> incidencias) async {
+    for (Incidencia incidencia in incidencias) {
+      await IncidenciasProvider.db.delete(incidencia.id ?? 0, DB.incidencias);
+    }
+    _incidencias = [];
+    notifyListeners();
+  }
 }
 
 class ReportesModel with ChangeNotifier {
