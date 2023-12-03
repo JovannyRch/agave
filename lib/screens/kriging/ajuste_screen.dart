@@ -58,6 +58,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
   int n_lags = 13;
   bool isLoadingSemiVariance = true;
   bool showAjusteForm = false;
+  int currentTab = 0;
 
   @override
   void initState() {
@@ -176,35 +177,216 @@ class _AjusteScreenState extends State<AjusteScreen> {
 
   Widget get _body => Container(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: _size.height - 420,
-                child: isLoadingSemiVariance
-                    ? const Center(
-                        child: SizedBox(
-                          height: 75,
-                          width: 75,
-                          child: const CircularProgressIndicator(),
-                        ),
-                      )
-                    : SemivariogramChart(
-                        lags: lags,
-                        semivariance: semivariance,
-                        modelSemivariance: modelSemivariance,
-                        range: range,
-                        sill: sill,
-                        nuggget: nugget,
-                        maxX: maxX,
-                        maxY: maxY,
-                      ),
-              ),
-              SizedBox(height: 10.0),
-              _showBodyContent(),
-            ],
-          ),
+          child: Column(children: [
+            _tabs(),
+            ...currentTab == 0 ? chartContent() : tableContent(),
+          ]),
         ),
       );
+
+  Widget _tabs() {
+    return Container(
+      height: 50,
+      padding: const EdgeInsets.all(10.0),
+      child: Row(
+        children: [
+          tabWidget(
+            () {
+              setState(() {
+                currentTab = 0;
+              });
+            },
+            "Gráfica",
+            currentTab == 0 ? kMainColor : Colors.white,
+            currentTab == 0 ? Colors.white : Colors.black,
+          ),
+          const SizedBox(width: 5.0),
+          tabWidget(
+            () {
+              setState(() {
+                currentTab = 1;
+              });
+            },
+            "Tabla",
+            currentTab == 1 ? kMainColor : Colors.white,
+            currentTab == 1 ? Colors.white : Colors.black,
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> tableContent() {
+    return [
+      //Table of semivariance values
+      Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 15.0,
+          horizontal: 10.0,
+        ),
+        child: Table(
+          border: TableBorder.all(
+            color: Colors.black,
+            width: 1,
+          ),
+          children: [
+            const TableRow(
+              children: [
+                TableCell(
+                  child: SizedBox(
+                    height: 25.0,
+                    child: Center(
+                      child: Text(
+                        "Lag",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                TableCell(
+                  child: SizedBox(
+                    height: 25.0,
+                    child: Center(
+                      child: Text(
+                        "Semivarianza",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            ...List.generate(
+              lags.length,
+              (index) => TableRow(
+                children: [
+                  tableCellClickable(lags, index),
+                  tableCellClickable(semivariance, index),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ];
+  }
+
+  TableCell tableCellClickable(List<double> data, int index) {
+    return TableCell(
+      child: GestureDetector(
+        onTap: () {
+          TextEditingController _controller = TextEditingController();
+          _controller.text = data[index].toStringAsFixed(2);
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Editar"),
+                content: TextField(
+                  controller: _controller,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: "Valor",
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: kMainColor,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Cancelar"),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: kMainColor,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        data[index] = double.parse(_controller.text);
+                        updateModelSemivariance();
+                      });
+                    },
+                    child: const Text("Guardar"),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        child: SizedBox(
+          height: 25.0,
+          child: Center(
+            child: Text(
+              data[index].toStringAsFixed(2),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget tabWidget(
+      Function() onPressed, String text, Color color, Color textColor) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onPressed,
+        child: Container(
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(10.0),
+            border: Border.all(
+              color: kMainColor,
+              width: 0.5,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: textColor,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> chartContent() {
+    return [
+      SizedBox(
+        height: _size.height - 420,
+        child: isLoadingSemiVariance
+            ? const Center(
+                child: SizedBox(
+                  height: 75,
+                  width: 75,
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            : SemivariogramChart(
+                lags: lags,
+                semivariance: semivariance,
+                modelSemivariance: modelSemivariance,
+                range: range,
+                sill: sill,
+                nuggget: nugget,
+                maxX: maxX,
+                maxY: maxY,
+              ),
+      ),
+      const SizedBox(height: 10.0),
+      _showBodyContent()
+    ];
+  }
 
   Widget _showBodyContent() {
     if (isLoadingSemiVariance) {
@@ -213,9 +395,8 @@ class _AjusteScreenState extends State<AjusteScreen> {
 
     if (showAjusteForm) {
       return _form();
-    } else {
-      return _rowButtons();
     }
+    return _rowButtons();
   }
 
   Widget _rowButtons() {
