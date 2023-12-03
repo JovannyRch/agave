@@ -7,6 +7,7 @@ import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/user_data.dart';
 import 'package:agave/const.dart';
+import 'package:agave/screens/charts/scatter_screen.dart';
 import 'package:agave/screens/incidencias/location_screen.dart';
 import 'package:agave/screens/kriging/ajuste_screen.dart';
 import 'package:agave/utils/exportIncidencias.dart';
@@ -44,6 +45,8 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   late Size size;
   bool isUTM = false;
   bool hasIncidencias = false;
+
+  List<List<double>> points = [];
 
   @override
   void initState() {
@@ -216,7 +219,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           RoundedButton(
-            text: 'Mapa',
+            text: 'Ubicaciones',
             icon: Icons.map,
             onPressed: () {
               Navigator.push(
@@ -230,9 +233,9 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
             },
           ),
           RoundedButton(
-            text: 'Ajustar',
+            text: 'Semivariograma',
             onPressed: isLoading ? null : _iniciarAjuste,
-            icon: Icons.settings,
+            icon: Icons.line_axis,
           ),
           RoundedButton(
             icon: Icons.percent,
@@ -505,64 +508,21 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       return;
     }
 
-    //Show loading dialog
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const AlertDialog(
-            title: Text(
-              'Calculando semivariograma',
-              textAlign: TextAlign.center,
-            ),
-            content: LinearProgressIndicator(),
-          );
-        });
-
-    setState(() {
-      isLoading = true;
-    });
-
     List<List<double>> points = incidencias
         .map(
           (e) => isUTM
-              ? [e.norte!, e.este!, e.cantidad!.toDouble() ?? 0.0]
-              : [e.latitud!, e.longitud!, e.cantidad!.toDouble() ?? 0.0],
+              ? [e.este!, e.norte!, e.cantidad!.toDouble() ?? 0.0]
+              : [e.longitud!, e.latitud!, e.cantidad!.toDouble() ?? 0.0],
         )
         .toList();
-    try {
-      SemivariogramaResponse? response =
-          await Api.getExperimentalSemivariogram(points);
-      Navigator.of(context).pop();
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AjusteScreen(
-            lags: response?.lags ?? [],
-            semivariance: response?.semivariance ?? [],
-            points: points,
-          ),
-        ),
-      );
 
-      if (response != null) {
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No se pudo obtener el semivariograma'),
-          ),
-        );
-      }
-    } catch (e) {
-      print(e);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No se pudo obtener el semivariograma'),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AjusteScreen(
+          points: points,
         ),
-      );
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
+      ),
+    );
   }
 }

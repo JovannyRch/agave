@@ -10,6 +10,16 @@ class UserData {
     return prefs.getString('tipoCoordenadas') ?? 'UTM';
   }
 
+  static Future<bool> isTesting() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('testing') ?? false;
+  }
+
+  static Future<void> setTesting(bool testing) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('testing', testing);
+  }
+
   static Future<bool> isUtm() async {
     final prefs = await SharedPreferences.getInstance();
     String? tipoCoordenadas = prefs.getString('tipoCoordenadas') ?? 'UTM';

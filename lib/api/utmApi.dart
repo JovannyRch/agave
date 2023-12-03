@@ -27,7 +27,11 @@ class UtmApiResponse {
 
 Future<UtmApiResponse?> latLongToUTM(double lat, double long) async {
   final baseUrl = "https://www.latlong.net/dec2utm.php";
-  final fullUrl = "$baseUrl?lat=$lat&long=$long";
+  //Log params
+
+  final fullUrl =
+      "$baseUrl?lat=${lat.toStringAsFixed(6)}&long=${long.toStringAsFixed(6)}";
+  print("lat: ${lat.toStringAsFixed(6)}, long: ${long.toStringAsFixed(6)}");
 
   final response = await http.get(Uri.parse(fullUrl));
 
@@ -36,6 +40,8 @@ Future<UtmApiResponse?> latLongToUTM(double lat, double long) async {
     if (jsonResponse.isNotEmpty) {
       final utmData = jsonResponse[0] as Map<String, dynamic>;
 
+      //Log response
+      print("UTM data: $utmData");
       return UtmApiResponse.fromJson(utmData);
     }
   }

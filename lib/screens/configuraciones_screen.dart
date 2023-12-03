@@ -14,6 +14,7 @@ class ConfiguracionScreen extends StatefulWidget {
 class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
   String tipoCoordenadas = "UTM";
   bool isLoading = true;
+  bool isTestingMode = false;
 
   @override
   void initState() {
@@ -23,6 +24,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
 
   void _loadData() async {
     tipoCoordenadas = await UserData.obtenerTipoCoordenadas() ?? "UTM";
+    isTestingMode = await UserData.isTesting() ?? false;
     setState(() {
       isLoading = false;
     });
@@ -126,6 +128,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         _plagas(context),
         _tiposPlanta(context),
         _tipoCoordenadasDropDown(context),
+        _testingDataModeSwitch(context),
         _limpiarActividad(context),
 
         /*  ListTile(
@@ -157,6 +160,21 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
           },
         ), */
       ],
+    );
+  }
+
+  Widget _testingDataModeSwitch(BuildContext context) {
+    return ListTile(
+      title: const Text('Modo de datos de prueba'),
+      trailing: Switch(
+        value: isTestingMode,
+        onChanged: (value) {
+          setState(() {
+            UserData.setTesting(value);
+            isTestingMode = value;
+          });
+        },
+      ),
     );
   }
 
