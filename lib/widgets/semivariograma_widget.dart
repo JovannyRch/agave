@@ -86,8 +86,8 @@ class SemivariogramChart extends StatelessWidget {
         ),
       ],
       isCurved: false,
-      barWidth: 1.5,
-      color: kMainColor,
+      barWidth: 0.0,
+      color: Colors.red,
       isStrokeCapRound: false,
       dotData: const FlDotData(
         show: true,
@@ -114,7 +114,7 @@ class SemivariogramChart extends StatelessWidget {
       ],
       isCurved: false,
       barWidth: 2.5,
-      color: Colors.red,
+      color: kMainColor,
       isStrokeCapRound: false,
       dotData: const FlDotData(
         show: true,

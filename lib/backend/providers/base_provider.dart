@@ -38,6 +38,10 @@ class BaseProvider {
           await db.insert(DB.plantas, agave.toJson());
         }
       },
+      onOpen: (Database db) async {
+        /*   db.execute("DROP table if exists ${DB.ajustes}");
+        db.execute(kTables.last); */
+      },
     );
   }
 

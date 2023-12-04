@@ -18,6 +18,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => MuestreosModel()),
         ChangeNotifierProvider(create: (context) => IncidenciasModel()),
         ChangeNotifierProvider(create: (context) => ReportesModel()),
+        ChangeNotifierProvider(create: (context) => AjustesModel()),
       ],
       child: const MyApp(),
     ),

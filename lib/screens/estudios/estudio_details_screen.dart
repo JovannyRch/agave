@@ -27,6 +27,12 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   EstudiosModel? _model;
 
   @override
+  void initState() {
+    _refresh();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     _model = Provider.of<EstudiosModel>(context);
 

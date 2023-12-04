@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
         physics: const BouncingScrollPhysics(),
         children: [
           /*  _accesoDirectoWidget(context), */
-          _busquedaRapidaWidget(),
+          /*   _busquedaRapidaWidget(), */
           /*    _estadoDelCultivoWidget(),
           const SizedBox(height: 10), // Espaciado entre widgets */
           if (ultimaPlaga != null) _ultimaPlagaDetectadaWidget(),

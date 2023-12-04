@@ -1,7 +1,7 @@
 import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/plaga.dart';
 
-const String kDBname = "agave_4_database";
+const String kDBname = "agave_5_database";
 
 class DB {
   static const String parcelas = 'parcelas';
@@ -10,6 +10,7 @@ class DB {
   static const String plantas = 'plantas';
   static const String muestreos = "muestreos";
   static const String incidencias = "incidencias";
+  static const String ajustes = "ajustes";
   static const String logs = "logs";
 }
 
@@ -131,6 +132,23 @@ const plantasTable = """
 );
 """;
 
+const ajustesTable = """
+  CREATE TABLE ${DB.ajustes} (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    muestreoId INTEGER NOT NULL,
+    nombre TEXT NOT NULL,
+    semivariogramaExperimental TEXT,
+    semivariogramaTeorico TEXT,
+    lags TEXT,
+    sill REAL,
+    range REAL,
+    nugget REAL,
+    modelo TEXT,
+    imagen TEXT,
+    FOREIGN KEY (muestreoId) REFERENCES muestreos(id) ON DELETE CASCADE
+);
+""";
+
 final List<String> kTables = [
   plantasTable,
   plaguesTable,
@@ -139,4 +157,5 @@ final List<String> kTables = [
   estudiosParcelasTable,
   muestreosTable,
   incidenciasTable,
+  ajustesTable,
 ];

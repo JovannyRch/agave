@@ -54,9 +54,12 @@ class EstudiosProvider extends BaseProvider {
   }
 
   Future<List<Parcela>> getParcelas(int idEstudio) async {
+    print("idEstudio ${idEstudio}");
     final db = await database;
     final parcelasIds = await db!.rawQuery(
         "SELECT parcelas.id FROM parcelas INNER JOIN estudios_parcelas ON estudios_parcelas.idParcela = parcelas.id WHERE estudios_parcelas.idEstudio = $idEstudio");
+
+    if (parcelasIds.isEmpty) return [];
 
     return ParcelasProvider.db.getAllWithAgave(
         parcelasIds:

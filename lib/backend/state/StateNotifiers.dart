@@ -1,3 +1,4 @@
+import 'package:agave/backend/models/ajustes.dart';
 import 'package:agave/backend/models/incidencia.dart';
 import 'package:agave/backend/models/actividad.dart';
 import 'package:agave/backend/models/agave.dart';
@@ -8,6 +9,7 @@ import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/models/plaga.dart';
 import 'package:agave/backend/providers/agave_provider.dart';
+import 'package:agave/backend/providers/ajustes_provider.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
 import 'package:agave/backend/providers/incidencias_provider.dart';
 import 'package:agave/backend/providers/muestreos_provider.dart';
@@ -162,6 +164,7 @@ class EstudiosModel with ChangeNotifier {
   }
 
   fetchParcelas(int id) async {
+    print("Fetch parcelas");
     _parcelas = await EstudiosProvider.db.getParcelas(_estudio!.id ?? 0);
     notifyListeners();
   }
@@ -284,6 +287,24 @@ class ReportesModel with ChangeNotifier {
 
   fetchData() async {
     _incidenciasPlaga = await ReportesProvider.db.incidenciasPorPlaga();
+    notifyListeners();
+  }
+}
+
+class AjustesModel with ChangeNotifier {
+  List<Ajuste> _ajustes = [];
+
+  List<Ajuste> get ajustes => _ajustes;
+
+  fetchData(int idMuestreo) async {
+    _ajustes = await AjustesProvider.db.getAll(idMuestreo);
+    notifyListeners();
+  }
+
+  Future add(Ajuste item) async {
+    Ajuste newItem = await AjustesProvider.db.insert(item);
+    _ajustes.add(newItem);
+
     notifyListeners();
   }
 }

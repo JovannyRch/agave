@@ -1,5 +1,4 @@
-import 'package:agave/api/api.dart';
-import 'package:agave/api/responses/semivariograma_response.dart';
+import 'package:agave/backend/models/ajustes.dart';
 import 'package:agave/backend/models/incidencia.dart';
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/muestreo.dart';
@@ -7,7 +6,6 @@ import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/user_data.dart';
 import 'package:agave/const.dart';
-import 'package:agave/screens/charts/scatter_screen.dart';
 import 'package:agave/screens/incidencias/location_screen.dart';
 import 'package:agave/screens/kriging/ajuste_screen.dart';
 import 'package:agave/utils/exportIncidencias.dart';
@@ -18,8 +16,6 @@ import 'package:agave/widgets/card_detail.dart';
 import 'package:agave/widgets/screen_title.dart';
 import 'package:agave/screens/incidencias/registro_indicencias_screen.dart';
 import 'package:file_picker/file_picker.dart';
-
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -40,6 +36,7 @@ class MuestreoDetailsScreen extends StatefulWidget {
 
 class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   IncidenciasModel? _model;
+  AjustesModel? _ajustesModel;
 
   bool isLoading = false;
   late Size size;
@@ -61,6 +58,10 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
     if (tipoCoordenadas == "UTM") {
       isUTM = true;
     }
+
+    Provider.of<AjustesModel>(context, listen: false)
+        .fetchData(widget.muestreo.id ?? -1);
+
     setState(() {
       isLoading = false;
     });
@@ -72,6 +73,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
     _model = Provider.of<IncidenciasModel>(context);
 
     hasIncidencias = _model?.incidencias.isNotEmpty ?? false;
+    _ajustesModel = Provider.of<AjustesModel>(context);
 
     return Scaffold(
       appBar: _appBar(),
@@ -180,8 +182,6 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
         ),
         trailing: const Icon(Icons.arrow_forward_ios),
         onTap: () {
-          print("incidencia");
-          print(incidencia);
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -214,46 +214,116 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
         children: [
-          RoundedButton(
-            text: 'Ubicaciones',
-            icon: Icons.map,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MultipleLocationMap(
-                    incidencias: _model?.incidencias ?? [],
-                  ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: RoundedButton(
+                  text: 'Ubicaciones',
+                  icon: Icons.map,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MultipleLocationMap(
+                          incidencias: _model?.incidencias ?? [],
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
+              ),
+              Expanded(
+                child: RoundedButton(
+                  text: 'Nuevo ajuste',
+                  onPressed: isLoading ? null : _iniciarAjuste,
+                  icon: Icons.line_axis,
+                ),
+              ),
+            ],
           ),
-          RoundedButton(
-            text: 'Semivariograma',
-            onPressed: isLoading ? null : _iniciarAjuste,
-            icon: Icons.line_axis,
+          const SizedBox(height: 20.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: RoundedButton(
+                  icon: Icons.percent,
+                  text: 'Cálculos',
+                  onPressed: _openCalculosBottomSheet,
+                ),
+              ),
+              Expanded(
+                child: RoundedButton(
+                  icon: Icons.list_alt,
+                  text: 'Ajustes guardados',
+                  onPressed: _openListAjustesDialog,
+                ),
+              ),
+            ],
           ),
-          RoundedButton(
-            icon: Icons.percent,
-            text: 'Calculos',
-            onPressed: _openCalculosBottomSheet,
-          ),
-          /*  RoundedButton(
-            icon: Icons.upload,
-            text: 'Exportar',
-            onPressed: _openCalculosBottomSheet,
-          ),
-          RoundedButton(
-            icon: Icons.download,
-            text: 'Importar',
-            onPressed: _openCalculosBottomSheet,
-          ), */
         ],
       ),
+    );
+  }
+
+  void _openListAjustesDialog() {
+    List<Ajuste> _ajustesModelList = _ajustesModel?.ajustes ?? [];
+    List<List<double>> points = _model?.incidencias
+            .map(
+              (e) => isUTM
+                  ? [e.este!, e.norte!, e.cantidad!.toDouble() ?? 0.0]
+                  : [e.longitud!, e.latitud!, e.cantidad!.toDouble() ?? 0.0],
+            )
+            .toList() ??
+        [];
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Ajustes guardados'),
+          content: Container(
+            width: size.width * 0.8,
+            height: size.height * 0.5,
+            child: _ajustesModelList.isEmpty
+                ? const Text('No hay ajustes')
+                : ListView.builder(
+                    itemCount: _ajustesModelList.length,
+                    itemBuilder: (context, index) {
+                      Ajuste ajuste = _ajustesModelList[index];
+                      return ListTile(
+                        title: Text(ajuste.nombre ?? ""),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AjusteScreen(
+                                points: points,
+                                idMuestreo: widget.muestreo.id ?? -1,
+                                ajuste: ajuste,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -521,6 +591,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       MaterialPageRoute(
         builder: (context) => AjusteScreen(
           points: points,
+          idMuestreo: widget.muestreo.id ?? -1,
         ),
       ),
     );
