@@ -46,6 +46,7 @@ class SemivariogramChart extends StatelessWidget {
             _rangeLineData(),
             _nuggetLineData(),
             _modelSemiVarianceLineData(),
+            _nuggetWithFirstLag(),
           ],
           titlesData: const FlTitlesData(
             show: true,
@@ -114,6 +115,28 @@ class SemivariogramChart extends StatelessWidget {
       ],
       isCurved: false,
       barWidth: 2.5,
+      color: kMainColor,
+      isStrokeCapRound: false,
+      dotData: const FlDotData(
+        show: true,
+      ),
+    );
+  }
+
+  LineChartBarData _nuggetWithFirstLag() {
+    return LineChartBarData(
+      spots: [
+        FlSpot(
+          nuggget,
+          lags[0],
+        ),
+        FlSpot(
+          nuggget,
+          lags[1],
+        ),
+      ],
+      isCurved: false,
+      barWidth: 1,
       color: kMainColor,
       isStrokeCapRound: false,
       dotData: const FlDotData(

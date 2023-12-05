@@ -80,7 +80,7 @@ class Muestreo {
   double calcularVarianza(List<Incidencia> incidencias, double media) {
     double suma = 0;
     for (var i = 0; i < incidencias.length; i++) {
-      suma += pow((incidencias[i].cantidad! - media), 2);
+      suma += pow((incidencias[i].value! - media), 2);
     }
     return suma / incidencias.length;
   }

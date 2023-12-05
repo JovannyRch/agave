@@ -87,6 +87,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
                 idMuestreo: widget.muestreo.id ?? -1,
                 muestreo: widget.muestreo,
                 parcela: widget.parcela,
+                isUtm: isUTM,
               ),
             ),
           );
@@ -174,7 +175,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
           ),
         ),
         subtitle: Text(
-          'Incidencias: ${incidencia.cantidad}',
+          'Incidencia: ${incidencia.value}',
           style: const TextStyle(
             fontSize: 12.0,
             fontWeight: FontWeight.bold,
@@ -190,6 +191,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
                 muestreo: widget.muestreo,
                 parcela: widget.parcela,
                 incidencia: incidencia,
+                isUtm: isUTM,
               ),
             ),
           );
@@ -200,9 +202,9 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
 
   String _getCoordenadas(Incidencia incidencia) {
     if (isUTM) {
-      return 'N: ${incidencia.norte}, E: ${incidencia.este}';
+      return 'E: ${incidencia.x}, N: ${incidencia.y}';
     } else {
-      return 'Ltd: ${incidencia.latitud}, Lng: ${incidencia.longitud}';
+      return 'Lng: ${incidencia.x}, Ltd: ${incidencia.y}';
     }
   }
 
@@ -274,11 +276,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   void _openListAjustesDialog() {
     List<Ajuste> _ajustesModelList = _ajustesModel?.ajustes ?? [];
     List<List<double>> points = _model?.incidencias
-            .map(
-              (e) => isUTM
-                  ? [e.este!, e.norte!, e.cantidad!.toDouble() ?? 0.0]
-                  : [e.longitud!, e.latitud!, e.cantidad!.toDouble() ?? 0.0],
-            )
+            .map((e) => [e.x!, e.y!, e.value!.toDouble()])
             .toList() ??
         [];
     showDialog(
@@ -404,26 +402,25 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       backgroundColor: Theme.of(context).primaryColor,
       title: const Text('Muestreo'),
       actions: [
-        if (_model?.incidencias.isNotEmpty ?? false)
-          PopupMenuButton<String>(
-            onSelected: handleClick,
-            itemBuilder: (BuildContext context) {
-              return {'Importar', 'Compartir', 'Eliminar registros'}
-                  .map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          ),
+        PopupMenuButton<String>(
+          onSelected: handleClick,
+          itemBuilder: (BuildContext context) {
+            return {'Importar', 'Exportar', 'Eliminar registros'}
+                .map((String choice) {
+              return PopupMenuItem<String>(
+                value: choice,
+                child: Text(choice),
+              );
+            }).toList();
+          },
+        )
       ],
     );
   }
 
   void handleClick(String value) {
     switch (value) {
-      case 'Compartir':
+      case 'Exportar':
         _compartir();
         break;
       case 'Importar':
@@ -559,6 +556,8 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       }
     } catch (e) {
       print(e);
+      Navigator.of(context).pop();
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Ocurrío un error al importar el archivo'),
@@ -580,13 +579,8 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       return;
     }
 
-    List<List<double>> points = incidencias
-        .map(
-          (e) => isUTM
-              ? [e.este!, e.norte!, e.cantidad!.toDouble() ?? 0.0]
-              : [e.longitud!, e.latitud!, e.cantidad!.toDouble() ?? 0.0],
-        )
-        .toList();
+    List<List<double>> points =
+        incidencias.map((e) => [e.x!, e.y!, e.value!.toDouble()]).toList();
 
     Navigator.push(
       context,

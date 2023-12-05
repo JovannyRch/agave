@@ -1,6 +1,5 @@
 import 'dart:ui' as ui;
 import 'package:agave/const.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -44,11 +43,10 @@ class _MultiLocationMapWidgetState extends State<MultiLocationMapWidget> {
 
   Future<void> _addMarkers() async {
     for (var location in widget.locations) {
-      final icon =
-          await _createCustomMarkerBitmap(location.id, location.incidents);
+      final icon = await _createCustomMarkerBitmap(location.id, location.value);
       final marker = Marker(
         markerId: MarkerId(location.id.toString()),
-        position: LatLng(location.latitude, location.longitude),
+        position: LatLng(location.x, location.y),
         icon: icon,
       );
       _markers.add(marker);
@@ -66,8 +64,7 @@ class _MultiLocationMapWidgetState extends State<MultiLocationMapWidget> {
   Widget build(BuildContext context) {
     return GoogleMap(
       initialCameraPosition: CameraPosition(
-        target:
-            LatLng(widget.locations[0].latitude, widget.locations[0].longitude),
+        target: LatLng(widget.locations[0].x, widget.locations[0].y),
         zoom: 17,
       ),
       markers: _markers,
@@ -77,14 +74,14 @@ class _MultiLocationMapWidgetState extends State<MultiLocationMapWidget> {
 
 class Location {
   final int id;
-  final double latitude;
-  final double longitude;
-  final double incidents; // cantidad de incidencias
+  final double x;
+  final double y;
+  final double value; // cantidad de incidencias
 
   Location({
     required this.id,
-    required this.latitude,
-    required this.longitude,
-    required this.incidents,
+    required this.x,
+    required this.y,
+    required this.value,
   });
 }

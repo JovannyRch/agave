@@ -10,7 +10,6 @@ class IncidenciasProvider extends BaseProvider {
   IncidenciasProvider._();
 
   Future<Incidencia> insert(Incidencia item) async {
-    print('Inserting ${item.toJson()}');
     final db = await database;
     await db!.insert(tabla, item.toJson());
 

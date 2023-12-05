@@ -28,17 +28,13 @@ Future<String> readCsvFileFromPath(FilePickerResult result) async {
 
 String convertirIncidenciasACsv(List<Incidencia> incidencias) {
   List<String> filas = [];
-  filas.add(
-      "latitud,longitud,norte,este,zona,incidencias"); // Encabezado del CSV
+  filas.add("x,y,incidencia"); // Encabezado del CSV
 
   for (var incidencia in incidencias) {
     var fila = [
-      incidencia.latitud.toString(),
-      incidencia.longitud.toString(),
-      incidencia.norte.toString(),
-      incidencia.este.toString(),
-      incidencia.zona ?? "",
-      incidencia.cantidad.toString(),
+      incidencia.x.toString(),
+      incidencia.y.toString(),
+      incidencia.value.toString(),
     ].join(',');
     filas.add(fila);
   }

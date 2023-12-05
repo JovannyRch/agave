@@ -42,11 +42,11 @@ class ReportesProvider extends BaseProvider {
       List<int> muestreosIds =
           res.map((e) => int.parse(e['id'].toString())).toList();
       final res2 = await db.rawQuery(
-          "SELECT sum(cantidad) cantidad from ${DB.incidencias} where id in (${muestreosIds.join(',')}) ");
+          "SELECT sum(value) value from ${DB.incidencias} where id in (${muestreosIds.join(',')}) ");
 
-      double cantidad = res2.first['cantidad'] == null
+      double cantidad = res2.first['value'] == null
           ? 0
-          : double.parse(res2.first['cantidad'].toString());
+          : double.parse(res2.first['value'].toString());
 
       inicidencia.cantidad = cantidad;
     }

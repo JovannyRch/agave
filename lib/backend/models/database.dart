@@ -1,7 +1,7 @@
 import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/plaga.dart';
 
-const String kDBname = "agave_6_database";
+const String kDBname = "agave_7_database";
 
 class DB {
   static const String parcelas = 'parcelas';
@@ -108,12 +108,9 @@ const incidenciasTable = """
   CREATE TABLE ${DB.incidencias} (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     idMuestreo INTEGER NOT NULL,
-    cantidad real NOT NULL,
-    latitud REAL,                   
-    longitud REAL,
-    norte REAL,
-    este REAL,
-    zona TEXT,
+    value real NOT NULL,
+    y REAL,
+    x REAL,
     FOREIGN KEY (idMuestreo) REFERENCES ${DB.muestreos}(id) ON DELETE CASCADE
   );
 """;

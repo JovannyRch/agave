@@ -33,7 +33,6 @@ class Api {
 
   static Future<SemivariogramaResponse?> getExperimentalSemivariogram(
       List<List<double>> points, int n_lags) async {
-    print(points);
     final response = await http.post(
       Uri.parse(getApiUrl("/semivariogram")),
       headers: {

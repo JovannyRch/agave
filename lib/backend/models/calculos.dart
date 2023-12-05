@@ -7,7 +7,7 @@ class CalculoResultado {
   double varianza;
   double desviacionEstandar;
   int totalMuestreos;
-  int totalIncidencias;
+  double totalIncidencias;
 
   CalculoResultado({
     required this.media,
@@ -28,10 +28,10 @@ class Calculo {
     double varianza = 0;
     double desviacionEstandar = 0;
     int totalMuestreos = incidencias.length;
-    int totalIncidencias = 0;
+    double totalIncidencias = 0.0;
 
     for (var i = 0; i < incidencias.length; i++) {
-      totalIncidencias += incidencias[i].cantidad?.toInt() ?? 0;
+      totalIncidencias += incidencias[i].value?.toDouble() ?? 0.0;
     }
 
     media = totalIncidencias / totalMuestreos;
@@ -51,7 +51,7 @@ class Calculo {
   double calcularVarianza(double media) {
     double suma = 0;
     for (var i = 0; i < incidencias.length; i++) {
-      suma += pow((incidencias[i].cantidad! - media), 2);
+      suma += pow((incidencias[i].value! - media), 2);
     }
     return suma / incidencias.length;
   }

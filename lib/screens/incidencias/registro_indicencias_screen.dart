@@ -21,11 +21,13 @@ class RegistroIncidenciasScreen extends StatefulWidget {
   Parcela parcela;
   Muestreo muestreo;
   Incidencia? incidencia;
+  bool isUtm;
 
   RegistroIncidenciasScreen({
     required this.idMuestreo,
     required this.parcela,
     required this.muestreo,
+    required this.isUtm,
     this.incidencia,
   });
 
@@ -47,30 +49,32 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
   IncidenciasModel? _incidenciasModel;
   MuestreosModel? _muestreosModel;
   bool _loading = false;
-  bool isUTM = false;
   bool isEditing = false;
   FocusNode focus = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _loadData();
     isEditing = widget.incidencia != null;
 
+    setData();
+  }
+
+  void setData() async {
     if (!isEditing) {
       _getLocation();
     } else {
-      _latitude = widget.incidencia!.latitud;
-      _longitude = widget.incidencia!.longitud;
-      _norte = widget.incidencia!.norte;
-      _este = widget.incidencia!.este;
-      _zona = widget.incidencia!.zona;
-      _incidenciasController.text = widget.incidencia!.cantidad.toString();
-    }
-  }
+      if (widget.isUtm) {
+        _este = widget.incidencia!.x;
+        _norte = widget.incidencia!.y;
+      } else {
+        _latitude = widget.incidencia!.y;
+        _longitude = widget.incidencia!.x;
+      }
 
-  _loadData() async {
-    isUTM = await UserData.isUtm();
+      _zona = "14Q";
+      _incidenciasController.text = widget.incidencia!.value.toString();
+    }
   }
 
   _getLocation() async {
@@ -86,7 +90,12 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
         false,
       );
     } catch (e) {
-      print('Error obteniendo ubicación: $e');
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error obteniendo ubicación: $e'),
+        ),
+      );
       setState(() {
         _loading = false;
       });
@@ -94,16 +103,18 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
   }
 
   void updateData(double latitude, double longitude, bool returnBack) async {
-    UtmApiResponse? response = await latLongToUTM(latitude, longitude);
+    _latitude = latitude;
+    _longitude = longitude;
 
-    setState(() {
-      _latitude = latitude;
-      _longitude = longitude;
+    if (widget.isUtm) {
+      UtmApiResponse? response = await latLongToUTM(latitude, longitude);
       _este = response!.easting;
       _norte = response.northing;
       _zona = response.zone;
+    }
+
+    setState(() {
       _loading = false;
-      /*  focus.requestFocus(); */
       if (returnBack) {
         Navigator.pop(context);
       }
@@ -216,12 +227,16 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
       Incidencia newItem = Incidencia();
 
       newItem.id = widget.incidencia!.id;
-      newItem.cantidad = double.parse(_incidenciasController.text);
-      newItem.latitud = _latitude!;
-      newItem.longitud = _longitude!;
+      newItem.value = double.parse(_incidenciasController.text);
       newItem.idMuestreo = widget.idMuestreo;
-      newItem.este = _este;
-      newItem.norte = _norte;
+
+      if (widget.isUtm) {
+        newItem.y = _norte;
+        newItem.x = _este;
+      } else {
+        newItem.y = _latitude;
+        newItem.x = _longitude;
+      }
 
       await _incidenciasModel!.update(newItem);
 
@@ -246,7 +261,7 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
 
   Widget _dataRow() {
     return Row(
-      children: isUTM
+      children: widget.isUtm
           ? [
               _card("Norte", _norte.toString()),
               _card("Este", _este.toString()),
@@ -271,18 +286,19 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
   }
 
   Widget _mapWidget() {
-    if (_latitude == null || _longitude == null) {
-      return Container(
+    if (_latitude == null && _longitude == null) {
+      return Container();
+      /* return Container(
         height: 250,
         child: Center(
           child: Text(
-            "No se pudo obtener la ubicación",
+            "No se pudo mostrar la ubicación en el mapa.",
             style: TextStyle(
               fontSize: 16,
             ),
           ),
         ),
-      );
+      ); */
     }
 
     return Container(
@@ -367,12 +383,16 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
 
       Incidencia newItem = Incidencia();
 
-      newItem.cantidad = double.parse(_incidenciasController.text);
-      newItem.latitud = _latitude!;
-      newItem.longitud = _longitude!;
+      newItem.value = double.parse(_incidenciasController.text);
       newItem.idMuestreo = widget.idMuestreo;
-      newItem.este = _este;
-      newItem.norte = _norte;
+
+      if (widget.isUtm) {
+        newItem.y = _norte;
+        newItem.x = _este;
+      } else {
+        newItem.y = _latitude;
+        newItem.x = _longitude;
+      }
 
       await _incidenciasModel!.add(newItem);
 

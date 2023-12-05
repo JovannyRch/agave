@@ -35,11 +35,7 @@ class _TabIncidenciasState extends State<TabIncidencias> {
   }
 
   String _getCoordenadas(Incidencia incidencia) {
-    if (isUTM) {
-      return 'N: ${incidencia.norte}, E: ${incidencia.este}';
-    } else {
-      return 'Ltd: ${incidencia.latitud}, Lng: ${incidencia.longitud}';
-    }
+    return 'N: ${incidencia.x}, E: ${incidencia.y}';
   }
 
   @override
@@ -54,7 +50,7 @@ class _TabIncidenciasState extends State<TabIncidencias> {
           title: Text(
             _getCoordenadas(widget.incidencias[index]),
           ),
-          subtitle: Text('Incidencias: ${widget.incidencias[index].cantidad}'),
+          subtitle: Text('Incidencias: ${widget.incidencias[index].value}'),
           leading: const Icon(
             Icons.search,
             color: kMainColor,
