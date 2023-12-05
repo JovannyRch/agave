@@ -76,7 +76,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
     super.initState();
     //Future 1 sec
     Future.delayed(Duration(milliseconds: 250), () {
-      //Get semivariance
+      print(widget.points);
       if (widget.ajuste == null) {
         showLagsForm();
       }
@@ -165,7 +165,6 @@ class _AjusteScreenState extends State<AjusteScreen> {
                           ),
                           onPressed: () {
                             _ajustesModel!.delete(widget.ajuste!.id ?? -1);
-                            Navigator.pop(context);
                             Navigator.pop(context);
                             Navigator.pop(context);
                           },

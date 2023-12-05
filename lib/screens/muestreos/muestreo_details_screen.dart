@@ -299,6 +299,8 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
                         title: Text(ajuste.nombre ?? ""),
                         trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
+                          Navigator.pop(context);
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(

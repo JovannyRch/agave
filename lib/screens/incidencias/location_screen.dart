@@ -21,7 +21,7 @@ class MultipleLocationMap extends StatelessWidget {
               .toList()
               .map(
                 (index) => Location(
-                  incidents: incidencias[index].cantidad ?? 0,
+                  incidents: incidencias[index].cantidad ?? 0.0,
                   id: index + 1,
                   latitude: incidencias[index].latitud ?? 0.0,
                   longitude: incidencias[index].longitud ?? 0.0,

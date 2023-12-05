@@ -1,6 +1,6 @@
 class IncidenciaPlaga {
   String plaga;
-  int cantidad;
+  double cantidad;
   int id;
 
   IncidenciaPlaga({

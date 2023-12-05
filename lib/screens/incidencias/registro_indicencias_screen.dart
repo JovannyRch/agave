@@ -216,7 +216,7 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
       Incidencia newItem = Incidencia();
 
       newItem.id = widget.incidencia!.id;
-      newItem.cantidad = int.parse(_incidenciasController.text);
+      newItem.cantidad = double.parse(_incidenciasController.text);
       newItem.latitud = _latitude!;
       newItem.longitud = _longitude!;
       newItem.idMuestreo = widget.idMuestreo;
@@ -367,7 +367,7 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
 
       Incidencia newItem = Incidencia();
 
-      newItem.cantidad = int.parse(_incidenciasController.text);
+      newItem.cantidad = double.parse(_incidenciasController.text);
       newItem.latitud = _latitude!;
       newItem.longitud = _longitude!;
       newItem.idMuestreo = widget.idMuestreo;

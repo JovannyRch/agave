@@ -1,7 +1,7 @@
 class Incidencia {
   int? id;
   int? idMuestreo;
-  int? cantidad;
+  double? cantidad;
   double? latitud;
   double? longitud;
   double? norte;

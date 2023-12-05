@@ -44,9 +44,9 @@ class ReportesProvider extends BaseProvider {
       final res2 = await db.rawQuery(
           "SELECT sum(cantidad) cantidad from ${DB.incidencias} where id in (${muestreosIds.join(',')}) ");
 
-      int cantidad = res2.first['cantidad'] == null
+      double cantidad = res2.first['cantidad'] == null
           ? 0
-          : int.parse(res2.first['cantidad'].toString());
+          : double.parse(res2.first['cantidad'].toString());
 
       inicidencia.cantidad = cantidad;
     }

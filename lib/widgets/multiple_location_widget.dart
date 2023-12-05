@@ -18,7 +18,7 @@ class _MultiLocationMapWidgetState extends State<MultiLocationMapWidget> {
   final Set<Marker> _markers = {};
 
   Future<BitmapDescriptor> _createCustomMarkerBitmap(
-      int id, int incidents) async {
+      int id, double incidents) async {
     final recorder = ui.PictureRecorder();
     final canvas =
         Canvas(recorder, Rect.fromPoints(Offset(0, 0), Offset(80, 80)));
@@ -79,11 +79,12 @@ class Location {
   final int id;
   final double latitude;
   final double longitude;
-  final int incidents; // cantidad de incidencias
+  final double incidents; // cantidad de incidencias
 
-  Location(
-      {required this.id,
-      required this.latitude,
-      required this.longitude,
-      required this.incidents});
+  Location({
+    required this.id,
+    required this.latitude,
+    required this.longitude,
+    required this.incidents,
+  });
 }
