@@ -307,4 +307,10 @@ class AjustesModel with ChangeNotifier {
 
     notifyListeners();
   }
+
+  Future delete(int id) async {
+    await AjustesProvider.db.delete(id, DB.ajustes);
+    _ajustes.removeWhere((item) => item.id == id);
+    notifyListeners();
+  }
 }

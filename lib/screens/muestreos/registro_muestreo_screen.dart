@@ -29,7 +29,7 @@ class _RegistroMuestreoState extends State<RegistroMuestreo> {
     _muestreosModel = Provider.of<MuestreosModel>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Registrar Estudio"),
+        title: const Text("Registrar Muestreo"),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Padding(
@@ -40,7 +40,6 @@ class _RegistroMuestreoState extends State<RegistroMuestreo> {
             _plagaDropdown(),
             _humedadInput(),
             _temperaturaInput(),
-            const SizedBox(height: 20),
             _submitButton(),
           ]),
         ),
@@ -77,10 +76,26 @@ class _RegistroMuestreoState extends State<RegistroMuestreo> {
 
   Widget _humedadInput() {
     return TextFormField(
-      decoration: const InputDecoration(labelText: 'Humedad'),
+      decoration: const InputDecoration(
+        labelText: 'Humedad',
+        prefixIcon: Icon(Icons.water),
+        suffixText: '%',
+      ),
       keyboardType: TextInputType.number,
       onSaved: (value) => _humedad = double.tryParse(value!),
       validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor ingresa un valor';
+        }
+
+        if (double.tryParse(value) == null) {
+          return 'Por favor ingresa un valor numérico';
+        }
+
+        if (double.tryParse(value)! < 0 || double.tryParse(value)! > 100) {
+          return 'Por favor ingresa un valor entre 0 y 100';
+        }
+
         return null;
       },
     );
@@ -88,10 +103,22 @@ class _RegistroMuestreoState extends State<RegistroMuestreo> {
 
   Widget _temperaturaInput() {
     return TextFormField(
-      decoration: const InputDecoration(labelText: 'Temperatura'),
+      decoration: const InputDecoration(
+        labelText: 'Temperatura',
+        prefixIcon: Icon(Icons.thermostat),
+        suffixText: '°C ',
+      ),
       keyboardType: TextInputType.number,
       onSaved: (value) => _temperatura = double.tryParse(value!),
       validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor ingresa un valor';
+        }
+
+        if (double.tryParse(value) == null) {
+          return 'Por favor ingresa un valor numérico';
+        }
+
         return null;
       },
     );

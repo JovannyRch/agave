@@ -22,7 +22,6 @@ class CardDetail extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.all(10),
-      height: 70.0,
       decoration: BoxDecoration(
         color: color ?? Colors.white,
         borderRadius: BorderRadius.circular(10),
@@ -48,7 +47,7 @@ class CardDetail extends StatelessWidget {
         Text(
           title,
           style: const TextStyle(
-            fontSize: 13,
+            fontSize: 12,
             color: Colors.black38,
           ),
         ),
@@ -59,11 +58,13 @@ class CardDetail extends StatelessWidget {
               isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
           children: [
             Text(
-              value,
+              cutText(value, unit != null ? 12 : 16),
               style: const TextStyle(
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
+                overflow: TextOverflow.ellipsis,
               ),
+              maxLines: 2,
             ),
             if (unit != null) const SizedBox(width: 3),
             if (unit != null)
@@ -78,6 +79,13 @@ class CardDetail extends StatelessWidget {
         )
       ],
     );
+  }
+
+  String cutText(String text, int limit) {
+    if (text.length > limit) {
+      return text.substring(0, limit - 1) + "...";
+    }
+    return text;
   }
 
   Widget _columnWithIcon(BuildContext context, Widget content) {

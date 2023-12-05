@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:agave/api/responses/kriging_contour_response.dart';
 import 'package:agave/backend/user_data.dart';
-import 'package:agave/const.dart';
 import 'package:http/http.dart' as http;
 import 'package:agave/api/responses/semivariograma_response.dart';
 

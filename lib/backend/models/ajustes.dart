@@ -56,4 +56,9 @@ class Ajuste {
 
     return data;
   }
+
+  @override
+  String toString() {
+    return 'Ajuste{id: $id, nombre: $nombre, muestreoId: $muestreoId, semivariogramaExperimental: $semivariogramaExperimental, semivariogramaTeorico: $semivariogramaTeorico, sill: $sill, range: $range, nugget: $nugget, modelo: $modelo, lags: $lags, imagen: $imagen}';
+  }
 }

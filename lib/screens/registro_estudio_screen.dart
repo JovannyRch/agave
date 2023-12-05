@@ -49,7 +49,6 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
           child: ListView(children: [
             _nombreInput(),
             _obervacionesInput(),
-            const SizedBox(height: 20),
             _submitButton(),
           ]),
         ),

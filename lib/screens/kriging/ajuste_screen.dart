@@ -6,6 +6,7 @@ import 'package:agave/const.dart';
 import 'package:agave/utils/models.dart';
 import 'package:agave/widgets/RoundedButton.dart';
 import 'package:agave/widgets/card_detail.dart';
+import 'package:agave/widgets/card_image.dart';
 import 'package:agave/widgets/semivariograma_widget.dart';
 import 'package:agave/widgets/submit_button.dart';
 import 'package:easy_image_viewer/easy_image_viewer.dart';
@@ -14,23 +15,19 @@ import 'dart:convert';
 
 import 'package:provider/provider.dart';
 
-/* const lags = [
-  21.015123121183937,
-  49.28636841525929,
-  80.24371511799016,
-  111.74996243123789,
-  141.47585829622963,
-  168.88347164191998
-];
+class HeatMapValues {
+  double sill;
+  double range;
+  double nugget;
+  int nLags;
 
-const semivariance = [
-  487.3976927747419,
-  632.2879310344828,
-  815.5228984633926,
-  1187.9924069855733,
-  933.7788868723533,
-  949.4097472924187
-]; */
+  HeatMapValues({
+    required this.sill,
+    required this.range,
+    required this.nugget,
+    required this.nLags,
+  });
+}
 
 class AjusteScreen extends StatefulWidget {
   final List<List<double>> points;
@@ -68,8 +65,11 @@ class _AjusteScreenState extends State<AjusteScreen> {
   bool isLoadingSemiVariance = true;
   bool showAjusteForm = false;
   int currentTab = 0;
+  bool creatingImage = false;
 
   AjustesModel? _ajustesModel;
+  HeatMapValues? heatMapValues;
+  String? base64HeatMapImage;
 
   @override
   void initState() {
@@ -96,6 +96,14 @@ class _AjusteScreenState extends State<AjusteScreen> {
       maxY = semivariance
           .reduce((value, element) => value > element ? value : element);
       isLoadingSemiVariance = false;
+
+      heatMapValues = HeatMapValues(
+        sill: sill,
+        range: range,
+        nugget: nugget,
+        nLags: n_lags,
+      );
+
       updateModelSemivariance();
     }
   }
@@ -124,16 +132,78 @@ class _AjusteScreenState extends State<AjusteScreen> {
   Widget build(BuildContext context) {
     _size = MediaQuery.of(context).size;
     _ajustesModel = Provider.of<AjustesModel>(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Semivariograma'),
+        title: const Text('Ajuste'),
         backgroundColor: Theme.of(context).primaryColor,
+        actions: [
+          //Delete action
+          if (widget.ajuste != null)
+            IconButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text("Eliminar ajuste"),
+                      content: const Text(
+                          "¿Está seguro que desea eliminar este ajuste?"),
+                      actions: [
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: kMainColor,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text("Cancelar"),
+                        ),
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: kMainColor,
+                          ),
+                          onPressed: () {
+                            _ajustesModel!.delete(widget.ajuste!.id ?? -1);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          },
+                          child: const Text("Eliminar"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              icon: const Icon(Icons.delete),
+            ),
+        ],
       ),
       body: _body,
     );
   }
 
   Future<String?> base64Image() async {
+    if (widget.ajuste != null && widget.ajuste!.imagen != null) {
+      return widget.ajuste!.imagen;
+    }
+
+    if (heatMapValues != null &&
+        heatMapValues!.sill == sill &&
+        heatMapValues!.range == range &&
+        heatMapValues!.nugget == nugget &&
+        heatMapValues!.nLags == n_lags &&
+        base64HeatMapImage != null) {
+      return base64HeatMapImage;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Generando mapa de contorno, espere un momento'),
+      ),
+    );
+
     KrigingContourResponse? krigingContourResponse =
         await Api.getKrigingContour(
       widget.points,
@@ -158,6 +228,15 @@ class _AjusteScreenState extends State<AjusteScreen> {
     try {
       String? imageBase64 = await base64Image();
 
+      base64HeatMapImage = imageBase64;
+
+      heatMapValues = HeatMapValues(
+        sill: sill,
+        range: range,
+        nugget: nugget,
+        nLags: n_lags,
+      );
+
       if (imageBase64 != null) {
         final imageProvider = Image.memory(
           fit: BoxFit.cover,
@@ -170,6 +249,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
         });
       }
     } catch (e) {
+      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('No se pudo obtener el mapa de contorno'),
@@ -184,15 +264,33 @@ class _AjusteScreenState extends State<AjusteScreen> {
 
   void _save() {
     TextEditingController _controller = TextEditingController();
+
+    if (range == 0 && sill == 0 && nugget == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Los valores de rango, meseta y pepita no pueden ser 0, por favor ajuste los valores'),
+        ),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text("Guardar ajuste"),
-          content: TextField(
-            controller: _controller,
-            decoration: const InputDecoration(
-              labelText: "Nombre del ajuste",
+          content: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.2,
+            child: Column(
+              children: [
+                TextField(
+                  controller: _controller,
+                  decoration: const InputDecoration(
+                    labelText: "Nombre del ajuste",
+                  ),
+                ),
+              ],
             ),
           ),
           actions: [
@@ -222,7 +320,8 @@ class _AjusteScreenState extends State<AjusteScreen> {
 
   void _saveAjuste(String nombre) async {
     try {
-      String? imageBase64 = await base64Image();
+      base64HeatMapImage = await base64Image();
+
       Ajuste ajuste = Ajuste(
         modelo: selectedModel.toString().split('.').last,
         sill: sill,
@@ -233,7 +332,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
         lags: jsonEncode(lags),
         muestreoId: widget.idMuestreo,
         nombre: nombre,
-        imagen: imageBase64,
+        imagen: base64HeatMapImage,
       );
       _ajustesModel!.add(ajuste);
       Navigator.pop(context);
@@ -243,9 +342,12 @@ class _AjusteScreenState extends State<AjusteScreen> {
         ),
       );
     } catch (e) {
+      Navigator.pop(context);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No se pudo guardar el ajuste'),
+          content: Text(
+              'No se pudo guardar el ajuste, revise los datos valores del modelo'),
         ),
       );
     }
@@ -523,8 +625,30 @@ class _AjusteScreenState extends State<AjusteScreen> {
           children: [
             Expanded(
               child: CardDetail(
+                title: "# Lags",
+                value: lags.length.toString(),
+                color: Colors.transparent,
+                isCenter: true,
+              ),
+            ),
+            Expanded(
+              child: CardDetail(
+                title: "Modelo",
+                value: modelToString(
+                  modelFromString(widget.ajuste!.modelo ?? ""),
+                ),
+                color: Colors.transparent,
+                isCenter: true,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: CardDetail(
                 title: "Meseta",
-                value: widget.ajuste!.sill.toString(),
+                value: widget.ajuste!.sill!.toStringAsFixed(2),
                 color: Colors.transparent,
                 isCenter: true,
               ),
@@ -532,7 +656,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
             Expanded(
               child: CardDetail(
                 title: "Rango",
-                value: widget.ajuste!.range.toString(),
+                value: widget.ajuste!.range!.toStringAsFixed(2),
                 color: Colors.transparent,
                 isCenter: true,
               ),
@@ -540,7 +664,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
             Expanded(
               child: CardDetail(
                 title: "E. Pepita",
-                value: widget.ajuste!.nugget.toString(),
+                value: widget.ajuste!.nugget!.toStringAsFixed(2),
                 color: Colors.transparent,
                 isCenter: true,
               ),
@@ -548,19 +672,14 @@ class _AjusteScreenState extends State<AjusteScreen> {
           ],
         ),
         const SizedBox(height: 20.0),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            RoundedButton(
-              text: "Mapa de contornos",
-              color: kMainColor,
-              icon: Icons.map,
-              onPressed: () {
-                _viewHeatMap();
-              },
-            ),
-          ],
-        ),
+        //Image
+        (widget.ajuste!.imagen != null && widget.ajuste!.imagen != "")
+            ? //Show image in a card
+            Base64CardImage(
+                image: widget!.ajuste!.imagen ?? '',
+                width: _size.width * 0.9,
+              )
+            : Container(),
       ];
     }
 
@@ -579,7 +698,15 @@ class _AjusteScreenState extends State<AjusteScreen> {
           icon: Icons.display_settings,
           onPressed: () {
             setState(() {
-              showAjusteForm = !showAjusteForm;
+              if (isLoadingHeatMap) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Generando mapa de contorno'),
+                  ),
+                );
+              } else {
+                showAjusteForm = !showAjusteForm;
+              }
             });
           },
         ),
@@ -588,7 +715,15 @@ class _AjusteScreenState extends State<AjusteScreen> {
           color: kMainColor,
           icon: Icons.map,
           onPressed: () {
-            _viewHeatMap();
+            if (!isLoadingHeatMap) {
+              _viewHeatMap();
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Espera a que se genere el mapa de contorno'),
+                ),
+              );
+            }
           },
         ),
       ),
@@ -599,7 +734,15 @@ class _AjusteScreenState extends State<AjusteScreen> {
           color: kMainColor,
           icon: Icons.settings,
           onPressed: () {
-            showLagsForm();
+            if (isLoadingHeatMap) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Generando mapa de contorno'),
+                ),
+              );
+            } else {
+              showLagsForm();
+            }
           },
         ),
         RoundedButton(
@@ -607,7 +750,15 @@ class _AjusteScreenState extends State<AjusteScreen> {
           color: kMainColor,
           icon: Icons.save,
           onPressed: () {
-            _save();
+            if (isLoadingHeatMap) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Generando mapa de contorno'),
+                ),
+              );
+            } else {
+              _save();
+            }
           },
         ),
       )
