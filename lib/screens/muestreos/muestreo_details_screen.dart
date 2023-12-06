@@ -1,3 +1,4 @@
+import 'package:agave/api/api.dart';
 import 'package:agave/backend/models/ajustes.dart';
 import 'package:agave/backend/models/incidencia.dart';
 import 'package:agave/backend/models/estudio.dart';
@@ -6,7 +7,7 @@ import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/user_data.dart';
 import 'package:agave/const.dart';
-import 'package:agave/screens/incidencias/location_screen.dart';
+import 'package:agave/screens/genera/image_loader.dart';
 import 'package:agave/screens/kriging/ajuste_screen.dart';
 import 'package:agave/utils/exportIncidencias.dart';
 import 'package:agave/utils/formatDate.dart';
@@ -224,14 +225,24 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
             children: [
               Expanded(
                 child: RoundedButton(
-                  text: 'Ubicaciones',
+                  text: 'Gráfico de dispersión',
                   icon: Icons.map,
                   onPressed: () {
+                    List<List<double>> points = _model?.incidencias
+                            .map((e) => [e.x!, e.y!, e.value!.toDouble()])
+                            .toList() ??
+                        [];
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => MultipleLocationMap(
-                          incidencias: _model?.incidencias ?? [],
+                        builder: (context) => ImageLoaderScreen(
+                          title: "Gráfico de dispersión",
+                          loadImage: () async {
+                            String? response = await Api.getScatterPlot(
+                              points,
+                            );
+                            return response;
+                          },
                         ),
                       ),
                     );

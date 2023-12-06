@@ -46,7 +46,6 @@ class Api {
     );
 
     if (response.statusCode == 200) {
-      print(response.body);
       return SemivariogramaResponse.fromJson(response.body);
     }
     throw Exception('Failed to load semivariogram');
@@ -73,6 +72,26 @@ class Api {
 
     if (response.statusCode == 200) {
       return KrigingContourResponse.fromJson(response.body);
+    }
+    throw Exception('Failed to load semivariogram');
+  }
+
+  static Future<String?> getScatterPlot(
+    List<List<double>> points,
+  ) async {
+    final response = await http.post(
+      Uri.parse(getApiUrl("/scatter")),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        "points": points,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final json = Map<String, dynamic>.from(jsonDecode(response.body));
+      return json['image_base64'];
     }
     throw Exception('Failed to load semivariogram');
   }

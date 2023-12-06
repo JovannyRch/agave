@@ -113,7 +113,7 @@ class _ImageLoaderScreenState extends State<ImageLoaderScreen> {
               });
             },
             icon: Icons.fullscreen,
-            text: 'Ver',
+            text: 'Expandir',
           ),
         ),
       ],
