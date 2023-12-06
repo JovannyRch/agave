@@ -3,6 +3,8 @@ import 'package:agave/api/responses/kriging_contour_response.dart';
 import 'package:agave/backend/models/ajustes.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/const.dart';
+import 'package:agave/screens/Navigation.dart';
+import 'package:agave/screens/genera/image_loader.dart';
 import 'package:agave/utils/models.dart';
 import 'package:agave/widgets/RoundedButton.dart';
 import 'package:agave/widgets/card_detail.dart';
@@ -197,12 +199,6 @@ class _AjusteScreenState extends State<AjusteScreen> {
       return base64HeatMapImage;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Generando mapa de contorno, espere un momento'),
-      ),
-    );
-
     KrigingContourResponse? krigingContourResponse =
         await Api.getKrigingContour(
       widget.points,
@@ -221,44 +217,15 @@ class _AjusteScreenState extends State<AjusteScreen> {
   }
 
   void _viewHeatMap() async {
-    setState(() {
-      isLoadingHeatMap = true;
-    });
-    try {
-      String? imageBase64 = await base64Image();
-
-      base64HeatMapImage = imageBase64;
-
-      heatMapValues = HeatMapValues(
-        sill: sill,
-        range: range,
-        nugget: nugget,
-        nLags: n_lags,
-      );
-
-      if (imageBase64 != null) {
-        final imageProvider = Image.memory(
-          fit: BoxFit.cover,
-          Base64Decoder().convert(
-            imageBase64,
-          ),
-        ).image;
-        showImageViewer(context, imageProvider, onViewerDismissed: () {
-          print("dismissed");
-        });
-      }
-    } catch (e) {
-      print(e);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No se pudo obtener el mapa de contorno'),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageLoaderScreen(
+          loadImage: base64Image,
+          title: "Mapa de contorno",
         ),
-      );
-    } finally {
-      setState(() {
-        isLoadingHeatMap = false;
-      });
-    }
+      ),
+    );
   }
 
   void _save() {
@@ -677,6 +644,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
             Base64CardImage(
                 image: widget!.ajuste!.imagen ?? '',
                 width: _size.width * 0.9,
+                title: "Mapa de contorno",
               )
             : Container(),
       ];

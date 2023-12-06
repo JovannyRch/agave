@@ -1,4 +1,4 @@
-import 'package:easy_image_viewer/easy_image_viewer.dart';
+import 'package:agave/screens/genera/image_loader.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
@@ -6,9 +6,11 @@ class Base64CardImage extends StatefulWidget {
   bool isLoading;
   String image;
   double width;
+  String title;
 
   Base64CardImage({
     this.isLoading = false,
+    this.title = "Imagen",
     required this.image,
     required this.width,
   });
@@ -31,17 +33,16 @@ class _CardImageState extends State<Base64CardImage> {
               ? const CircularProgressIndicator()
               : GestureDetector(
                   onTap: () {
-                    showImageViewer(
+                    Navigator.push(
                       context,
-                      Image.memory(
-                        fit: BoxFit.cover,
-                        Base64Decoder().convert(
-                          widget.image,
+                      MaterialPageRoute(
+                        builder: (context) => ImageLoaderScreen(
+                          loadImage: () async {
+                            return widget.image;
+                          },
+                          title: widget.title,
                         ),
-                      ).image,
-                      onViewerDismissed: () {
-                        print("dismissed");
-                      },
+                      ),
                     );
                   },
                   child: SizedBox(

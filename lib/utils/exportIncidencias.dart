@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
@@ -43,7 +44,30 @@ String convertirIncidenciasACsv(List<Incidencia> incidencias) {
 }
 
 Future<void> compartirArchivo(String rutaArchivo) async {
-  await Share.shareFiles([rutaArchivo], text: 'Aquí está tu archivo CSV.');
+  await Share.shareFiles([rutaArchivo], text: '');
+}
+
+Future<void> compartirImagen(String rutaImagen) async {
+  await Share.shareFiles([rutaImagen], text: '');
+}
+
+Future<bool> guardarImagen(String base64Image, String nombreArchivo) async {
+  try {
+    // Obtener el directorio local de la aplicación
+    final directorio = await getApplicationDocumentsDirectory();
+    String ruta = '${directorio.path}/$nombreArchivo.png';
+
+    // Escribir en el archivo
+    File archivo = File(ruta);
+    await archivo.writeAsBytes(base64Decode(base64Image));
+    await compartirImagen(ruta);
+
+    return true;
+  } catch (e) {
+    // Manejo de errores, por ejemplo, imprimir el error
+    print('Error al guardar el archivo: $e');
+    return false;
+  }
 }
 
 Future<bool> guardarCsv(String csvData, String nombreArchivo) async {
