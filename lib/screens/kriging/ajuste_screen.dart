@@ -977,7 +977,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
             child: SizedBox(
               width: 80,
               child: Text(
-                "$label: ${value.toStringAsFixed(0)}",
+                "$label: ${value.toStringAsFixed(2)}",
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -986,7 +986,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
             ),
             onTap: () {
               TextEditingController _controller = TextEditingController();
-              _controller.text = value.toStringAsFixed(0);
+              _controller.text = value.toStringAsFixed(2);
               showDialog(
                 context: context,
                 builder: (context) {
@@ -1015,7 +1015,15 @@ class _AjusteScreenState extends State<AjusteScreen> {
                         ),
                         onPressed: () {
                           Navigator.pop(context);
-                          onChanged(double.parse(_controller.text));
+
+                          double newValue = maxValue(
+                            min,
+                            minValue(
+                              max * 1.1,
+                              double.parse(_controller.text),
+                            ),
+                          );
+                          onChanged(newValue);
                         },
                         child: const Text("Guardar"),
                       ),
@@ -1030,7 +1038,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
             child: Slider(
               value: value,
               min: min,
-              max: max,
+              max: max * 1.1,
               label: label,
               activeColor: kMainColor,
               onChanged: (double value) {
@@ -1078,6 +1086,14 @@ class _AjusteScreenState extends State<AjusteScreen> {
         range,
       );
     }
+  }
+
+  double maxValue(double a, double b) {
+    return a > b ? a : b;
+  }
+
+  double minValue(double a, double b) {
+    return a < b ? a : b;
   }
 
   Widget _buildSill() {
