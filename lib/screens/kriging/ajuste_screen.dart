@@ -643,7 +643,6 @@ class _AjusteScreenState extends State<AjusteScreen> {
             ? //Show image in a card
             Base64CardImage(
                 image: widget!.ajuste!.imagen ?? '',
-                width: _size.width * 0.9,
                 title: "Mapa de contorno",
               )
             : Container(),

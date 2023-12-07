@@ -9,6 +9,7 @@ import 'package:agave/backend/user_data.dart';
 import 'package:agave/const.dart';
 import 'package:agave/screens/genera/image_loader.dart';
 import 'package:agave/screens/kriging/ajuste_screen.dart';
+import 'package:agave/screens/kriging/new_ajuste_screen.dart';
 import 'package:agave/utils/exportIncidencias.dart';
 import 'package:agave/utils/formatDate.dart';
 import 'package:agave/widgets/RoundedButton.dart';
@@ -232,6 +233,16 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
                             .map((e) => [e.x!, e.y!, e.value!.toDouble()])
                             .toList() ??
                         [];
+
+                    if (points.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('No hay registros'),
+                        ),
+                      );
+                      return;
+                    }
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -596,7 +607,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AjusteScreen(
+        builder: (context) => NewAjusteScreen(
           points: points,
           idMuestreo: widget.muestreo.id ?? -1,
         ),

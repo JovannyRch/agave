@@ -5,14 +5,12 @@ import 'dart:convert';
 class Base64CardImage extends StatefulWidget {
   bool isLoading;
   String image;
-  double width;
   String title;
 
   Base64CardImage({
     this.isLoading = false,
     this.title = "Imagen",
     required this.image,
-    required this.width,
   });
 
   @override
@@ -46,8 +44,6 @@ class _CardImageState extends State<Base64CardImage> {
                     );
                   },
                   child: SizedBox(
-                    width: widget.width,
-                    height: widget.width,
                     child: Image.memory(
                       fit: BoxFit.cover,
                       Base64Decoder().convert(
