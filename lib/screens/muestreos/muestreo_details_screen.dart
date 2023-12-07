@@ -324,8 +324,8 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AjusteScreen(
-                                points: points,
+                              builder: (context) => NewAjusteScreen(
+                                points: [],
                                 idMuestreo: widget.muestreo.id ?? -1,
                                 ajuste: ajuste,
                               ),

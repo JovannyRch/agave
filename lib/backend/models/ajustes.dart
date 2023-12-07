@@ -2,27 +2,25 @@ class Ajuste {
   int? id;
   String? nombre;
   int? muestreoId;
-  String? semivariogramaExperimental;
-  String? semivariogramaTeorico;
-  String? lags;
+  int? nLags;
   double? sill;
   double? range;
   double? nugget;
-  String? modelo;
-  String? imagen;
+  String? model;
+  String? semivariogramImage;
+  String? contourImage;
 
   Ajuste({
     this.id,
     this.nombre,
     this.muestreoId,
-    this.semivariogramaExperimental,
-    this.semivariogramaTeorico,
+    this.nLags,
     this.sill,
     this.range,
     this.nugget,
-    this.modelo,
-    this.lags,
-    this.imagen,
+    this.model,
+    this.semivariogramImage,
+    this.contourImage,
   });
 
   Ajuste.fromJson(Map<String, dynamic> json) {
@@ -30,14 +28,13 @@ class Ajuste {
 
     nombre = json['nombre'];
     muestreoId = json['muestreoId'];
-    semivariogramaExperimental = json['semivariogramaExperimental'];
-    semivariogramaTeorico = json['semivariogramaTeorico'];
     sill = json['sill'];
     range = json['range'];
     nugget = json['nugget'];
-    modelo = json['modelo'];
-    lags = json['lags'];
-    imagen = json['imagen'];
+    model = json['model'];
+    semivariogramImage = json['semivariogramImage'];
+    contourImage = json['contourImage'];
+    nLags = json['nLags'];
   }
 
   Map<String, dynamic> toJson() {
@@ -45,20 +42,19 @@ class Ajuste {
 
     data['nombre'] = nombre;
     data['muestreoId'] = muestreoId;
-    data['semivariogramaExperimental'] = semivariogramaExperimental;
-    data['semivariogramaTeorico'] = semivariogramaTeorico;
     data['sill'] = sill;
     data['range'] = range;
     data['nugget'] = nugget;
-    data['modelo'] = modelo;
-    data['lags'] = lags;
-    data['imagen'] = imagen;
+    data['model'] = model;
+    data['semivariogramImage'] = semivariogramImage;
+    data['contourImage'] = contourImage;
+    data['nLags'] = nLags;
 
     return data;
   }
 
   @override
   String toString() {
-    return 'Ajuste{id: $id, nombre: $nombre, muestreoId: $muestreoId, semivariogramaExperimental: $semivariogramaExperimental, semivariogramaTeorico: $semivariogramaTeorico, sill: $sill, range: $range, nugget: $nugget, modelo: $modelo, lags: $lags, imagen: $imagen}';
+    return 'Ajuste{id: $id, nombre: $nombre, muestreoId: $muestreoId, sill: $sill, range: $range, nugget: $nugget, model: $model, semivariogramImage: $semivariogramImage, contourImage: $contourImage}';
   }
 }

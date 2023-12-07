@@ -8,7 +8,14 @@ class SemivariogramaResponse {
   double? sill;
   double? range;
 
-  SemivariogramaResponse({this.lags, this.image_base64, this.semivariance});
+  SemivariogramaResponse({
+    this.lags,
+    this.image_base64,
+    this.semivariance,
+    this.nugget,
+    this.sill,
+    this.range,
+  });
 
   SemivariogramaResponse.fromJson(String jsonResponse) {
     final json = Map<String, dynamic>.from(jsonDecode(jsonResponse));

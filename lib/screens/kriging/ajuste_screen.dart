@@ -88,13 +88,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
       sill = widget.ajuste!.sill ?? 0;
       range = widget.ajuste!.range ?? 0;
       nugget = widget.ajuste!.nugget ?? 0;
-      selectedModel = modelFromString(widget.ajuste!.modelo ?? "");
-      modelSemivariance =
-          doubleValuesFromJson(widget.ajuste!.semivariogramaTeorico ?? "");
-      lags = doubleValuesFromJson(widget.ajuste!.lags ?? "");
-      semivariance =
-          doubleValuesFromJson(widget.ajuste!.semivariogramaExperimental ?? "");
-      maxX = lags.reduce((value, element) => value > element ? value : element);
+
       maxY = semivariance
           .reduce((value, element) => value > element ? value : element);
       isLoadingSemiVariance = false;
@@ -150,7 +144,8 @@ class _AjusteScreenState extends State<AjusteScreen> {
                     return AlertDialog(
                       title: const Text("Eliminar ajuste"),
                       content: const Text(
-                          "¿Está seguro que desea eliminar este ajuste?"),
+                        "¿Está seguro que desea eliminar este ajuste?",
+                      ),
                       actions: [
                         TextButton(
                           style: TextButton.styleFrom(
@@ -186,10 +181,6 @@ class _AjusteScreenState extends State<AjusteScreen> {
   }
 
   Future<String?> base64Image() async {
-    if (widget.ajuste != null && widget.ajuste!.imagen != null) {
-      return widget.ajuste!.imagen;
-    }
-
     if (heatMapValues != null &&
         heatMapValues!.sill == sill &&
         heatMapValues!.range == range &&
@@ -288,19 +279,6 @@ class _AjusteScreenState extends State<AjusteScreen> {
     try {
       base64HeatMapImage = await base64Image();
 
-      Ajuste ajuste = Ajuste(
-        modelo: selectedModel.toString().split('.').last,
-        sill: sill,
-        range: range,
-        nugget: nugget,
-        semivariogramaExperimental: jsonEncode(semivariance),
-        semivariogramaTeorico: jsonEncode(modelSemivariance),
-        lags: jsonEncode(lags),
-        muestreoId: widget.idMuestreo,
-        nombre: nombre,
-        imagen: base64HeatMapImage,
-      );
-      _ajustesModel!.add(ajuste);
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -601,7 +579,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
               child: CardDetail(
                 title: "Modelo",
                 value: modelToString(
-                  modelFromString(widget.ajuste!.modelo ?? ""),
+                  modelFromString(widget.ajuste!.model ?? ""),
                 ),
                 color: Colors.transparent,
                 isCenter: true,
@@ -639,10 +617,11 @@ class _AjusteScreenState extends State<AjusteScreen> {
         ),
         const SizedBox(height: 20.0),
         //Image
-        (widget.ajuste!.imagen != null && widget.ajuste!.imagen != "")
+        (widget.ajuste!.semivariogramImage != null &&
+                widget.ajuste!.semivariogramImage != "")
             ? //Show image in a card
             Base64CardImage(
-                image: widget!.ajuste!.imagen ?? '',
+                image: widget!.ajuste!.semivariogramImage ?? '',
                 title: "Mapa de contorno",
               )
             : Container(),

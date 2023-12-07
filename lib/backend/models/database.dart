@@ -134,14 +134,13 @@ const ajustesTable = """
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     muestreoId INTEGER NOT NULL,
     nombre TEXT NOT NULL,
-    semivariogramaExperimental TEXT,
-    semivariogramaTeorico TEXT,
-    lags TEXT,
-    sill REAL,
-    range REAL,
-    nugget REAL,
-    modelo TEXT,
-    imagen TEXT,
+    nLags INTEGER NOT NULL,
+    sill REAL NOT NULL,
+    range REAL NOT NULL,
+    nugget REAL NOT NULL,
+    model TEXT NOT NULL,
+    semivariogramImage TEXT NOT NULL,
+    contourImage TEXT,
     FOREIGN KEY (muestreoId) REFERENCES muestreos(id) ON DELETE CASCADE
 );
 """;
