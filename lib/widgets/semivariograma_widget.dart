@@ -42,7 +42,7 @@ class SemivariogramChart extends StatelessWidget {
           maxY: maxY * 1.06,
           lineBarsData: [
             _experimentalSemiVariance(),
-            //_sillLineData(),
+            _sillLineData(),
             _rangeLineData(),
             _modelSemiVarianceLineData(),
           ],
@@ -115,12 +115,12 @@ class SemivariogramChart extends StatelessWidget {
           ),
         ),
       ],
-      isCurved: false,
+      isCurved: true,
       barWidth: 2.5,
       color: kMainColor,
       isStrokeCapRound: false,
       dotData: const FlDotData(
-        show: true,
+        show: false,
       ),
     );
   }
@@ -133,7 +133,7 @@ class SemivariogramChart extends StatelessWidget {
           sill,
         ),
         FlSpot(
-          maxY * 1.06,
+          maxX * 1.06,
           sill,
         ),
       ],

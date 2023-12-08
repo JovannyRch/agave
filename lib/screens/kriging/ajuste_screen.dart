@@ -4,7 +4,7 @@ import 'package:agave/backend/models/ajustes.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/const.dart';
 import 'package:agave/screens/Navigation.dart';
-import 'package:agave/screens/genera/image_loader.dart';
+import 'package:agave/screens/general/image_loader.dart';
 import 'package:agave/utils/models.dart';
 import 'package:agave/widgets/RoundedButton.dart';
 import 'package:agave/widgets/card_detail.dart';

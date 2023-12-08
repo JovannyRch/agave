@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CardDetail extends StatelessWidget {
   String title;
@@ -34,50 +35,65 @@ class CardDetail extends StatelessWidget {
           ),
         ], */
       ),
-      child: icon != null ? _columnWithIcon(context, _content()) : _content(),
+      child: icon != null
+          ? _columnWithIcon(
+              context,
+              _content(context),
+            )
+          : _content(context),
     );
   }
 
-  Widget _content() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment:
-          isCenter ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.black38,
+  Widget _content(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        copyTextToClipboard(value);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Copiado al portapapeles'),
           ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment:
-              isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
-          children: [
-            Text(
-              cutText(value, unit != null ? 12 : 16),
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                overflow: TextOverflow.ellipsis,
-              ),
-              maxLines: 2,
+        );
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment:
+            isCenter ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.black38,
             ),
-            if (unit != null) const SizedBox(width: 3),
-            if (unit != null)
+          ),
+          const SizedBox(height: 10),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment:
+                isCenter ? MainAxisAlignment.center : MainAxisAlignment.start,
+            children: [
               Text(
-                unit!,
+                cutText(value, unit != null ? 12 : 16),
                 style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.black38,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                maxLines: 2,
               ),
-          ],
-        )
-      ],
+              if (unit != null) const SizedBox(width: 3),
+              if (unit != null)
+                Text(
+                  unit!,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black38,
+                  ),
+                ),
+            ],
+          )
+        ],
+      ),
     );
   }
 
@@ -103,5 +119,9 @@ class CardDetail extends StatelessWidget {
         content,
       ],
     );
+  }
+
+  void copyTextToClipboard(String text) async {
+    await Clipboard.setData(ClipboardData(text: text));
   }
 }

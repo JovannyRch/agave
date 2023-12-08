@@ -26,3 +26,15 @@ String getModelName(VariogramModel model) {
       return 'Esférico';
   }
 }
+
+VariogramModel getVariogramModel(String model) {
+  if (model == 'spherical') {
+    return VariogramModel.spherical;
+  } else if (model == 'gaussian') {
+    return VariogramModel.gaussian;
+  } else if (model == 'exponential') {
+    return VariogramModel.exponential;
+  } else {
+    return VariogramModel.spherical;
+  }
+}

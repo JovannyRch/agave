@@ -51,6 +51,36 @@ class Api {
     throw Exception('Failed to load semivariogram');
   }
 
+  static Future<SemivariogramaResponse?> getCustomSemivariogram(
+    List<List<double>> points,
+    int n_lags,
+    double sill,
+    double range,
+    double nugget,
+    String model,
+  ) async {
+    final response = await http.post(
+      Uri.parse(getApiUrl("/custom_semivariogram")),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        "points": points,
+        "n_lags": n_lags,
+        "sill": sill,
+        "range": range,
+        "nugget": nugget,
+        "variogram_model": model,
+        "testing": await UserData.isTesting()
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return SemivariogramaResponse.fromJson(response.body);
+    }
+    throw Exception('Failed to load semivariogram');
+  }
+
   static Future<KrigingContourResponse?> getKrigingContour(
     List<List<double>> points,
     String variogram_model,

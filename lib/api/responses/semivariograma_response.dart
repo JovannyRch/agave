@@ -7,6 +7,7 @@ class SemivariogramaResponse {
   double? nugget;
   double? sill;
   double? range;
+  String? model;
 
   SemivariogramaResponse({
     this.lags,
@@ -15,6 +16,7 @@ class SemivariogramaResponse {
     this.nugget,
     this.sill,
     this.range,
+    this.model,
   });
 
   SemivariogramaResponse.fromJson(String jsonResponse) {
@@ -25,6 +27,7 @@ class SemivariogramaResponse {
     nugget = double.parse(json['nugget'].toString());
     sill = double.parse(json['sill'].toString());
     range = double.parse(json['range'].toString());
+    model = json['model'];
   }
 
   Map<String, dynamic> toJson() {
@@ -34,6 +37,7 @@ class SemivariogramaResponse {
     data['semivariance'] = this.semivariance;
     data['nugget'] = this.nugget;
     data['sill'] = this.sill;
+    data['range'] = this.range;
     return data;
   }
 }

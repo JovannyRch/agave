@@ -7,7 +7,7 @@ import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/user_data.dart';
 import 'package:agave/const.dart';
-import 'package:agave/screens/genera/image_loader.dart';
+import 'package:agave/screens/general/image_loader.dart';
 import 'package:agave/screens/kriging/ajuste_screen.dart';
 import 'package:agave/screens/kriging/new_ajuste_screen.dart';
 import 'package:agave/utils/exportIncidencias.dart';
@@ -177,7 +177,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
           ),
         ),
         subtitle: Text(
-          'Incidencia: ${incidencia.value}',
+          'Incidencia ${incidencia.id}: ${incidencia.value}',
           style: const TextStyle(
             fontSize: 12.0,
             fontWeight: FontWeight.bold,

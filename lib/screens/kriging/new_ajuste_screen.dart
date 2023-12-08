@@ -6,6 +6,7 @@ import 'package:agave/api/responses/semivariograma_response.dart';
 import 'package:agave/backend/models/ajustes.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/const.dart';
+import 'package:agave/screens/kriging/ajuste_manual.dart';
 import 'package:agave/widgets/RoundedButton.dart';
 import 'package:agave/widgets/card_detail.dart';
 import 'package:agave/widgets/card_image.dart';
@@ -359,8 +360,51 @@ class _NewAjusteScreenState extends State<NewAjusteScreen> {
         children: [
           Expanded(
             child: RoundedButton(
-              onPressed: () {
-                Navigator.pop(context, _semivariogramaResponse);
+              onPressed: () async {
+                Map<String, Object>? response = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AjusteManualScreen(
+                      lags: _semivariogramaResponse!.lags!,
+                      semivariance: _semivariogramaResponse!.semivariance!,
+                      sill: _semivariogramaResponse!.sill!,
+                      range: _semivariogramaResponse!.range!,
+                      nugget: _semivariogramaResponse!.nugget!,
+                      model: selectedModel.toString().split('.').last,
+                    ),
+                  ),
+                );
+
+                if (response != null) {
+                  try {
+                    setState(() {
+                      _isLoadingSemivariogram = true;
+                      selectedModel = response['model'] as VariogramModel;
+                    });
+
+                    int nLags = int.parse(_nLagsController.text);
+
+                    _semivariogramaResponse = await Api.getCustomSemivariogram(
+                      widget.points,
+                      nLags,
+                      response['sill'] as double,
+                      response['range'] as double,
+                      response['nugget'] as double,
+                      selectedModel.toString().split('.').last,
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            'Error al obtener el semivariograma, revise los valores del modelo'),
+                      ),
+                    );
+                  } finally {
+                    setState(() {
+                      _isLoadingSemivariogram = false;
+                    });
+                  }
+                }
               },
               icon: Icons.draw,
               text: 'Ajuste manual',

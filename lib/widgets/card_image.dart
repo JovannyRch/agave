@@ -1,4 +1,4 @@
-import 'package:agave/screens/genera/image_loader.dart';
+import 'package:agave/screens/general/image_loader.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 

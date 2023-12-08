@@ -17,6 +17,7 @@ List<double> calculateSphericalModelSemivariance(
 List<double> calculateLinearModelSemivariance(
     List<double> lags, double nugget, double sill, double range) {
   double slope = (sill - nugget) / range;
+  lags.insert(0, 0);
 
   return lags.map((h) {
     if (h > range) {
@@ -39,5 +40,19 @@ List<double> calculateExponentialModelSemivariance(
     List<double> lags, double nugget, double sill, double range) {
   return lags.map((h) {
     return nugget + (sill - nugget) * (1 - math.exp(-3 * h / range));
+  }).toList();
+}
+
+List<double> calculateCubicModelSemivariance(
+    List<double> lags, double nugget, double sill, double range) {
+  return lags.map((h) {
+    if (h <= range) {
+      return nugget +
+          (sill - nugget) *
+              (1.5 * (h / range) -
+                  0.5 * (h / range) * (h / range) * (h / range));
+    } else {
+      return nugget + (sill - nugget);
+    }
   }).toList();
 }
