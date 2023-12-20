@@ -105,10 +105,6 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ListView(
         physics: const BouncingScrollPhysics(),
         children: [
-          /*  _accesoDirectoWidget(context), */
-          /*   _busquedaRapidaWidget(), */
-          /*    _estadoDelCultivoWidget(),
-          const SizedBox(height: 10), // Espaciado entre widgets */
           _countsWidget(),
           if (ultimaPlaga != null) ...[
             const SizedBox(height: 20),

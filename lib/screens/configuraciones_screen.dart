@@ -15,6 +15,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
   String tipoCoordenadas = "UTM";
   bool isLoading = true;
   bool isTestingMode = false;
+  Size? size;
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Configuración'),
@@ -128,8 +130,75 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         _plagas(context),
         _tiposPlanta(context),
         _tipoCoordenadasDropDown(context),
-        _testingDataModeSwitch(context),
-        _limpiarActividad(context),
+        /*  _testingDataModeSwitch(context),
+        _limpiarActividad(context), */
+        //About the app
+        ListTile(
+          title: const Text('Acerca de la aplicación'),
+          trailing: const Icon(Icons.arrow_forward),
+          onTap: () {
+            // Acción para mostrar información de la aplicación
+            //Show dialog with the information of the app
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('Acerca de la aplicación'),
+                  content: SizedBox(
+                    height: size!.height * 0.4,
+                    child: const Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        /* About the app */
+                        Text(
+                          APP_NAME,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          'Aplicación para el registro de plagas en plantas de agave y generación de semivariogramas y mapas de contorno para el análisis de datos.',
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Versión 1.0.0',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Desarrollado por:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          'Ing. Esther Pino Miranda',
+                        ),
+                        /* Add email pinomiranda234@gmail.com */
+                        SizedBox(height: 10),
+                        Text(
+                          'pinomiranda234@gmail.com',
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cerrar'),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
 
         /*  ListTile(
           title: const Text('Exportar datos'),
