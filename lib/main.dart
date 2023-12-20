@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Kriging App',
+      title: APP_NAME,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: kMainColor),
       home: const Navigation(),

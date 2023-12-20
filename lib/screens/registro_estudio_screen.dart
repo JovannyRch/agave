@@ -114,12 +114,12 @@ class _RegistroEstudioState extends State<RegistroEstudio> {
       estudio.observaciones = _observaciones;
     }
 
-    _model?.add(estudio);
+    Estudio? newEstudio = await _model?.add(estudio);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Estudio guardado con éxito!')),
     );
-    Navigator.pop(context);
+    Navigator.pop(context, newEstudio);
   }
 
   Widget _obervacionesInput() {

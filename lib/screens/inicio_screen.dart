@@ -10,12 +10,15 @@ import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/user_data.dart';
 import 'package:agave/const.dart';
+import 'package:agave/screens/estudios/estudio_details_screen.dart';
 import 'package:agave/screens/muestreos/muestreo_details_screen.dart';
+import 'package:agave/screens/registro_estudio_screen.dart';
 import 'package:agave/utils/formatDate.dart';
 import 'package:agave/utils/randomColor.dart';
 import 'package:agave/utils/truncateText.dart';
 import 'package:agave/widgets/actividad_item.dart';
 import 'package:agave/widgets/home_list_item.dart';
+import 'package:agave/widgets/submit_button.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,11 +36,14 @@ class _HomeScreenState extends State<HomeScreen> {
       GlobalKey<RefreshIndicatorState>();
 
   ReportesModel? _reportesModel;
+  EstudiosModel? _estudiosModel;
 
   bool isLoading = true;
   List<Actividad> actividades = [];
   UltimaPlaga? ultimaPlaga;
   MuestreosModel? _muestreosModel;
+  bool isDataEmpty = false;
+  Size _size = Size(0, 0);
 
   @override
   void initState() {
@@ -53,6 +59,10 @@ class _HomeScreenState extends State<HomeScreen> {
     actividades = await UserData.obtenerActividadReciente();
     ultimaPlaga = await UserData.obtenerUltimaPlaga();
 
+    if (actividades.isEmpty && ultimaPlaga == null) {
+      isDataEmpty = true;
+    }
+
     setState(() {
       isLoading = false;
     });
@@ -66,6 +76,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     _muestreosModel = Provider.of<MuestreosModel>(context);
     _reportesModel = Provider.of<ReportesModel>(context);
+    _estudiosModel = Provider.of<EstudiosModel>(context);
+    _size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inicio'),
@@ -97,15 +109,61 @@ class _HomeScreenState extends State<HomeScreen> {
           /*   _busquedaRapidaWidget(), */
           /*    _estadoDelCultivoWidget(),
           const SizedBox(height: 10), // Espaciado entre widgets */
-          if (ultimaPlaga != null) _ultimaPlagaDetectadaWidget(),
-          if (ultimaPlaga != null) const SizedBox(height: 20),
-          _actividadRecienteWidget(),
-          const SizedBox(height: 20),
-          _distribucionPlagasWidget(),
-          const SizedBox(height: 20),
+          if (ultimaPlaga != null) ...[
+            _ultimaPlagaDetectadaWidget(),
+            const SizedBox(height: 20)
+          ],
+          if (isDataEmpty) _zeroState(),
+          if (!isDataEmpty) ...[
+            _actividadRecienteWidget(),
+            const SizedBox(height: 20),
+            _distribucionPlagasWidget(),
+            const SizedBox(height: 20),
+          ]
           /*  _evolucionCultivoWidget(),
           const SizedBox(height: 20),
           _incidenciasParcelaWidget(), */
+        ],
+      ),
+    );
+  }
+
+  Widget _zeroState() {
+    return SizedBox(
+      height: _size.height * 0.75,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.search,
+            size: 75,
+            color: kMainColor,
+          ),
+          const SizedBox(height: 20),
+          const Text("No hay datos para mostrar"),
+          /* Action button */
+          SubmitButton(
+            text: 'Registrar Estudio',
+            onPressed: () async {
+              Estudio? lastEstudio = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegistroEstudio(),
+                ),
+              );
+              _refresh();
+
+              if (lastEstudio != null) {
+                _estudiosModel!.setSelected(lastEstudio);
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EstudioDetailsScreen(),
+                  ),
+                );
+              }
+            },
+          ),
         ],
       ),
     );

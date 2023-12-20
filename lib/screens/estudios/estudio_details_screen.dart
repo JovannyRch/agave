@@ -7,6 +7,7 @@ import 'package:agave/widgets/single_card_detail.dart';
 import 'package:agave/screens/parcelas/parcelas_screen.dart';
 import 'package:agave/screens/parcelas_details_screen.dart';
 import 'package:agave/screens/registro_estudio_screen.dart';
+import 'package:agave/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -193,9 +194,37 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
   }
 
   Widget _emptyList() {
-    return const Center(
-      child: Text(
-        'No hay parcelas asociadas a este estudio',
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(
+            height: 50.0,
+          ),
+          const Icon(
+            Icons.nature,
+            size: 100.0,
+            color: Colors.grey,
+          ),
+          const SizedBox(
+            height: 20.0,
+          ),
+          const Text(
+            'No hay parcelas asociadas a este estudio',
+          ),
+          SubmitButton(
+            text: 'Asociar Parcela',
+            onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ParcelasScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

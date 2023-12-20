@@ -7,8 +7,7 @@ import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/user_data.dart';
 import 'package:agave/const.dart';
-import 'package:agave/screens/general/image_loader.dart';
-import 'package:agave/screens/kriging/ajuste_screen.dart';
+import 'package:agave/screens/genera/image_loader.dart';
 import 'package:agave/screens/kriging/new_ajuste_screen.dart';
 import 'package:agave/utils/exportIncidencias.dart';
 import 'package:agave/utils/formatDate.dart';
@@ -17,6 +16,7 @@ import 'package:agave/widgets/calculos_bottom_sheet.dart';
 import 'package:agave/widgets/card_detail.dart';
 import 'package:agave/widgets/screen_title.dart';
 import 'package:agave/screens/incidencias/registro_indicencias_screen.dart';
+import 'package:agave/widgets/submit_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -155,12 +155,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   List<Widget> _incidenciasList() {
     if (!hasIncidencias) {
       return [
-        const SizedBox(
-          height: 150.0,
-          child: Center(
-            child: Text('No hay registros'),
-          ),
-        ),
+        _zeroState(),
       ];
     }
 
@@ -200,6 +195,43 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
         },
       );
     }).toList();
+  }
+
+  Widget _zeroState() {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.bug_report,
+            size: 75,
+            color: kMainColor,
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'No hay incidencias registradas',
+          ),
+          /* Action button */
+          SubmitButton(
+            text: 'Registrar Incidencia',
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegistroIncidenciasScreen(
+                    idMuestreo: widget.muestreo.id ?? -1,
+                    muestreo: widget.muestreo,
+                    parcela: widget.parcela,
+                    isUtm: isUTM,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   String _getCoordenadas(Incidencia incidencia) {

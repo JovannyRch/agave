@@ -10,6 +10,7 @@ import 'package:agave/const.dart';
 import 'package:agave/screens/muestreos/muestreo_details_screen.dart';
 import 'package:agave/screens/muestreos/registro_muestreo_screen.dart';
 import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
+import 'package:agave/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -229,27 +230,39 @@ class _DetallesParcelaState extends State<DetallesParcela> {
     return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: _refresh,
-      child: _model!.muestreos.isEmpty ? _emptyList() : _list(),
+      child: _model!.muestreos.isEmpty ? _zeroState() : _list(),
     );
   }
 
-  Widget _emptyList() {
-    return const Center(
+  Widget _zeroState() {
+    return SizedBox(
+      width: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.bug_report,
-            size: 50,
-            color: Colors.black45,
+            size: 75,
+            color: kMainColor,
           ),
-          SizedBox(height: 20),
-          Text(
-            "No hay muestreos registrados",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black38,
-            ),
+          const SizedBox(height: 20),
+          const Text(
+            'No hay muestreos registrados',
+          ),
+          /* Action button */
+          SubmitButton(
+            text: 'Registrar Muestreo',
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegistroMuestreo(
+                    idEstudio: widget.estudio.id ?? -1,
+                    idParcela: widget.parcela.id ?? -1,
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),

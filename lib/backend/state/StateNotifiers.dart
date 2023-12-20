@@ -110,7 +110,7 @@ class EstudiosModel with ChangeNotifier {
     notifyListeners();
   }
 
-  add(Estudio estudio) async {
+  Future<Estudio?> add(Estudio estudio) async {
     Estudio newItem = await EstudiosProvider.db.insert(estudio);
     _estudios.add(newItem);
 
@@ -124,11 +124,23 @@ class EstudiosModel with ChangeNotifier {
     );
 
     notifyListeners();
+    return newItem;
   }
 
   delete(int id) async {
     await EstudiosProvider.db.delete(id, DB.estudios);
     _estudios.removeWhere((item) => item.id == id);
+    List<Actividad> actividadRecientes =
+        await UserData.obtenerActividadReciente();
+    for (Actividad actividad in actividadRecientes) {
+      if (actividad.id == id &&
+          (actividad.tipo == TipoActividad.nuevo_estudio ||
+              actividad.tipo == TipoActividad.update_estudio)) {
+        actividadRecientes.remove(actividad);
+        break;
+      }
+    }
+    await UserData.guardarActividadReciente(actividadRecientes);
     notifyListeners();
   }
 

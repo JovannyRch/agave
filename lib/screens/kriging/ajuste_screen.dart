@@ -3,15 +3,12 @@ import 'package:agave/api/responses/kriging_contour_response.dart';
 import 'package:agave/backend/models/ajustes.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/const.dart';
-import 'package:agave/screens/Navigation.dart';
-import 'package:agave/screens/general/image_loader.dart';
 import 'package:agave/utils/models.dart';
 import 'package:agave/widgets/RoundedButton.dart';
 import 'package:agave/widgets/card_detail.dart';
 import 'package:agave/widgets/card_image.dart';
 import 'package:agave/widgets/semivariograma_widget.dart';
 import 'package:agave/widgets/submit_button.dart';
-import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
@@ -208,7 +205,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
   }
 
   void _viewHeatMap() async {
-    Navigator.push(
+    /*  Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ImageLoaderScreen(
@@ -216,7 +213,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
           title: "Mapa de contorno",
         ),
       ),
-    );
+    ); */
   }
 
   void _save() {
@@ -483,7 +480,8 @@ class _AjusteScreenState extends State<AjusteScreen> {
   }
 
   List<Widget> chartContent() {
-    return [
+    return [];
+    /*  return [
       SizedBox(
         height: _size.height - 430,
         child: isLoadingSemiVariance
@@ -496,6 +494,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
               )
             : SemivariogramChart(
                 lags: lags,
+                la
                 semivariance: semivariance,
                 modelSemivariance: modelSemivariance,
                 range: range,
@@ -508,7 +507,7 @@ class _AjusteScreenState extends State<AjusteScreen> {
       isLoadingSemiVariance ? Container() : _chartLegend(),
       const SizedBox(height: 20.0),
       ..._showBodyContent()
-    ];
+    ]; */
   }
 
   Widget _chartLegend() {

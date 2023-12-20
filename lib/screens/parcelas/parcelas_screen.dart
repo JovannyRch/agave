@@ -3,6 +3,7 @@ import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/screens/parcelas/registro_parcela_screen.dart';
+import 'package:agave/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -104,20 +105,65 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
     return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: _refresh,
-      child: list.isEmpty
-          ? Center(
-              child: Text(
-                _searchText.isEmpty
-                    ? 'No hay parcelas registradas'
-                    : 'No hay resultados para la búsqueda',
-              ),
-            )
-          : listBuilder,
+      child: list.isEmpty ? _zeroState() : listBuilder,
     );
   }
 
   Future<void> _refresh() async {
     Provider.of<ParcelaModel>(context, listen: false).fetchData();
+  }
+
+  Widget _zeroState() {
+    if (_searchText.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.nature,
+              size: 100.0,
+              color: Colors.grey,
+            ),
+            const SizedBox(
+              height: 20.0,
+            ),
+            const Text(
+              'Aún no hay parcelas registradas',
+            ),
+            SubmitButton(
+              text: 'Registrar Parcela',
+              onPressed: () async {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RegistroParcelaScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.nature,
+            size: 100.0,
+            color: Colors.grey,
+          ),
+          const SizedBox(
+            height: 20.0,
+          ),
+          const Text(
+            'No hay resultados para la búsqueda',
+          ),
+        ],
+      ),
+    );
   }
 
   void _showDeleteConfirmationDialog(BuildContext context) {
