@@ -1,5 +1,6 @@
 import 'package:agave/backend/models/database.dart';
 import 'package:agave/backend/models/incidencia_plaga.dart';
+import 'package:agave/backend/models/reporteConteo.dart';
 import 'package:agave/backend/providers/base_provider.dart';
 
 class ReportesProvider extends BaseProvider {
@@ -52,6 +53,32 @@ class ReportesProvider extends BaseProvider {
     }
 
     resultado = resultado.where((element) => element.cantidad != 0).toList();
+
+    return resultado;
+  }
+
+  Future<ReporteConteo> reporteConteo() async {
+    final db = await database;
+    ReporteConteo resultado = ReporteConteo();
+
+    //Get total of estudios
+    final res = await db!.rawQuery("SELECT count(*) total from ${DB.estudios}");
+    resultado.estudios = res.first['total'] == null
+        ? 0
+        : int.parse(res.first['total'].toString());
+
+    //Get total of parcelas
+    final res2 = await db.rawQuery("SELECT count(*) total from ${DB.parcelas}");
+    resultado.parcelas = res2.first['total'] == null
+        ? 0
+        : int.parse(res2.first['total'].toString());
+
+    //Get total of muestreos
+    final res3 =
+        await db.rawQuery("SELECT count(*) total from ${DB.muestreos}");
+    resultado.muestreos = res3.first['total'] == null
+        ? 0
+        : int.parse(res3.first['total'].toString());
 
     return resultado;
   }

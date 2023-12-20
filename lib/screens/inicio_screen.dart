@@ -109,10 +109,12 @@ class _HomeScreenState extends State<HomeScreen> {
           /*   _busquedaRapidaWidget(), */
           /*    _estadoDelCultivoWidget(),
           const SizedBox(height: 10), // Espaciado entre widgets */
+          _countsWidget(),
           if (ultimaPlaga != null) ...[
+            const SizedBox(height: 20),
             _ultimaPlagaDetectadaWidget(),
-            const SizedBox(height: 20)
           ],
+          const SizedBox(height: 20),
           if (isDataEmpty) _zeroState(),
           if (!isDataEmpty) ...[
             _actividadRecienteWidget(),
@@ -125,6 +127,50 @@ class _HomeScreenState extends State<HomeScreen> {
           _incidenciasParcelaWidget(), */
         ],
       ),
+    );
+  }
+
+  Widget _countsWidget() {
+    return Card(
+      elevation: 4.0,
+      child: Padding(
+        padding: const EdgeInsets.only(
+          bottom: 20.0,
+        ),
+        child: Column(
+          children: [
+            const ListTile(
+              title: Text('Conteo'),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _countWidget(
+                    "Parcelas", _reportesModel!.reporteConteo!.parcelas),
+                _countWidget(
+                    "Estudios", _reportesModel!.reporteConteo!.estudios),
+                _countWidget(
+                    "Muestreos", _reportesModel!.reporteConteo!.muestreos),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _countWidget(String title, int count) {
+    return Column(
+      children: [
+        Text(
+          "$count",
+          style: const TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(title),
+      ],
     );
   }
 

@@ -8,6 +8,7 @@ import 'package:agave/backend/models/incidencia_plaga.dart';
 import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/models/plaga.dart';
+import 'package:agave/backend/models/reporteConteo.dart';
 import 'package:agave/backend/providers/agave_provider.dart';
 import 'package:agave/backend/providers/ajustes_provider.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
@@ -294,11 +295,15 @@ class IncidenciasModel with ChangeNotifier {
 
 class ReportesModel with ChangeNotifier {
   List<IncidenciaPlaga> _incidenciasPlaga = [];
+  ReporteConteo? _reporteConteo;
 
   List<IncidenciaPlaga> get incidenciasPlaga => _incidenciasPlaga;
 
+  ReporteConteo? get reporteConteo => _reporteConteo;
+
   fetchData() async {
     _incidenciasPlaga = await ReportesProvider.db.incidenciasPorPlaga();
+    _reporteConteo = await ReportesProvider.db.reporteConteo();
     notifyListeners();
   }
 }

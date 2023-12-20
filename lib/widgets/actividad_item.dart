@@ -60,7 +60,7 @@ class _ActividadItemState extends State<ActividadItem> {
                   Text(
                     getTitle(),
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -68,7 +68,7 @@ class _ActividadItemState extends State<ActividadItem> {
                   Text(
                     formatDate(widget.actividad.fecha),
                     style: const TextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       color: Colors.grey,
                     ),
                   ),
@@ -84,7 +84,7 @@ class _ActividadItemState extends State<ActividadItem> {
 
   String getTitle() {
     if (widget.actividad.tipo == TipoActividad.nuevo_estudio) {
-      return "Estudio nuevo \"${widget.actividad.titulo}\"";
+      return "Nuevo Estudio \"${widget.actividad.titulo}\"";
     }
 
     if (widget.actividad.tipo == TipoActividad.update_estudio) {
@@ -92,7 +92,7 @@ class _ActividadItemState extends State<ActividadItem> {
     }
 
     if (widget.actividad.tipo == TipoActividad.nueva_plaga) {
-      return "Plaga agregada \"${widget.actividad.titulo}\"";
+      return "Nueva plaga registrada \"${widget.actividad.titulo}\"";
     }
 
     if (widget.actividad.tipo == TipoActividad.nueva_parcela) {
