@@ -90,12 +90,64 @@ class _ParcelasScreenState extends State<ParcelasScreen> {
       itemBuilder: (context, index) {
         return ListTile(
           title: Text(list[index].nombre ?? ""),
-          trailing: IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () async {
-              _estudiosModel!.addParcela(list[index]);
-              Navigator.pop(context);
-            },
+          trailing: SizedBox(
+            width: 100,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () async {
+                    bool ok = await _estudiosModel!.addParcela(list[index]);
+
+                    if (ok) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Parcela agregada correctamente'),
+                        ),
+                      );
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('La parcela ya está asociada'),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Eliminar parcela'),
+                          content: const Text(
+                              '¿Estás seguro de que quieres eliminar esta parcela y sus registros? Esta acción no se puede deshacer.'),
+                          actions: [
+                            TextButton(
+                              child: const Text('Cancelar'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            TextButton(
+                              child: const Text('Eliminar',
+                                  style: TextStyle(color: Colors.red)),
+                              onPressed: () {
+                                _model?.delete(list[index].id ?? -1);
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
           subtitle: Text('${list[index].tipoAgave}'),
         );

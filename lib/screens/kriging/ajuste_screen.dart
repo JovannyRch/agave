@@ -75,7 +75,6 @@ class _AjusteScreenState extends State<AjusteScreen> {
     super.initState();
     //Future 1 sec
     Future.delayed(Duration(milliseconds: 250), () {
-      print(widget.points);
       if (widget.ajuste == null) {
         showLagsForm();
       }

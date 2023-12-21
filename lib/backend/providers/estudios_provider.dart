@@ -41,28 +41,35 @@ class EstudiosProvider extends BaseProvider {
     return res;
   }
 
-  Future<Parcela> joinParcela(int idEstudio, int idParcela) async {
+  Future<Parcela?> joinParcela(int idEstudio, int idParcela) async {
     final db = await database;
+
+    final res = await db!.rawQuery(
+        "SELECT * FROM estudios_parcelas WHERE idEstudio = $idEstudio AND idParcela = $idParcela");
+
+    if (res.isNotEmpty) {
+      return null;
+    }
+
     await db!.insert("estudios_parcelas", {
       "idEstudio": idEstudio,
       "idParcela": idParcela,
     });
 
-    final res = await db.rawQuery(
+    final res2 = await db.rawQuery(
         "SELECT * FROM parcelas WHERE id = $idParcela ORDER BY id DESC LIMIT 1");
-    return Parcela.fromJson(res.first);
+    return Parcela.fromJson(res2.first);
   }
 
   Future<List<Parcela>> getParcelas(int idEstudio) async {
-    print("idEstudio ${idEstudio}");
     final db = await database;
-    final parcelasIds = await db!.rawQuery(
-        "SELECT parcelas.id FROM parcelas INNER JOIN estudios_parcelas ON estudios_parcelas.idParcela = parcelas.id WHERE estudios_parcelas.idEstudio = $idEstudio");
+    final parcelas = await db!.rawQuery(
+        "SELECT * FROM estudios_parcelas WHERE idEstudio = $idEstudio");
 
-    if (parcelasIds.isEmpty) return [];
+    if (parcelas.isEmpty) return [];
 
     return ParcelasProvider.db.getAllWithAgave(
         parcelasIds:
-            parcelasIds.map((e) => e['id'].toString()).join(',') ?? '');
+            parcelas.map((e) => e['idParcela'].toString()).join(',') ?? '');
   }
 }

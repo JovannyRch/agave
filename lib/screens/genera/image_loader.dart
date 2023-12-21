@@ -108,9 +108,7 @@ class _ImageLoaderScreenState extends State<ImageLoaderScreen> {
                   base64Image,
                 ),
               ).image;
-              showImageViewer(context, imageProvider, onViewerDismissed: () {
-                print("dismissed");
-              });
+              showImageViewer(context, imageProvider, onViewerDismissed: () {});
             },
             icon: Icons.fullscreen,
             text: 'Expandir',

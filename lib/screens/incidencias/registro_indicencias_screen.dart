@@ -361,7 +361,6 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
                 true,
               );
             } catch (e) {
-              print('Error obteniendo ubicación: $e');
               setState(() {
                 _loading = false;
               });

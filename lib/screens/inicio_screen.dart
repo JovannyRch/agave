@@ -62,6 +62,9 @@ class _HomeScreenState extends State<HomeScreen> {
     if (actividades.isEmpty && ultimaPlaga == null) {
       isDataEmpty = true;
     }
+    if (_reportesModel != null) {
+      await _reportesModel!.fetchData();
+    }
 
     setState(() {
       isLoading = false;
@@ -105,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ListView(
         physics: const BouncingScrollPhysics(),
         children: [
-          _countsWidget(),
+          if (!isDataEmpty) _countsWidget(),
           if (ultimaPlaga != null) ...[
             const SizedBox(height: 20),
             _ultimaPlagaDetectadaWidget(),
@@ -142,11 +145,11 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _countWidget(
-                    "Parcelas", _reportesModel!.reporteConteo!.parcelas),
+                    "Parcelas", _reportesModel?.reporteConteo?.parcelas ?? 0),
                 _countWidget(
-                    "Estudios", _reportesModel!.reporteConteo!.estudios),
+                    "Estudios", _reportesModel?.reporteConteo?.estudios ?? 0),
                 _countWidget(
-                    "Muestreos", _reportesModel!.reporteConteo!.muestreos),
+                    "Muestreos", _reportesModel?.reporteConteo?.muestreos ?? 0),
               ],
             ),
           ],

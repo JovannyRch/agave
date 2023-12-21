@@ -132,6 +132,17 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         _tipoCoordenadasDropDown(context),
         /*  _testingDataModeSwitch(context),
         _limpiarActividad(context), */
+
+        //rate app
+        /*    ListTile(
+          title: const Text('Calificar aplicación'),
+          trailing: const Icon(Icons.arrow_forward),
+          onTap: () {
+            // Acción para calificar la aplicación
+            _rateApp();
+          },
+        ), */
+
         //About the app
         ListTile(
           title: const Text('Acerca de la aplicación'),
@@ -159,7 +170,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          'Aplicación para el registro de plagas en plantas de agave y generación de semivariogramas y mapas de contorno para el análisis de datos.',
+                          'Aplicación para el monitoreo de plagas en plantas de agave y generación de semivariogramas y mapas de contorno para el análisis de datos.',
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 20),
@@ -178,12 +189,12 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          'Ing. Esther Pino Miranda',
+                          'Biol. Esther Pino Miranda',
                         ),
                         /* Add email pinomiranda234@gmail.com */
                         SizedBox(height: 10),
                         Text(
-                          'pinomiranda234@gmail.com',
+                          'Dr. José Francisco Ramírez Dávila',
                         ),
                       ],
                     ),
@@ -246,6 +257,8 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
       ),
     );
   }
+
+  void _rateApp() {}
 
   void _clearUserData(BuildContext context) {
     showDialog(

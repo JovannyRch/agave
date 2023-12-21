@@ -15,7 +15,6 @@ class AjustesProvider extends BaseProvider {
     final res =
         await db.rawQuery("SELECT * FROM $tabla ORDER BY id DESC LIMIT 1");
 
-    print('res: $res.first');
     return Ajuste.fromJson(res.first);
   }
 

@@ -28,6 +28,7 @@ class ParcelasProvider extends BaseProvider {
 
   Future<List<Parcela>> getAllWithAgave({String? parcelasIds}) async {
     final db = await database;
+
     final res = await db!.rawQuery(
         "SELECT $table.*, ${DB.plantas}.nombre AS tipoAgave FROM $table INNER JOIN ${DB.plantas} ON $table.idTipoAgave = ${DB.plantas}.id ${(parcelasIds == null || parcelasIds.isEmpty) ? '' : 'WHERE $table.id IN ($parcelasIds)'}");
     return res.isEmpty
@@ -58,6 +59,17 @@ class ParcelasProvider extends BaseProvider {
   Future<int> deleteOne(int id) async {
     final db = await database;
     final res = await db!.delete(table, where: '$id = ?', whereArgs: [id]);
+
+    await db!
+        .delete("estudios_parcelas", where: 'idParcela = ?', whereArgs: [id]);
+
     return res;
+  }
+
+  Future<bool> desvincular(int idEstudio, int idParcela) async {
+    final db = await database;
+    final res = await db!.rawDelete(
+        "DELETE FROM estudios_parcelas WHERE idEstudio = $idEstudio AND idParcela = $idParcela");
+    return res > 0;
   }
 }

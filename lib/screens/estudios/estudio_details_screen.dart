@@ -238,7 +238,7 @@ class _EstudioDetailsScreenState extends State<EstudioDetailsScreen> {
             title: list[index].nombre ?? "",
             subtitle: list[index].tipoAgave ?? "",
             icon: Icons.nature,
-            onTap: () {
+            onTap: () async {
               Navigator.push(
                 context,
                 MaterialPageRoute(

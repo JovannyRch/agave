@@ -43,6 +43,7 @@ class BaseProvider {
       onOpen: (Database db) async {
         /*  db.execute("DROP table if exists ${DB.ajustes}");
         db.execute(kTables.last); */
+        //db.execute("DELETE FROM estudios_parcelas");
       },
     );
   }

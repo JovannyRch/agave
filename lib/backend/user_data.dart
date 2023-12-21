@@ -23,7 +23,6 @@ class UserData {
   static Future<bool> isUtm() async {
     final prefs = await SharedPreferences.getInstance();
     String? tipoCoordenadas = prefs.getString('tipoCoordenadas') ?? 'UTM';
-    print('tipoCoordenadas: $tipoCoordenadas');
     return tipoCoordenadas == 'UTM';
   }
 

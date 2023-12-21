@@ -64,8 +64,6 @@ Future<bool> guardarImagen(String base64Image, String nombreArchivo) async {
 
     return true;
   } catch (e) {
-    // Manejo de errores, por ejemplo, imprimir el error
-    print('Error al guardar el archivo: $e');
     return false;
   }
 }
@@ -83,8 +81,6 @@ Future<bool> guardarCsv(String csvData, String nombreArchivo) async {
 
     return true;
   } catch (e) {
-    // Manejo de errores, por ejemplo, imprimir el error
-    print('Error al guardar el archivo: $e');
     return false;
   }
 }

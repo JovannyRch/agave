@@ -33,6 +33,18 @@ class PlagasModel with ChangeNotifier {
 
   delete(int id) async {
     await PlagasProvider.db.delete(id, DB.plagas);
+
+    List<Actividad> actividadRecientes =
+        await UserData.obtenerActividadReciente();
+
+    for (Actividad actividad in actividadRecientes) {
+      if (actividad.id == id && (actividad.tipo == TipoActividad.nueva_plaga)) {
+        actividadRecientes.remove(actividad);
+        break;
+      }
+    }
+    await UserData.guardarActividadReciente(actividadRecientes);
+
     _plagas.removeWhere((item) => item.id == id);
     notifyListeners();
   }
@@ -81,6 +93,19 @@ class AgavesModel with ChangeNotifier {
 
   delete(int id) async {
     await AgaveProvider.db.delete(id, DB.plantas);
+
+    List<Actividad> actividadRecientes =
+        await UserData.obtenerActividadReciente();
+
+    for (Actividad actividad in actividadRecientes) {
+      if (actividad.id == id &&
+          (actividad.tipo == TipoActividad.nuevo_tipo_agave)) {
+        actividadRecientes.remove(actividad);
+        break;
+      }
+    }
+    await UserData.guardarActividadReciente(actividadRecientes);
+
     _agaves.removeWhere((item) => item.id == id);
     notifyListeners();
   }
@@ -128,6 +153,12 @@ class EstudiosModel with ChangeNotifier {
     return newItem;
   }
 
+  desvincularParcela(int idParcela) async {
+    await ParcelasProvider.db.desvincular(_estudio!.id ?? 0, idParcela);
+    _parcelas.removeWhere((item) => item.id == idParcela);
+    notifyListeners();
+  }
+
   delete(int id) async {
     await EstudiosProvider.db.delete(id, DB.estudios);
     _estudios.removeWhere((item) => item.id == id);
@@ -169,15 +200,19 @@ class EstudiosModel with ChangeNotifier {
     fetchParcelas(estudio?.id ?? 0);
   }
 
-  addParcela(Parcela parcela) async {
-    Parcela newItem = await EstudiosProvider.db
+  Future<bool> addParcela(Parcela parcela) async {
+    Parcela? newItem = await EstudiosProvider.db
         .joinParcela(_estudio!.id ?? 0, parcela.id ?? 0);
+
+    if (newItem == null) {
+      return false;
+    }
     _parcelas.add(newItem);
     notifyListeners();
+    return true;
   }
 
   fetchParcelas(int id) async {
-    print("Fetch parcelas");
     _parcelas = await EstudiosProvider.db.getParcelas(_estudio!.id ?? 0);
     notifyListeners();
   }
@@ -210,6 +245,12 @@ class ParcelaModel with ChangeNotifier {
       ),
     );
 
+    notifyListeners();
+  }
+
+  delete(int id) async {
+    await ParcelasProvider.db.delete(id, DB.parcelas);
+    _parcelas.removeWhere((item) => item.id == id);
     notifyListeners();
   }
 }

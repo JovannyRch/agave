@@ -32,6 +32,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
   Parcela? parcela;
   Estudio? estudio;
   MuestreosModel? _model;
+  EstudiosModel? _estudiosModel;
 
   @override
   void initState() {
@@ -44,6 +45,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
   @override
   Widget build(BuildContext context) {
     _model = Provider.of<MuestreosModel>(context);
+    _estudiosModel = Provider.of<EstudiosModel>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
@@ -93,8 +95,8 @@ class _DetallesParcelaState extends State<DetallesParcela> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Eliminar Parcela"),
-          content: const Text("¿Estás seguro de eliminar esta parcela?"),
+          title: const Text("Desvincular parcela del estudio"),
+          content: const Text("¿Estás seguro de desvincular esta parcela?"),
           actions: [
             TextButton(
               style: TextButton.styleFrom(
@@ -110,11 +112,12 @@ class _DetallesParcelaState extends State<DetallesParcela> {
                 foregroundColor: Theme.of(context).primaryColor,
               ),
               onPressed: () async {
-                await ParcelasProvider.db.deleteOne(parcela!.id ?? -1);
+                await _estudiosModel
+                    ?.desvincularParcela(widget.parcela.id ?? -1);
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
               },
-              child: const Text("Eliminar"),
+              child: const Text("Desvincular"),
             ),
           ],
         );

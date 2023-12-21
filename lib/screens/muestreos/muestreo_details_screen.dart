@@ -609,7 +609,6 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
         );
       }
     } catch (e) {
-      print(e);
       Navigator.of(context).pop();
 
       ScaffoldMessenger.of(context).showSnackBar(
