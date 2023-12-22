@@ -1,4 +1,4 @@
-package com.example.agave
+package com.estherpino.krigingapp
 
 import io.flutter.embedding.android.FlutterActivity
 
