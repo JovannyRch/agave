@@ -182,6 +182,15 @@ class _ActividadItemState extends State<ActividadItem> {
     Estudio? estudio =
         await EstudiosProvider.db.getById(muestreo.idEstudio ?? -1);
 
+    if (parcela == null || estudio == null) {
+      //Shoe snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo encontrar la parcela o el estudio'),
+        ),
+      );
+      return;
+    }
     _muestreosModel!.setSelected(muestreo);
 
     Navigator.push(

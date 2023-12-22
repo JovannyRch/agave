@@ -38,6 +38,7 @@ class MuestreoDetailsScreen extends StatefulWidget {
 
 class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   IncidenciasModel? _model;
+  MuestreosModel? _muestreosModel;
   AjustesModel? _ajustesModel;
 
   bool isLoading = false;
@@ -73,6 +74,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     _model = Provider.of<IncidenciasModel>(context);
+    _muestreosModel = Provider.of<MuestreosModel>(context);
 
     hasIncidencias = _model?.incidencias.isNotEmpty ?? false;
     _ajustesModel = Provider.of<AjustesModel>(context);
@@ -459,8 +461,12 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
         PopupMenuButton<String>(
           onSelected: handleClick,
           itemBuilder: (BuildContext context) {
-            return {'Importar', 'Exportar', 'Eliminar registros'}
-                .map((String choice) {
+            return {
+              'Importar',
+              'Exportar',
+              'Eliminar registros',
+              'Eliminar muestreo'
+            }.map((String choice) {
               return PopupMenuItem<String>(
                 value: choice,
                 child: Text(choice),
@@ -482,8 +488,39 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
         break;
       case 'Eliminar registros':
         _eliminarRegistros();
+      case 'Eliminar muestreo':
+        _eliminarMuestreo();
         break;
     }
+  }
+
+  void _eliminarMuestreo() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Eliminar muestreo'),
+          content: const Text('¿Está seguro de eliminar este muestreo?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _model?.deleteAllIncidencias(_model?.incidencias ?? []);
+                await _muestreosModel?.delete(widget.muestreo.id ?? -1);
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Aceptar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _eliminarRegistros() async {

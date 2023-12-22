@@ -41,6 +41,11 @@ class UserData {
     prefs.setString('ultimaPlaga', jsonEncode(plaga.toJson()));
   }
 
+  static Future<void> eliminarUltimaPlaga() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('ultimaPlaga');
+  }
+
   static Future<UltimaPlaga?> obtenerUltimaPlaga() async {
     final prefs = await SharedPreferences.getInstance();
     String? jsonPlaga = prefs.getString('ultimaPlaga');

@@ -247,6 +247,12 @@ class _HomeScreenState extends State<HomeScreen> {
               .getOneWithPlaga(ultimaPlaga!.idMuestreo ?? -1);
           if (muestreo != null) {
             goToMuestreo(muestreo);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("No se pudo obtener el muestreo"),
+              ),
+            );
           }
         },
       ),
@@ -482,15 +488,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
     _muestreosModel!.setSelected(muestreo);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MuestreoDetailsScreen(
-          parcela: parcela!,
-          estudio: estudio,
-          muestreo: muestreo,
+    if (parcela != null && estudio != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MuestreoDetailsScreen(
+            parcela: parcela,
+            estudio: estudio,
+            muestreo: muestreo,
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("No se pudo obtener el muestreo"),
+        ),
+      );
+    }
   }
 }

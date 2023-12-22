@@ -42,10 +42,10 @@ class MuestreosProvider extends BaseProvider {
         : res.map((registro) => Muestreo.fromJson(registro)).toList();
   }
 
-  Future<Muestreo> getOneWithPlaga(int idMuestreo) async {
+  Future<Muestreo?> getOneWithPlaga(int idMuestreo) async {
     final db = await database;
     final res = await db!.rawQuery(
         "SELECT $tabla.*, plagas.nombre AS nombrePlaga FROM $tabla INNER JOIN plagas ON $tabla.idPlaga = plagas.id WHERE $tabla.id = $idMuestreo");
-    return res.isEmpty ? Muestreo() : Muestreo.fromJson(res.first);
+    return res.isEmpty ? null : Muestreo.fromJson(res.first);
   }
 }

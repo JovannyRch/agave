@@ -270,8 +270,9 @@ class MuestreosModel with ChangeNotifier {
 
   add(Muestreo muestreo) async {
     Muestreo newItem = await MuestreosProvider.db.insert(muestreo);
-    Muestreo newItemWithPlaga =
+    Muestreo? newItemWithPlaga =
         await MuestreosProvider.db.getOneWithPlaga(newItem.id ?? 0);
+    if (newItemWithPlaga == null) return;
     _muestreos.add(newItemWithPlaga);
     UserData.addActividad(
       Actividad(
@@ -281,6 +282,31 @@ class MuestreosModel with ChangeNotifier {
         tipo: TipoActividad.new_muestreo,
       ),
     );
+
+    notifyListeners();
+  }
+
+  delete(int id) async {
+    await MuestreosProvider.db.delete(id, DB.muestreos);
+    _muestreos.removeWhere((item) => item.id == id);
+
+    List<Actividad> actividadRecientes =
+        await UserData.obtenerActividadReciente();
+
+    for (Actividad actividad in actividadRecientes) {
+      if (actividad.id == id &&
+          (actividad.tipo == TipoActividad.new_muestreo)) {
+        actividadRecientes.remove(actividad);
+        break;
+      }
+    }
+
+    await UserData.guardarActividadReciente(actividadRecientes);
+
+    final ultimaPlaga = await UserData.obtenerUltimaPlaga();
+    if (ultimaPlaga?.idMuestreo == id) {
+      await UserData.eliminarUltimaPlaga();
+    }
 
     notifyListeners();
   }
@@ -311,6 +337,7 @@ class IncidenciasModel with ChangeNotifier {
   Future delete(int id) async {
     await IncidenciasProvider.db.delete(id, DB.incidencias);
     _incidencias.removeWhere((item) => item.id == id);
+
     notifyListeners();
   }
 

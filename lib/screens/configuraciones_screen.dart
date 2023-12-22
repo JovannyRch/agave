@@ -130,8 +130,8 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
         _plagas(context),
         _tiposPlanta(context),
         _tipoCoordenadasDropDown(context),
-        /*  _testingDataModeSwitch(context),
-        _limpiarActividad(context), */
+        /*  _testingDataModeSwitch(context),*/
+        _limpiarActividad(context),
 
         //rate app
         /*    ListTile(
