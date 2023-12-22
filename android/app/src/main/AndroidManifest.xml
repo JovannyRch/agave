@@ -2,7 +2,7 @@
     <application
         android:label="Kriging App"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAql34T4IrMPnXk-19n-c-5uQ28DaUt8dM"/>
         <activity
