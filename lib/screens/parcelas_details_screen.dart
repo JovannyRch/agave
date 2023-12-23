@@ -75,9 +75,7 @@ class _DetallesParcelaState extends State<DetallesParcela> {
               ),
             ),
           );
-          Future.delayed(const Duration(milliseconds: 500), () {
-            _refresh();
-          });
+          await _refresh();
         },
         child: const Icon(Icons.add),
       ),

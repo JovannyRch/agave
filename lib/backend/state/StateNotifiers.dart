@@ -276,7 +276,6 @@ class MuestreosModel with ChangeNotifier {
   }
 
   add(Muestreo muestreo) async {
-    print("Adding muestreo ${muestreo.toJson()}");
     Muestreo newItem = await MuestreosProvider.db.insert(muestreo);
 
     if (newItem.tipo == Muestreo.TIPO_PLAGA) {
@@ -302,6 +301,9 @@ class MuestreosModel with ChangeNotifier {
         ),
       );
     }
+
+    //Fetch data
+    this.fetchData(muestreo.idEstudio ?? 0, muestreo.idParcela ?? 0);
 
     notifyListeners();
   }

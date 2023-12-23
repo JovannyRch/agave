@@ -181,7 +181,6 @@ class _RegistroMuestreoState extends State<RegistroMuestreo> {
       }
 
       _muestreosModel?.add(muestreo);
-      _muestreosModel?.fetchData(widget.idEstudio, widget.idParcela);
       Navigator.pop(context);
     }
   }
@@ -205,7 +204,6 @@ class _RegistroMuestreoState extends State<RegistroMuestreo> {
       }
 
       _muestreosModel?.add(muestreo);
-      _muestreosModel?.fetchData(widget.idEstudio, widget.idParcela);
 
       Navigator.pop(context);
     }

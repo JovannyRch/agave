@@ -156,9 +156,10 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                 return AlertDialog(
                   title: const Text('Acerca de la aplicación'),
                   content: SizedBox(
-                    height: size!.height * 0.4,
+                    height: size!.height * 0.6,
                     child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         /* About the app */
                         Text(
@@ -190,11 +191,13 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                         SizedBox(height: 10),
                         Text(
                           'Ing. José Luis Hernández Rodríguez',
+                          textAlign: TextAlign.center,
                         ),
                         /* Add email pinomiranda234@gmail.com */
                         SizedBox(height: 10),
                         Text(
                           'Dr. José Francisco Ramírez Dávila',
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),

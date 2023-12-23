@@ -196,7 +196,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   builder: (context) => RegistroEstudio(),
                 ),
               );
-              _refresh();
 
               if (lastEstudio != null) {
                 _estudiosModel!.setSelected(lastEstudio);
@@ -206,6 +205,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (context) => EstudioDetailsScreen(),
                   ),
                 );
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  _loadData();
+                });
               }
             },
           ),
