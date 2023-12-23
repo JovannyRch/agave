@@ -44,4 +44,11 @@ class IncidenciasProvider extends BaseProvider {
         .update(tabla, item.toJson(), where: 'id = ?', whereArgs: [item.id]);
     return res;
   }
+
+  Future<void> insertMany(List<Incidencia> items) async {
+    final db = await database;
+    for (Incidencia item in items) {
+      await db!.insert(tabla, item.toJson());
+    }
+  }
 }

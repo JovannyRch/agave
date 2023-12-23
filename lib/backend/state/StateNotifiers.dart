@@ -334,6 +334,14 @@ class IncidenciasModel with ChangeNotifier {
     notifyListeners();
   }
 
+  Future addAll(List<Incidencia> incidencias) async {
+    for (Incidencia incidencia in incidencias) {
+      Incidencia newItem = await IncidenciasProvider.db.insert(incidencia);
+      _incidencias.add(newItem);
+    }
+    notifyListeners();
+  }
+
   Future delete(int id) async {
     await IncidenciasProvider.db.delete(id, DB.incidencias);
     _incidencias.removeWhere((item) => item.id == id);

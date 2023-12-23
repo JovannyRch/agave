@@ -633,9 +633,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
 
         int total = incidencias.length;
 
-        incidencias.forEach((element) async {
-          await _model?.add(element);
-        });
+        _model?.addAll(incidencias);
 
         Navigator.of(context).pop();
 
