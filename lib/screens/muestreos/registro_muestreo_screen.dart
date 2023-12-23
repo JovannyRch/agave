@@ -22,6 +22,7 @@ class _RegistroMuestreoState extends State<RegistroMuestreo> {
   String? _nombre;
   PlagasModel? _plagasModel;
   MuestreosModel? _muestreosModel;
+  int _tipo = Muestreo.TIPO_PLAGA;
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +38,43 @@ class _RegistroMuestreoState extends State<RegistroMuestreo> {
         child: Form(
           key: _formKey,
           child: ListView(children: [
-            _plagaDropdown(),
+            _tipoDropdown(),
+            if (_tipo == Muestreo.TIPO_PLAGA) _plagaDropdown(),
             _humedadInput(),
             _temperaturaInput(),
             _submitButton(),
           ]),
         ),
       ),
+    );
+  }
+
+  Widget _tipoDropdown() {
+    return DropdownButtonFormField<int>(
+      value: _tipo,
+      items: [
+        DropdownMenuItem<int>(
+          value: Muestreo.TIPO_PLAGA,
+          child: Text("Incidencias de plaga"),
+        ),
+        DropdownMenuItem<int>(
+          value: Muestreo.TIPO_NUTRIENTES,
+          child: Text("Incidencias de nutrientes"),
+        ),
+      ],
+      decoration: const InputDecoration(
+        labelText: 'Tipo de muestreo',
+        hintText: 'Selecciona una plaga',
+      ),
+      validator: (value) {
+        if (value == null) {
+          return 'Por favor selecciona una plaga';
+        }
+        return null;
+      },
+      onChanged: (value) => setState(() {
+        _tipo = value!;
+      }),
     );
   }
 
@@ -125,16 +156,20 @@ class _RegistroMuestreoState extends State<RegistroMuestreo> {
   }
 
   Widget _submitButton() {
-    return SubmitButton(text: "Registrar", onPressed: _guardarEstudio);
+    return SubmitButton(
+        text: "Registrar",
+        onPressed: _tipo == Muestreo.TIPO_PLAGA
+            ? _guardarEstudio
+            : guardarEstudioNutrientes);
   }
 
-  void _guardarEstudio() async {
+  void guardarEstudioNutrientes() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       Muestreo muestreo = Muestreo(
         idEstudio: widget.idEstudio,
         idParcela: widget.idParcela,
-        idPlaga: _idPlaga!,
+        tipo: Muestreo.TIPO_NUTRIENTES,
       );
 
       if (_humedad != null) {
@@ -146,6 +181,31 @@ class _RegistroMuestreoState extends State<RegistroMuestreo> {
       }
 
       _muestreosModel?.add(muestreo);
+      _muestreosModel?.fetchData(widget.idEstudio, widget.idParcela);
+      Navigator.pop(context);
+    }
+  }
+
+  void _guardarEstudio() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      Muestreo muestreo = Muestreo(
+        idEstudio: widget.idEstudio,
+        idParcela: widget.idParcela,
+        idPlaga: _idPlaga!,
+        tipo: Muestreo.TIPO_PLAGA,
+      );
+
+      if (_humedad != null) {
+        muestreo.humedad = _humedad;
+      }
+
+      if (_temperatura != null) {
+        muestreo.temperatura = _temperatura;
+      }
+
+      _muestreosModel?.add(muestreo);
+      _muestreosModel?.fetchData(widget.idEstudio, widget.idParcela);
 
       Navigator.pop(context);
     }

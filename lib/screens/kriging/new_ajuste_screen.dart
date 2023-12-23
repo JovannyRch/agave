@@ -19,12 +19,14 @@ class NewAjusteScreen extends StatefulWidget {
   final int idMuestreo;
 
   final Ajuste? ajuste;
+  String? nutriente;
 
-  const NewAjusteScreen({
+  NewAjusteScreen({
     Key? key,
     required this.points,
     required this.idMuestreo,
     this.ajuste,
+    this.nutriente,
   }) : super(key: key);
 
   @override
@@ -523,6 +525,11 @@ class _NewAjusteScreenState extends State<NewAjusteScreen> {
   void _save() async {
     TextEditingController _controller = TextEditingController();
 
+    if (widget.nutriente != null) {
+      _controller.text = "${widget.nutriente} - ${getModelName(selectedModel)}";
+    } else {
+      _controller.text = "${getModelName(selectedModel)}";
+    }
     showDialog(
       context: context,
       builder: (context) {

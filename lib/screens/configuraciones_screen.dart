@@ -170,7 +170,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          'Aplicación para el monitoreo de plagas en plantas de agave y generación de semivariogramas y mapas de contorno para el análisis de datos.',
+                          'Aplicación para el monitoreo de plagas y nutrientes en plantas de café, así como la generación de semivariogramas y mapas de contorno para el análisis de datos.',
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 20),
@@ -189,7 +189,7 @@ class _ConfiguracionScreenState extends State<ConfiguracionScreen> {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          'Biol. Esther Pino Miranda',
+                          'Ing. José Luis Hernández Rodríguez',
                         ),
                         /* Add email pinomiranda234@gmail.com */
                         SizedBox(height: 10),

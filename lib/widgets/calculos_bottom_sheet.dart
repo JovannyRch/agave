@@ -1,13 +1,12 @@
 import 'package:agave/backend/models/calculos.dart';
-import 'package:agave/backend/models/incidencia.dart';
 import 'package:agave/const.dart';
 import 'package:agave/widgets/card_detail.dart';
 import 'package:flutter/material.dart';
 
 class CalculosBottomSheet extends StatefulWidget {
-  List<Incidencia> incidencias = [];
+  List<List<double>> points = [];
 
-  CalculosBottomSheet({super.key, required this.incidencias});
+  CalculosBottomSheet({super.key, required this.points});
 
   @override
   State<CalculosBottomSheet> createState() => _CalculosBottomSheetState();
@@ -33,7 +32,8 @@ class _CalculosBottomSheetState extends State<CalculosBottomSheet> {
     setState(() {
       isLoading = true;
     });
-    resultado = await Calculo(incidencias: widget.incidencias).calcular();
+    resultado = await Calculo(values: widget.points.map((e) => e[2]).toList())
+        .calcular();
 
     setState(() {
       isLoading = false;

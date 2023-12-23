@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.estherpino.krigingapp">
+    package="com.joseluishernandez.krigingapp">
     <application
-        android:label="Agave VarioApp"
+        android:label="Café VarioApp"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <meta-data android:name="com.google.android.geo.API_KEY"

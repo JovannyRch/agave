@@ -9,6 +9,7 @@ import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
 import 'package:agave/backend/models/plaga.dart';
 import 'package:agave/backend/models/reporteConteo.dart';
+import 'package:agave/backend/models/ubicacion.dart';
 import 'package:agave/backend/providers/agave_provider.dart';
 import 'package:agave/backend/providers/ajustes_provider.dart';
 import 'package:agave/backend/providers/estudios_provider.dart';
@@ -17,6 +18,7 @@ import 'package:agave/backend/providers/muestreos_provider.dart';
 import 'package:agave/backend/providers/parcelas_provider.dart';
 import 'package:agave/backend/providers/plagas_provider.dart';
 import 'package:agave/backend/providers/reportes_provider.dart';
+import 'package:agave/backend/providers/ubicaciones_provider.dart';
 import 'package:agave/backend/user_data.dart';
 import 'package:agave/widgets/actividad_item.dart';
 import 'package:flutter/material.dart';
@@ -257,31 +259,49 @@ class ParcelaModel with ChangeNotifier {
 
 class MuestreosModel with ChangeNotifier {
   List<Muestreo> _muestreos = [];
+  List<Muestreo> _muestreoNutrientes = [];
+
   Muestreo? _selectedMuestreo;
 
   List<Muestreo> get muestreos => _muestreos;
+  List<Muestreo> get muestreoNutrientes => _muestreoNutrientes;
   Muestreo? get selectedMuestreo => _selectedMuestreo;
 
   fetchData(int idEstudio, int idParcela) async {
     _muestreos =
         await MuestreosProvider.db.getAllWithPlagas(idEstudio, idParcela);
+    _muestreoNutrientes =
+        await MuestreosProvider.db.getAllNutrientesTipo(idEstudio, idParcela);
     notifyListeners();
   }
 
   add(Muestreo muestreo) async {
+    print("Adding muestreo ${muestreo.toJson()}");
     Muestreo newItem = await MuestreosProvider.db.insert(muestreo);
-    Muestreo? newItemWithPlaga =
-        await MuestreosProvider.db.getOneWithPlaga(newItem.id ?? 0);
-    if (newItemWithPlaga == null) return;
-    _muestreos.add(newItemWithPlaga);
-    UserData.addActividad(
-      Actividad(
-        id: newItem.id ?? -1,
-        titulo: newItemWithPlaga.nombrePlaga ?? "",
-        fecha: DateTime.now().toIso8601String(),
-        tipo: TipoActividad.new_muestreo,
-      ),
-    );
+
+    if (newItem.tipo == Muestreo.TIPO_PLAGA) {
+      Muestreo? newItemWithPlaga =
+          await MuestreosProvider.db.getOneWithPlaga(newItem.id ?? 0);
+      if (newItemWithPlaga == null) return;
+      _muestreos.add(newItemWithPlaga);
+      UserData.addActividad(
+        Actividad(
+          id: newItem.id ?? -1,
+          titulo: newItemWithPlaga.nombrePlaga ?? "",
+          fecha: DateTime.now().toIso8601String(),
+          tipo: TipoActividad.new_muestreo,
+        ),
+      );
+    } else {
+      UserData.addActividad(
+        Actividad(
+          id: newItem.id ?? -1,
+          titulo: "de nutrientes",
+          fecha: DateTime.now().toIso8601String(),
+          tipo: TipoActividad.new_muestreo,
+        ),
+      );
+    }
 
     notifyListeners();
   }
@@ -317,6 +337,49 @@ class MuestreosModel with ChangeNotifier {
   }
 }
 
+class UbicacionesModel with ChangeNotifier {
+  List<Ubicacion> _ubicaciones = [];
+
+  List<Ubicacion> get ubicaciones => _ubicaciones;
+
+  fetchData(int idMuestreo) async {
+    _ubicaciones = await UbicacionesProvider.db.getAll(idMuestreo);
+    notifyListeners();
+  }
+
+  Future add(Ubicacion item) async {
+    Ubicacion newItem = await UbicacionesProvider.db.insert(item);
+    _ubicaciones.add(newItem);
+
+    notifyListeners();
+  }
+
+  //Add many
+  Future addMany(List<Ubicacion> items) async {
+    await UbicacionesProvider.db.insertMany(items);
+    _ubicaciones.addAll(items);
+    notifyListeners();
+  }
+
+  Future delete(int id) async {
+    await UbicacionesProvider.db.delete(id, DB.ubicaciones);
+    _ubicaciones.removeWhere((item) => item.id == id);
+
+    notifyListeners();
+  }
+
+  Future update(Ubicacion item) async {
+    await UbicacionesProvider.db.update(item);
+    _ubicaciones = _ubicaciones.map((ubicacion) {
+      if (ubicacion.id == item.id) {
+        ubicacion = item;
+      }
+      return ubicacion;
+    }).toList();
+    notifyListeners();
+  }
+}
+
 class IncidenciasModel with ChangeNotifier {
   List<Incidencia> _incidencias = [];
 
@@ -331,6 +394,12 @@ class IncidenciasModel with ChangeNotifier {
     Incidencia newItem = await IncidenciasProvider.db.insert(item);
     _incidencias.add(newItem);
 
+    notifyListeners();
+  }
+
+  Future addMany(List<Incidencia> items) async {
+    await IncidenciasProvider.db.insertMany(items);
+    _incidencias.addAll(items);
     notifyListeners();
   }
 

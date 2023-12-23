@@ -4,6 +4,7 @@ import 'package:agave/backend/models/incidencia.dart';
 import 'package:agave/backend/models/estudio.dart';
 import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
+import 'package:agave/backend/models/ubicacion.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/user_data.dart';
 import 'package:agave/const.dart';
@@ -20,6 +21,12 @@ import 'package:agave/widgets/submit_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+List<String> nutrientes = [
+  "Nitrógeno",
+  "Potasio",
+  "Fósforo",
+];
 
 class MuestreoDetailsScreen extends StatefulWidget {
   Muestreo muestreo;
@@ -38,6 +45,7 @@ class MuestreoDetailsScreen extends StatefulWidget {
 
 class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   IncidenciasModel? _model;
+  UbicacionesModel? _ubicacionesModel;
   MuestreosModel? _muestreosModel;
   AjustesModel? _ajustesModel;
 
@@ -47,6 +55,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   bool hasIncidencias = false;
 
   List<List<double>> points = [];
+  String _nutrienteSeleccionado = "Nitrógeno";
 
   @override
   void initState() {
@@ -55,8 +64,25 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   }
 
   void _loadData() async {
-    Provider.of<IncidenciasModel>(context, listen: false)
-        .fetchData(widget.muestreo.id ?? -1);
+    if (widget.muestreo.tipo == Muestreo.TIPO_PLAGA) {
+      await Provider.of<IncidenciasModel>(context, listen: false)
+          .fetchData(widget.muestreo.id ?? -1);
+
+      points = _model?.incidencias
+              .map((e) => [e.x!, e.y!, e.value!.toDouble()])
+              .toList() ??
+          [];
+    } else {
+      await Provider.of<UbicacionesModel>(context, listen: false)
+          .fetchData(widget.muestreo.id ?? -1);
+
+      points = _ubicacionesModel?.ubicaciones
+              .map((e) =>
+                  [e.x!, e.y!, getNutrienteValue(e, _nutrienteSeleccionado)])
+              .toList() ??
+          [];
+    }
+
     String tipoCoordenadas = await UserData.obtenerTipoCoordenadas() ?? "UTM";
     if (tipoCoordenadas == "UTM") {
       isUTM = true;
@@ -75,16 +101,19 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
     size = MediaQuery.of(context).size;
     _model = Provider.of<IncidenciasModel>(context);
     _muestreosModel = Provider.of<MuestreosModel>(context);
+    _ubicacionesModel = Provider.of<UbicacionesModel>(context);
 
-    hasIncidencias = _model?.incidencias.isNotEmpty ?? false;
+    hasIncidencias = widget.muestreo.tipo == Muestreo.TIPO_PLAGA
+        ? _model?.incidencias.isNotEmpty ?? false
+        : _ubicacionesModel?.ubicaciones.isNotEmpty ?? false;
     _ajustesModel = Provider.of<AjustesModel>(context);
 
     return Scaffold(
       appBar: _appBar(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => RegistroIncidenciasScreen(
@@ -95,6 +124,9 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
               ),
             ),
           );
+          Future.delayed(const Duration(milliseconds: 500), () {
+            _loadData();
+          });
         },
         tooltip: 'Agregar Incidencia',
         child: const Icon(Icons.pin_drop),
@@ -116,10 +148,11 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ScreenTitle(
-                subtitle: "Plaga",
-                title: widget.muestreo.nombrePlaga ?? "",
-              ),
+              if (this.widget.muestreo.tipo == Muestreo.TIPO_PLAGA)
+                ScreenTitle(
+                  subtitle: "Plaga ${widget.muestreo.nombrePlaga ?? ""}",
+                  title: widget.muestreo.nombrePlaga ?? "",
+                ),
               _grid(),
               hasIncidencias ? const Divider() : Container(),
               scrollableActionRowList(),
@@ -127,8 +160,10 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
               const SizedBox(
                 height: 30.0,
               ),
-              const Text(
-                "Registros",
+              Text(
+                widget.muestreo.tipo == Muestreo.TIPO_PLAGA
+                    ? 'Incidencias'
+                    : 'Ubicaciones',
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
@@ -159,6 +194,45 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       return [
         _zeroState(),
       ];
+    }
+
+    if (widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES) {
+      return _ubicacionesModel!.ubicaciones.map((ubicacion) {
+        return ListTile(
+          leading: const Icon(
+            Icons.location_on,
+            color: kMainColor,
+          ),
+          title: Text(
+            'Registro de nutrientes',
+            style: const TextStyle(
+              fontSize: 11.0,
+            ),
+          ),
+          subtitle: Text(
+            'Ubicación #${ubicacion.id}',
+            style: const TextStyle(
+              fontSize: 12.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RegistroIncidenciasScreen(
+                  idMuestreo: widget.muestreo.id ?? -1,
+                  muestreo: widget.muestreo,
+                  parcela: widget.parcela,
+                  ubicacion: ubicacion,
+                  isUtm: isUTM,
+                ),
+              ),
+            );
+          },
+        );
+      }).toList();
     }
 
     return _model!.incidencias.map((incidencia) {
@@ -205,18 +279,24 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.bug_report,
+          Icon(
+            this.widget.muestreo.tipo == Muestreo.TIPO_PLAGA
+                ? Icons.bug_report
+                : Icons.grass,
             size: 75,
             color: kMainColor,
           ),
           const SizedBox(height: 20),
-          const Text(
-            'No hay incidencias registradas',
+          Text(
+            this.widget.muestreo.tipo == Muestreo.TIPO_PLAGA
+                ? 'No hay incidencias de plaga registradas'
+                : 'No hay ubicaciones registradas',
           ),
           /* Action button */
           SubmitButton(
-            text: 'Registrar Incidencia',
+            text: this.widget.muestreo.tipo == Muestreo.TIPO_PLAGA
+                ? 'Registrar Incidencia de Plaga'
+                : 'Registrar Ubicación',
             onPressed: () async {
               await Navigator.push(
                 context,
@@ -245,8 +325,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   }
 
   Widget scrollableActionRowList() {
-    int total = _model?.incidencias.length ?? 0;
-    if (total == 0) {
+    if (!hasIncidencias) {
       return Container();
     }
 
@@ -254,6 +333,8 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Column(
         children: [
+          if (widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES)
+            _nutrienteSelector(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -263,11 +344,6 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
                   text: 'Gráfico de dispersión',
                   icon: Icons.map,
                   onPressed: () {
-                    List<List<double>> points = _model?.incidencias
-                            .map((e) => [e.x!, e.y!, e.value!.toDouble()])
-                            .toList() ??
-                        [];
-
                     if (points.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -329,12 +405,55 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
     );
   }
 
+  Widget _nutrienteSelector() {
+    return DropdownButton<String>(
+      value: _nutrienteSeleccionado,
+      icon: const Icon(Icons.arrow_downward),
+      iconSize: 24,
+      elevation: 16,
+      style: const TextStyle(color: kMainColor),
+      underline: Container(
+        height: 2,
+        color: kMainColor,
+      ),
+      onChanged: (String? newValue) {
+        setState(() {
+          _nutrienteSeleccionado = newValue!;
+          //Update points according to the selected nutrient
+          points = _ubicacionesModel!.ubicaciones
+                  .map((e) => [e.x!, e.y!, getNutrienteValue(e, newValue)])
+                  .toList() ??
+              [];
+        });
+      },
+      items: nutrientes.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 12.0),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  double getNutrienteValue(Ubicacion ubicacion, String nutriente) {
+    switch (nutriente) {
+      case "Nitrógeno":
+        return ubicacion.nitrogeno ?? 0;
+      case "Fósforo":
+        return ubicacion.fosforo ?? 0;
+      case "Potasio":
+        return ubicacion.potasio ?? 0;
+      default:
+        return 0;
+    }
+  }
+
   void _openListAjustesDialog() {
     List<Ajuste> _ajustesModelList = _ajustesModel?.ajustes ?? [];
-    List<List<double>> points = _model?.incidencias
-            .map((e) => [e.x!, e.y!, e.value!.toDouble()])
-            .toList() ??
-        [];
+
     showDialog(
       context: context,
       builder: (context) {
@@ -388,7 +507,7 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       context: context,
       builder: (context) {
         return CalculosBottomSheet(
-          incidencias: _model?.incidencias ?? [],
+          points: points,
         );
       },
     );
@@ -422,7 +541,9 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
           ),
           CardDetail(
             title: "Registros",
-            value: _model!.incidencias.length.toString(),
+            value: widget.muestreo.tipo == Muestreo.TIPO_PLAGA
+                ? _model?.incidencias.length.toString() ?? "0"
+                : _ubicacionesModel?.ubicaciones.length.toString() ?? "0",
             color: Colors.transparent,
             icon: Icons.list,
           ),
@@ -456,7 +577,9 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   AppBar _appBar() {
     return AppBar(
       backgroundColor: Theme.of(context).primaryColor,
-      title: const Text('Muestreo'),
+      title: Text(this.widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES
+          ? 'Muestreo de Nutrientes'
+          : 'Muestreo de Plaga'),
       actions: [
         PopupMenuButton<String>(
           onSelected: handleClick,
@@ -576,9 +699,13 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
             ),
             TextButton(
               onPressed: () async {
-                String csvContent = convertirIncidenciasACsv(
-                  _model?.incidencias ?? [],
-                );
+                String csvContent = widget.muestreo.tipo == Muestreo.TIPO_PLAGA
+                    ? convertirIncidenciasACsv(
+                        _model?.incidencias ?? [],
+                      )
+                    : convertirUbicacionesACsv(
+                        _ubicacionesModel?.ubicaciones ?? [],
+                      );
                 bool response = await guardarCsv(
                   csvContent,
                   _controller.text,
@@ -626,17 +753,26 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
           },
         );
 
-        List<Incidencia> incidencias = await parseIncidencias(
-          widget.muestreo.id!,
-          await loadCsvData(csvContent),
-        );
+        int total = 0;
 
-        int total = incidencias.length;
+        if (widget.muestreo.tipo == Muestreo.TIPO_PLAGA) {
+          List<Incidencia> incidencias = await parseIncidencias(
+            widget.muestreo.id!,
+            await loadCsvData(csvContent),
+          );
 
-        incidencias.forEach((element) async {
-          await _model?.add(element);
-        });
+          total = incidencias.length;
 
+          await _model?.addMany(incidencias);
+        } else {
+          List<Ubicacion> ubicaciones = await parseUbicacion(
+            widget.muestreo.id!,
+            await loadCsvData(csvContent),
+          );
+          await _ubicacionesModel?.addMany(ubicaciones);
+        }
+
+        _loadData();
         Navigator.of(context).pop();
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -657,9 +793,11 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
   }
 
   void _iniciarAjuste() async {
-    List<Incidencia> incidencias = _model?.incidencias ?? [];
+    int totalItems = widget.muestreo.tipo == Muestreo.TIPO_PLAGA
+        ? _model?.incidencias.length ?? 0
+        : _ubicacionesModel?.ubicaciones.length ?? 0;
 
-    if (incidencias.length < 3) {
+    if (totalItems < 3) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content:
@@ -668,15 +806,14 @@ class _MuestreoDetailsScreenState extends State<MuestreoDetailsScreen> {
       );
       return;
     }
-
-    List<List<double>> points =
-        incidencias.map((e) => [e.x!, e.y!, e.value!.toDouble()]).toList();
-
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => NewAjusteScreen(
           points: points,
+          nutriente: widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES
+              ? _nutrienteSeleccionado
+              : null,
           idMuestreo: widget.muestreo.id ?? -1,
         ),
       ),

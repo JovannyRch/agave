@@ -1,7 +1,7 @@
 import 'package:agave/backend/models/agave.dart';
 import 'package:agave/backend/models/plaga.dart';
 
-const String kDBname = "agave_release_db";
+const String kDBname = "cafe_release_db_1.0.4";
 
 class DB {
   static const String parcelas = 'parcelas';
@@ -12,8 +12,10 @@ class DB {
   static const String incidencias = "incidencias";
   static const String ajustes = "ajustes";
   static const String logs = "logs";
+  static const String ubicaciones = "ubicaciones";
+  static const String nutrientes = "nutrientes";
 }
-/* 
+
 List<Plaga> kPlagues = [
   Plaga(id: 1, nombre: "Broca del café"),
   Plaga(id: 2, nombre: "Roya del café"),
@@ -29,8 +31,8 @@ List<Agave> kAgaves = [
   Agave(id: 3, nombre: "Coffea liberica (Liberica)"),
   Agave(id: 4, nombre: "Coffea excelsa (Excelsa)"),
   Agave(id: 5, nombre: "Coffea racemosa (Racemosa)"),
-]; */
-
+];
+/* 
 List<Plaga> kPlagues = [
   Plaga(id: 1, nombre: "Picudo del agave"),
   Plaga(id: 2, nombre: "Gusano barrenador del cogollo"),
@@ -51,7 +53,7 @@ List<Agave> kAgaves = [
   Agave(id: 3, nombre: "Agave salmiana"),
   Agave(id: 4, nombre: "Agave americana"),
   Agave(id: 5, nombre: "Agave potatorum (Tobala)"),
-];
+]; */
 
 const studiesTable = """
   CREATE TABLE ${DB.estudios} (
@@ -94,9 +96,10 @@ const muestreosTable = """
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     idParcela INTEGER NOT NULL,
     idEstudio INTEGER NOT NULL,
-    idPlaga INTEGER NOT NULL,
+    idPlaga INTEGER,
     temperatura REAL,
     humedad REAL,
+    tipo INTEGER,
     fechaCreacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (idParcela) REFERENCES ${DB.parcelas}(id) ON DELETE CASCADE,
     FOREIGN KEY (idEstudio) REFERENCES ${DB.estudios}(id) ON DELETE CASCADE,
@@ -111,6 +114,19 @@ const incidenciasTable = """
     value real NOT NULL,
     y REAL,
     x REAL,
+    FOREIGN KEY (idMuestreo) REFERENCES ${DB.muestreos}(id) ON DELETE CASCADE
+  );
+""";
+
+const ubicacionesTable = """
+  CREATE TABLE ubicaciones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    idMuestreo INTEGER NOT NULL,
+    x REAL,
+    y REAL,
+    nitrogeno REAL default 0,
+    fosforo REAL default 0,
+    potasio REAL default 0,
     FOREIGN KEY (idMuestreo) REFERENCES ${DB.muestreos}(id) ON DELETE CASCADE
   );
 """;
@@ -154,4 +170,5 @@ final List<String> kTables = [
   muestreosTable,
   incidenciasTable,
   ajustesTable,
+  ubicacionesTable,
 ];

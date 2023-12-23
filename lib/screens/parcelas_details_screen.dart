@@ -75,6 +75,9 @@ class _DetallesParcelaState extends State<DetallesParcela> {
               ),
             ),
           );
+          Future.delayed(const Duration(milliseconds: 500), () {
+            _refresh();
+          });
         },
         child: const Icon(Icons.add),
       ),
@@ -233,7 +236,9 @@ class _DetallesParcelaState extends State<DetallesParcela> {
     return RefreshIndicator(
       key: _refreshIndicatorKey,
       onRefresh: _refresh,
-      child: _model!.muestreos.isEmpty ? _zeroState() : _list(),
+      child: (_model!.muestreos.isEmpty && _model!.muestreoNutrientes.isEmpty)
+          ? _zeroState()
+          : _list(),
     );
   }
 
@@ -286,18 +291,45 @@ class _DetallesParcelaState extends State<DetallesParcela> {
     );
   }
 
+  void mustreoNutrientes(Muestreo muestreo, int index) {
+    _model!.setSelected(muestreo);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MuestreoDetailsScreen(
+          muestreo: muestreo,
+          parcela: parcela!,
+          estudio: widget.estudio,
+        ),
+      ),
+    );
+  }
+
   Widget _list() {
     return ListView.builder(
-      itemCount: _model!.muestreos.length,
+      itemCount: _model!.muestreos.length + _model!.muestreoNutrientes.length,
       itemBuilder: (context, index) {
-        Muestreo muestreo = _model!.muestreos[index];
-        return ListItem(
-            title: muestreo!.nombrePlaga ?? "",
-            subtitle: formatDate(muestreo.fechaCreacion),
+        if (index < _model!.muestreos.length) {
+          Muestreo muestreo = _model!.muestreos[index];
+          return ListItem(
+            title: formatDate(muestreo.fechaCreacion ?? ""),
             icon: Icons.bug_report,
+            subtitle: muestreo.nombrePlaga ?? "",
             onTap: () {
               onClickMuestreo(muestreo, index);
-            });
+            },
+          );
+        }
+        Muestreo muestreo =
+            _model!.muestreoNutrientes[index - _model!.muestreos.length];
+        return ListItem(
+          title: formatDate(muestreo.fechaCreacion ?? ""),
+          icon: Icons.bug_report,
+          subtitle: "Muestreo de Nutrientes",
+          onTap: () {
+            mustreoNutrientes(muestreo, index);
+          },
+        );
       },
     );
   }

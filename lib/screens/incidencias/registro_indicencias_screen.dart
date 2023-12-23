@@ -2,6 +2,7 @@ import 'package:agave/api/utmApi.dart';
 import 'package:agave/backend/models/incidencia.dart';
 import 'package:agave/backend/models/muestreo.dart';
 import 'package:agave/backend/models/parcela.dart';
+import 'package:agave/backend/models/ubicacion.dart';
 import 'package:agave/backend/models/ultima_plaga.dart';
 import 'package:agave/backend/state/StateNotifiers.dart';
 import 'package:agave/backend/user_data.dart';
@@ -21,6 +22,7 @@ class RegistroIncidenciasScreen extends StatefulWidget {
   Parcela parcela;
   Muestreo muestreo;
   Incidencia? incidencia;
+  Ubicacion? ubicacion;
   bool isUtm;
 
   RegistroIncidenciasScreen({
@@ -28,6 +30,7 @@ class RegistroIncidenciasScreen extends StatefulWidget {
     required this.parcela,
     required this.muestreo,
     required this.isUtm,
+    this.ubicacion,
     this.incidencia,
   });
 
@@ -38,7 +41,13 @@ class RegistroIncidenciasScreen extends StatefulWidget {
 
 class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
   final TextEditingController _incidenciasController = TextEditingController();
+
+  final TextEditingController _nitrogenoController = TextEditingController();
+  final TextEditingController _potasioController = TextEditingController();
+  final TextEditingController _fosforoController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
+  final _nutrientesFormKey = GlobalKey<FormState>();
 
   double? _latitude;
   double? _longitude;
@@ -47,7 +56,8 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
   String? _zona;
 
   IncidenciasModel? _incidenciasModel;
-  MuestreosModel? _muestreosModel;
+  UbicacionesModel? _ubicacionesModel;
+
   bool _loading = false;
   bool isEditing = false;
   FocusNode focus = FocusNode();
@@ -55,7 +65,7 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
   @override
   void initState() {
     super.initState();
-    isEditing = widget.incidencia != null;
+    isEditing = widget.incidencia != null || widget.ubicacion != null;
 
     setData();
   }
@@ -65,15 +75,31 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
       _getLocation();
     } else {
       if (widget.isUtm) {
-        _este = widget.incidencia!.x;
-        _norte = widget.incidencia!.y;
+        _este = widget.ubicacion != null
+            ? widget.ubicacion!.x
+            : widget.incidencia!.x;
+        _norte = widget.ubicacion != null
+            ? widget.ubicacion!.y
+            : widget.incidencia!.y;
       } else {
-        _latitude = widget.incidencia!.y;
-        _longitude = widget.incidencia!.x;
+        _latitude = widget.ubicacion != null
+            ? widget.ubicacion!.y
+            : widget.incidencia!.y;
+        _longitude = widget.ubicacion != null
+            ? widget.ubicacion!.x
+            : widget.incidencia!.x;
       }
 
       _zona = "14Q";
-      _incidenciasController.text = widget.incidencia!.value.toString();
+
+      _incidenciasController.text =
+          widget.incidencia != null ? widget.incidencia!.value.toString() : "0";
+
+      if (widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES) {
+        _nitrogenoController.text = widget.ubicacion!.nitrogeno.toString();
+        _potasioController.text = widget.ubicacion!.potasio.toString();
+        _fosforoController.text = widget.ubicacion!.fosforo.toString();
+      }
     }
   }
 
@@ -124,10 +150,13 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
   @override
   Widget build(BuildContext context) {
     _incidenciasModel = Provider.of<IncidenciasModel>(context);
-    _muestreosModel = Provider.of<MuestreosModel>(context);
+    _ubicacionesModel = Provider.of<UbicacionesModel>(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Incidencia'),
+        title: widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES
+            ? Text("Registro de nutrientes")
+            : Text("Registro de incidencia"),
         backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Padding(
@@ -161,13 +190,11 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
                         ],
                       ),
                       SizedBox(height: 20),
-                      _cantidadIncidenciasInput(),
-                      SizedBox(height: 20),
-                      if (!isEditing)
-                        SubmitButton(
-                          onPressed: _saveIncidencia,
-                          text: "Registrar",
-                        ),
+                      if (this.widget.muestreo.tipo == Muestreo.TIPO_PLAGA)
+                        _cantidadIncidenciasInput(),
+                      if (widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES &&
+                          isEditing)
+                        _nutrientesForm(),
                       if (isEditing)
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -176,13 +203,21 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
                               onPressed: () {
                                 _showDeleteConfirmationDialog(context);
                               },
-                              text: "Eliminar",
+                              text: widget.muestreo.tipo ==
+                                      Muestreo.TIPO_NUTRIENTES
+                                  ? "Eliminar registro"
+                                  : "Eliminar",
                             ),
                             SubmitButton(
                               onPressed: _updateIncidencia,
-                              text: "Actualizar",
+                              text: "Guardar cambios",
                             ),
                           ],
+                        ),
+                      if (!isEditing)
+                        SubmitButton(
+                          onPressed: _saveIncidencia,
+                          text: "Registrar ubicación",
                         ),
                     ],
                   ),
@@ -192,13 +227,71 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
     );
   }
 
+  //Input for potassium, phosphorus and nitrogen
+  Widget _nutrientesForm() {
+    return Form(
+      key: _nutrientesFormKey,
+      child: Column(
+        children: [
+          TextFormField(
+            controller: _nitrogenoController,
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Por favor ingrese la cantidad de nitrógeno';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              labelText: 'Nitrógeno',
+            ),
+          ),
+          TextFormField(
+            controller: _potasioController,
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Por favor ingrese la cantidad de potasio';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              labelText: 'Potasio',
+            ),
+          ),
+          TextFormField(
+            controller: _fosforoController,
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Por favor ingrese la cantidad de fósforo';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              labelText: 'Fósforo',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showDeleteConfirmationDialog(BuildContext context) {
+    String title = widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES
+        ? "Eliminar registro"
+        : "Eliminar incidencia";
+
+    String content = widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES
+        ? "¿Está seguro que desea eliminar este registro?"
+        : "¿Está seguro que desea eliminar esta incidencia?";
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Eliminar incidencia"),
-          content: Text("¿Está seguro que desea eliminar esta incidencia?"),
+          title: Text(title),
+          content: Text(content),
           actions: [
             TextButton(
               onPressed: () {
@@ -208,7 +301,12 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
             ),
             TextButton(
               onPressed: () async {
-                await _incidenciasModel!.delete(widget.incidencia!.id!);
+                if (widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES) {
+                  await _ubicacionesModel!.delete(widget.ubicacion!.id!);
+                } else {
+                  await _incidenciasModel!.delete(widget.incidencia!.id!);
+                }
+
                 Navigator.pop(context);
                 Navigator.pop(context);
               },
@@ -220,7 +318,37 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
     );
   }
 
+  void _updateUbicacion() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      Ubicacion newItem = Ubicacion();
+      newItem.id = widget.ubicacion!.id;
+      newItem.idMuestreo = widget.idMuestreo;
+      newItem.x = _este;
+      newItem.y = _norte;
+      newItem.nitrogeno = double.parse(_nitrogenoController.text);
+      newItem.potasio = double.parse(_potasioController.text);
+      newItem.fosforo = double.parse(_fosforoController.text);
+
+      _ubicacionesModel!.update(newItem);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ubicación actualizada!'),
+        ),
+      );
+
+      Navigator.pop(context);
+    }
+  }
+
   void _updateIncidencia() async {
+    if (widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES) {
+      _updateUbicacion();
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -376,7 +504,36 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
     );
   }
 
+  void _saveLocation() async {
+    Ubicacion ubicacion = Ubicacion();
+
+    ubicacion.x = widget.isUtm ? _este : _longitude;
+    ubicacion.y = widget.isUtm ? _norte : _latitude;
+    ubicacion.idMuestreo = widget.idMuestreo;
+    ubicacion.fosforo = 0.0;
+    ubicacion.potasio = 0.0;
+    ubicacion.nitrogeno = 0.0;
+
+    await _ubicacionesModel!.add(ubicacion);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Ubicación registrada!',
+        ),
+      ),
+    );
+
+    Navigator.pop(context);
+  }
+
   void _saveIncidencia() async {
+    if (widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES) {
+      _saveLocation();
+
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -386,11 +543,11 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
       newItem.idMuestreo = widget.idMuestreo;
 
       if (widget.isUtm) {
-        newItem.y = _norte;
         newItem.x = _este;
+        newItem.y = _norte;
       } else {
-        newItem.y = _latitude;
         newItem.x = _longitude;
+        newItem.y = _latitude;
       }
 
       await _incidenciasModel!.add(newItem);

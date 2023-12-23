@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:agave/backend/models/ubicacion.dart';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -36,6 +37,24 @@ String convertirIncidenciasACsv(List<Incidencia> incidencias) {
       incidencia.x.toString(),
       incidencia.y.toString(),
       incidencia.value.toString(),
+    ].join(',');
+    filas.add(fila);
+  }
+
+  return filas.join('\n');
+}
+
+String convertirUbicacionesACsv(List<Ubicacion> ubicaciones) {
+  List<String> filas = [];
+  filas.add("x,y,nitrógeno,potasio,fósforo"); // Encabezado del CSV
+
+  for (var ubicacion in ubicaciones) {
+    var fila = [
+      ubicacion.x.toString(),
+      ubicacion.y.toString(),
+      ubicacion.nitrogeno.toString(),
+      ubicacion.fosforo.toString(),
+      ubicacion.potasio.toString(),
     ].join(',');
     filas.add(fila);
   }

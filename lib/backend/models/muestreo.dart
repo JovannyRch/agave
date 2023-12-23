@@ -12,6 +12,7 @@ class Muestreo {
   String? fechaCreacion;
   double? temperatura;
   double? humedad;
+  int? tipo;
 
   double? media;
   double? varianza;
@@ -19,6 +20,9 @@ class Muestreo {
   int? totalMuestreos;
   List<Incidencia>? incidencias;
   int? totalIncidencias;
+
+  static const int TIPO_PLAGA = 0;
+  static const int TIPO_NUTRIENTES = 1;
 
   Muestreo({
     this.id,
@@ -35,6 +39,7 @@ class Muestreo {
     this.totalMuestreos,
     this.incidencias,
     this.totalIncidencias,
+    this.tipo,
   });
 
   factory Muestreo.fromJson(Map<String, dynamic> json) => Muestreo(
@@ -46,6 +51,7 @@ class Muestreo {
         fechaCreacion: json["fechaCreacion"],
         temperatura: json["temperatura"],
         humedad: json["humedad"],
+        tipo: json["tipo"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -54,6 +60,7 @@ class Muestreo {
         "idEstudio": idEstudio,
         "humedad": humedad,
         "temperatura": temperatura,
+        "tipo": tipo,
       };
 
   Future<int> hacerCalculos() async {
