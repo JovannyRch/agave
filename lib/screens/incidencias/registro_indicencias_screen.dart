@@ -171,6 +171,9 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
                     children: <Widget>[
                       _mapWidget(),
                       _dataRow(),
+                      if (widget.muestreo.tipo == Muestreo.TIPO_NUTRIENTES &&
+                          isEditing)
+                        _nutrientesLabels(),
                       SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -224,6 +227,18 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
                 ),
               ),
       ),
+    );
+  }
+
+  Widget _nutrientesLabels() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _card(
+            "Nitrógeno", _nitrogenoStatus(widget.ubicacion!.nitrogeno ?? 0.0)),
+        _card("Potasio", _potasionStatus(widget.ubicacion!.potasio ?? 0.0)),
+        _card("Fósforo", _fosforoStatus(widget.ubicacion!.fosforo ?? 0.0)),
+      ],
     );
   }
 
@@ -586,5 +601,41 @@ class _RegistroIncidenciasScreenState extends State<RegistroIncidenciasScreen> {
         labelText: 'Cantidad de Incidencias',
       ),
     );
+  }
+
+  String _nitrogenoStatus(double value) {
+    if (value < 0.05) {
+      return "Muy bajo";
+    } else if (value >= 0.05 && value < 0.10) {
+      return "Bajo";
+    } else if (value >= 0.10 && value < 0.15) {
+      return "Medio";
+    } else if (value >= 0.15 && value <= 0.25) {
+      return "Alto";
+    } else {
+      return "Muy alto";
+    }
+  }
+
+  String _fosforoStatus(double value) {
+    if (value < 15) {
+      return "Bajo";
+    } else if (value >= 15 && value < 30) {
+      return "Medio";
+    } else {
+      return "Muy alto";
+    }
+  }
+
+  String _potasionStatus(double value) {
+    if (value < 150) {
+      return "Bajo";
+    } else if (value >= 150 && value < 250) {
+      return "Medio";
+    } else if (value >= 250 && value < 800) {
+      return "Alto";
+    } else {
+      return "Muy alto";
+    }
   }
 }

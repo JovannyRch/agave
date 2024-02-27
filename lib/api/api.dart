@@ -45,6 +45,11 @@ class Api {
       }),
     );
 
+    //Log the status code
+    print("--------------- STATUS CODE -------------------");
+    print(response.statusCode);
+    print("--------------------------------------------");
+
     if (response.statusCode == 200) {
       return SemivariogramaResponse.fromJson(response.body);
     }
