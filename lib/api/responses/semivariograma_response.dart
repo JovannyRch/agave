@@ -24,10 +24,6 @@ class SemivariogramaResponse {
     try {
       final json = Map<String, dynamic>.from(jsonDecode(jsonResponse));
 
-      json.forEach((key, value) {
-        print("Key: $key, Value: $value");
-      });
-
       lags = json['lags'].cast<double>();
       sill = double.parse(json['sill'].toString());
       image_base64 = json['image_base64'];
@@ -36,14 +32,12 @@ class SemivariogramaResponse {
       semivariance = castSemivarianceFromJson(json);
       model = json['model'];
     } catch (e) {
-      print("Error parsing SemivariogramaResponse");
-      print(e);
+      print("Error parsing semivariograma response: $e");
     }
   }
 
   List<double> castSemivarianceFromJson(Map<String, dynamic> json) {
     return json['semivariance'].map<dynamic>((e) {
-      print("e: $e");
       if (e is String && e.contains("NaN")) {
         return 0;
       }
