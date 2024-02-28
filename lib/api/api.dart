@@ -45,11 +45,6 @@ class Api {
       }),
     );
 
-    //Log the status code
-    print("--------------- STATUS CODE -------------------");
-    print(response.statusCode);
-    print("--------------------------------------------");
-
     if (response.statusCode == 200) {
       return SemivariogramaResponse.fromJson(response.body);
     }
@@ -89,8 +84,10 @@ class Api {
   static Future<KrigingContourResponse?> getKrigingContour(
     List<List<double>> points,
     String variogram_model,
-    ModelParams modelParams,
-  ) async {
+    ModelParams modelParams, {
+    bool showPercentage = true,
+    String graphTitle = "Porcentaje de superficie no infestada: ",
+  }) async {
     final response = await http.post(
       Uri.parse(getApiUrl("/generate_contour")),
       headers: {
@@ -102,6 +99,8 @@ class Api {
         "testing": await UserData.isTesting(),
         "model_params": modelParams.toJson(),
         "coordinates": await UserData.isUtm() ? "utm" : "latlng",
+        "graph_title": graphTitle,
+        "show_percentage": showPercentage,
       }),
     );
 

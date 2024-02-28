@@ -235,6 +235,10 @@ class _NewAjusteScreenState extends State<NewAjusteScreen> {
           range: _semivariogramaResponse!.range!,
           nugget: _semivariogramaResponse!.nugget!,
         ),
+        showPercentage: widget.nutriente == null,
+        graphTitle: widget.nutriente != null
+            ? widget.nutriente!
+            : "Porcentaje de superficie no infestada: ",
       );
       //Show success
       ScaffoldMessenger.of(context).showSnackBar(
