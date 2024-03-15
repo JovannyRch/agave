@@ -4,7 +4,7 @@ import 'package:agave/backend/user_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:agave/api/responses/semivariograma_response.dart';
 
-String API_BASE_URL = "https://goldfish-app-oqgqm.ondigitalocean.app";
+String API_BASE_URL = "https://kriging-backend.onrender.com";
 
 class ModelParams {
   double sill;
