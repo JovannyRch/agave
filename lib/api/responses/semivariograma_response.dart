@@ -29,7 +29,7 @@ class SemivariogramaResponse {
       image_base64 = json['image_base64'];
       nugget = double.parse(json['nugget'].toString());
       range = double.parse(json['range'].toString());
-      semivariance = castSemivarianceFromJson(json);
+      semivariance = json['semivariance'].cast<double>();
       model = json['model'];
     } catch (e) {
       print("Error parsing semivariograma response: $e");
@@ -58,5 +58,10 @@ class SemivariogramaResponse {
     data['sill'] = this.sill;
     data['range'] = this.range;
     return data;
+  }
+
+  @override
+  String toString() {
+    return 'SemivariogramaResponse{lags: $lags, semivariance: $semivariance, nugget: $nugget, sill: $sill, range: $range, model: $model}';
   }
 }
